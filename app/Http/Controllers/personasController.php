@@ -57,16 +57,31 @@ class personasController extends Controller
     public function store(Request $request)
     {
         // dump(request()->all());
-          DB::table('persona')->insert(
-            [
-                'ciudad_id' => request()->ciudad, 'tipo_documento' => request()->tipo_documento,
-                'nombre' => request()->nombre, 'apellido' => request()->apellido,
-                'telefono' => request()->telefono, 'email' => request()->email,
-                'direccion' => request()->direccion, 'fecha_nacimiento' => request()->fecha_nacimiento,
-                'nro_documento' => request()->numero
-            ]
-        );
-       
+        try {
+            $deptonro = DB::table('ciudad')
+                ->select('idDepartamento')
+                ->where('id', '=', request()->ciudad)
+                ->get();
+
+            $paisid = DB::table('departamento')
+                ->select('pais_id')
+                ->where('id', '=', $deptonro[0]->idDepartamento)
+                ->get();
+
+            DB::table('persona')->insert(
+                [
+                    'ciudad_id' => request()->ciudad, 'tipo_documento' => request()->tipo_documento,
+                    'nombre' => request()->nombre, 'apellido' => request()->apellido,
+                    'telefono' => request()->telefono, 'email' => request()->email,
+                    'direccion' => request()->direccion, 'fecha_nacimiento' => request()->fecha_nacimiento,
+                    'nro_documento' => request()->numero, 'pais_id' => $paisid[0]->pais_id
+                ]
+            );
+        } catch (\Exception $e) {
+            request()->session()->flash('error_', $e->getMessage());
+            return redirect()->route('personas.index');
+        }
+
         return redirect()->route('personas.index');
     }
 
@@ -114,17 +129,32 @@ class personasController extends Controller
     public function update(Request $request)
     {
         //dump($request->all());
-        DB::table('persona')
-            ->where('nro_documento', request()->numero)
-            ->update(
-                [
-                    'ciudad_id' => request()->ciudad, 'tipo_documento' => request()->tipo_documento,
-                    'nombre' => request()->nombre, 'apellido' => request()->apellido,
-                    'telefono' => request()->telefono, 'email' => request()->email,
-                    'direccion' => request()->direccion, 'fecha_nacimiento' => request()->fecha_nacimiento,
-                ]
-            );
-      
+        try {
+            $deptonro = DB::table('ciudad')
+                ->select('idDepartamento')
+                ->where('id', '=', request()->ciudad)
+                ->get();
+
+            $paisid = DB::table('departamento')
+                ->select('pais_id')
+                ->where('id', '=', $deptonro[0]->idDepartamento)
+                ->get();
+            DB::table('persona')
+                ->where('nro_documento', request()->numero)
+                ->update(
+                    [
+                        'ciudad_id' => request()->ciudad, 'tipo_documento' => request()->tipo_documento,
+                        'nombre' => request()->nombre, 'apellido' => request()->apellido,
+                        'telefono' => request()->telefono, 'email' => request()->email,
+                        'direccion' => request()->direccion, 'fecha_nacimiento' => request()->fecha_nacimiento,
+                        'nro_documento' => request()->numero, 'pais_id' => $paisid[0]->pais_id
+                    ]
+                );
+        } catch (\Exception $e) {
+            request()->session()->flash('error_', $e->getMessage());
+            return redirect()->route('personas.index');
+        }
+
 
         return redirect()->route('personas.index');
     }
@@ -137,9 +167,17 @@ class personasController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('persona')->where('nro_documento', '=', $id)->delete();
-
+        try {
+            DB::table('persona')
+                ->where([
+                    ['nro_documento', '=', $id],
+                    ['pais_id', '=', 4]
+                ])->delete();
+        } catch (\Exception $e) {
+            request()->session()->flash('error_', $e->getMessage());
             return redirect()->route('personas.index');
+        }
+        return redirect()->route('personas.index');
     }
 
     public function tarifa(Request $request)
