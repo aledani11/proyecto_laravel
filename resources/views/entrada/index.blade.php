@@ -23,23 +23,19 @@
                 <table id="eventsTable" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
                     <thead>
                         <tr>
-                            <th data-sortable="true" data-field="id">Numero</th>
+                            <th data-sortable="true" data-field="id">Id</th>
                             <th>Fecha</th>
                             <th>Concepto</th>
                             <th>Observaciones</th>
-                            <th>Proveedor</th>
-                            <th>Ruc</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach($entradas as $entrada)
                         <tr>
-                            <td>{{$entrada->orden_de_compra_numero}}</td>
+                            <td>{{$entrada->id}}</td>
                             <td>{{ \Carbon\Carbon::parse($entrada->fecha)->format('d/m/Y')}}</td>
                             <td>{{$entrada->concepto}}</td>
                             <td>{{$entrada->observaciones}}</td>
-                            <td>{{$entrada->nombre}}</td>
-                            <td>{{$entrada->ruc}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -52,7 +48,7 @@
                 <a class="btn btn-dark form-group" href="{{ route('entrada.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('entrada.destroy', ['numero' => 'empty','proveedor' => 'empty']) }}">Anular</a>
+            <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('entrada.destroy', 'empty') }}">Anular</a>
             </div>
             <div class="col-md-12">
                 <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('entrada.edit', 'empty') }}">Modificar</a>
@@ -62,25 +58,21 @@
 </div>
 
 <script>
-var id_sel;
+    var id_sel;
     $('#eventsTable').on('click-row.bs.table', function(e, row) {
-        id_sel=row;
-         //console.log(row.id);
+        id_sel = row;
+        // console.log(row.id);
+        var a = document.getElementById("modificar").getAttribute("href");
         var f = document.getElementById("anular").getAttribute("href");
         //console.log(f);
-        var pos = f.lastIndexOf("numero/");
-        var pos0 = f.lastIndexOf("proveedor/");
-       // console.log(pos);
-        //console.log(pos0);
-        var res = f.slice(0, pos + 7);
-        var res0 = f.slice(pos0, pos0+10);
-        var link = res.concat(row.id,'/');
-        var link0 = res0.concat(row[5]);
-        //console.log(link);
-        //console.log(link0);
-        link3 = link.concat(link0);
-       // console.log(link3);
-        document.getElementById("anular").setAttribute("href", link3);
+        var pos = a.lastIndexOf("/");
+        var pos1 = f.lastIndexOf("/");
+        var res = a.slice(0, pos + 1);
+        var res1 = f.slice(0, pos1 + 1);
+        var link = res.concat(row.id);
+        var link1 = res1.concat(row.id);
+        document.getElementById("modificar").setAttribute("href", link);
+        document.getElementById("anular").setAttribute("href", link1);
     })
 
     $('#eventsTable').on('click', 'tbody tr', function(event) {
@@ -97,6 +89,7 @@ var id_sel;
             return false;
         }
     }
+
     function mensaje_modificar() {
         if (id_sel == null) {
             alert("Seleccionar fila primero");

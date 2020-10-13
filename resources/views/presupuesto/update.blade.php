@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
 @endsection
 
-@section('title','Ajuste agregar')
+@section('title','Estadía editar')
 
 @section('script')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -17,65 +17,311 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Ajuste agregar')
+@section('header', 'Estadía editar')
 
 @section('content')
 
-<form onsubmit="return validateForm()" method="POST" action="{{route('ajuste.store')}}">
+<form onsubmit="return validateForm()" method="POST" action="{{route('estadia.update',$estad[0]->id)}}">
     @csrf
-
+    @method('PUT')
     <div class="container" style="margin-top:30px">
         <div class="row">
-        @if (session('error_')!==null)
-        <div class="col-md-12 mb-3">
-            <div class="alert alert-danger">
-                <ul>
-                    <li>{{ session('error_') }}</li>
-                </ul>
-            </div>
-        </div>
-        @endif
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="codigo"> Codigo </label>
-                    <input type="text" id="codigo" name="codigo">
+                    <label for="id"> Codigo </label>
+                    <input type="text" id="id" name="codigo" readonly value="{{$estad[0]->id}}">
                 </div>
                 <div class="form-group">
-                    <label for="inventario">Inventario</label>
-                    <input type="text" id="inventario" required name="inventario" readonly value="{{$inventario_id}}">
-                    <input type="button" value="..." class=" btn-dark">
+                    <label for="operador">Operador</label>
+                    <select id="operador" name="operador" required tabindex="2">
+                        <option value="">--Selecciona una opción--</option>
+                        @foreach($operadores as $operador)
+                        @if ($estad[0]->id_operador == $operador->id)
+                        <option selected value={{ $operador->id }}>{{ $operador->descripcion }}</option>
+                        @else
+                        <option value={{ $operador->id }}>{{ $operador->descripcion }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tipoe">Tipo estadia</label>
+                    <select id="tipoe" name="tipo_estadia" required tabindex="4">
+                        <option value="">--Selecciona una opción--</option>
+                        @foreach($tipo_estadias as $tipo_estadia)
+                        @if ($estad[0]->Tipo_estadia_id == $tipo_estadia->id)
+                        <option selected value={{ $tipo_estadia->id }}>{{ $tipo_estadia->descripcion }}</option>
+                        @else
+                        <option value={{ $tipo_estadia->id }}>{{ $tipo_estadia->descripcion }}</option>
+                        @endif
+                        @endforeach
+                    </select>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="fecha">Fecha</label>
-                    <input type="date" id="fecha" name="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
+                    <input type="date" name="fecha" id="fecha" required value="{{$estad[0]->fecha}}">
                 </div>
                 <div class="form-group">
-                    <label for="cantidad">Cantidad</label>
-                    <input type="number" id="cantidad" name="cantidad" value="0" min="0" max="1000000000" required>
+                    <label for="tipoc">Tipo cliente</label>
+                    <select id="tipoc" name="tipo_cliente" required tabindex="3">
+                        <option value="">--Selecciona una opción--</option>
+                        @foreach($tipo_clientes as $tipo_cliente)
+                        @if ($estad[0]->tipo_cliente_id == $tipo_cliente->id)
+                        <option selected value={{ $tipo_cliente->id }}>{{ $tipo_cliente->descripcion }}</option>
+                        @else
+                        <option value={{ $tipo_cliente->id }}>{{ $tipo_cliente->descripcion }}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reserva">Reserva</label>
+                    <input type="text" id="reserva" name="reserva" class="readonly" autocomplete="off" value="{{ isset($reserv[0]->reservas_id) ? $reserv[0]->reservas_id : '' }}" style="caret-color: transparent !important;">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin('reserva')" tabindex="5">
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="motivo">Motivo</label>
-                    <input type="text" id="motivo" name="motivo" required>
+                    <label for="comentarios">Comentarios</label>
+                    <textarea autofocus id="comentarios" cols="30" rows="4" name="comentarios" maxlength="100" required tabindex="1">{{$estad[0]->comentarios}}</textarea>
                 </div>
                 <div class="form-group">
-                    <label for="precio">Precio</label>
-                    <input type="number" id="precio" name="precio" value="0" min="0" max="1000000000" required>
+                    <label for="cliente">Cliente</label>
+                    <input type="text" id="cliente" name="cliente" required class="readonly" autocomplete="off" value="{{$estad[0]->clientes_id}}" style="caret-color: transparent !important;">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin('cliente')" tabindex="6">
                 </div>
             </div>
         </div>
-    </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="tarifa">Tarifa</label>
+                    <input type="text" id="tarifa" readonly autocomplete="off">
+                    <input type="button" value="..." class="btn-dark" onclick="openWin('tarifa')" tabindex="7">
+                </div>
+            </div>
+            <div class="col-md-4">
+            </div>
+        </div>
+
+        <div class="form-group my-2 col-md-10">
+            <h5>Tarifas</h5>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10 form-group">
+                <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
+                    <table id="tarifa_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
+                        <thead>
+                            <tr>
+                                <th data-sortable="true">Id</th>
+                                <th>Nombre</th>
+                                <th>Id habitacion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($tarifas as $tarifa)
+                            <tr>
+                                <td>{{$tarifa->tarifa_id}}</td>
+                                <td>{{$tarifa->descripcion}}<input type="hidden" name="tarifa[]" value={{ $tarifa->tarifa_id }}></td>
+                                <td> {{ $tarifa->habitacion_id }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-2 form-group">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="add('tarifa')" tabindex="8">Agregar</button>
+                </div>
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="remove('tarifa')">Quitar</button>
+                </div>
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="edit('tarifa')">Editar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="fechae">Fecha entrada</label>
+                    <input type="date" id="fechae" tabindex="9">
+                </div>
+                <div class="form-group">
+                    <label for="fechas">Fecha Salida</label>
+                    <input type="date" id="fechas" tabindex="11">
+                </div>
+                <div class="form-group">
+                    <label for="habi">Habitacion</label>
+                    <select id="habi" tabindex="13">
+                        <option value="">--Selecciona una opción--</option>
+                        @foreach($habitaciones as $habitacion)
+                        @foreach($tarifas as $tarifa)
+                        @if($tarifa->habitacion_id == $habitacion->id)
+                        <option class="show" name="combo_habi[]" value={{ $habitacion->id }}>{{ $habitacion->descripcion }}</option>
+                        @else
+                        <option class="hidden" name="combo_habi[]" value={{ $habitacion->id }}>{{ $habitacion->descripcion }}</option>
+                        @endif
+                        @endforeach
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="horae">Hora entrada</label>
+                    <input type="time" id="horae" tabindex="10">
+                </div>
+                <div class="form-group">
+                    <label for="horas">Hora salida</label>
+                    <input type="time" id="horas" tabindex="12">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-4 col-md-10">
+            <h5>Habitacion</h5>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10 form-group">
+                <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
+                    <table id="habitacion_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
+                        <thead>
+
+                            <tr>
+                                <th data-sortable="true">Id</th>
+                                <th>Habitacion</th>
+                                <th>Fecha entrada</th>
+                                <th>Fecha salida</th>
+                                <th>Hora entrada</th>
+                                <th>Hora salida</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($estadia_habitaciones as $habita)
+                            <tr>
+                                <td>{{$habita->id_habitacion}}</td>
+                                <td>{{$habita->descripcion}}</td>
+                                <td>{{ \Carbon\Carbon::parse($habita->entrada)->format('d/m/Y')}}</td>
+                                <td>{{ \Carbon\Carbon::parse($habita->salida)->format('d/m/Y')}}</td>
+                                <td>{{$habita->hora_entrada}}</td>
+                                <td>{{$habita->hora_salida}}
+                                    <input type="hidden" name="habitacion[]" value={{ $habita->id_habitacion }}>
+                                    <input type="hidden" name="f_entrada[]" value={{ $habita->entrada }}>
+                                    <input type="hidden" name="f_salida[]" value={{ $habita->salida }}>
+                                    <input type="hidden" name="h_entrada[]" value={{ $habita->hora_entrada }}>
+                                    <input type="hidden" name="h_salida[]" value={{ $habita->hora_salida }}>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-2 form-group">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="add('habitacion')" tabindex="14">Agregar</button>
+                </div>
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="remove('habitacion')">Quitar</button>
+                </div>
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="edit('habitacion')">Editar</button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="habitacion">Habitacion</label>
+                    <select id="habitacion" tabindex="15">
+                        <option value="">--Selecciona una opción--</option>
+                        @foreach($habitaciones as $habitacion)
+                        @foreach($tarifas as $tarifa)
+                        @if($tarifa->habitacion_id == $habitacion->id)
+                        <option class="show" name="combo_habi[]" value={{ $habitacion->id }}>{{ $habitacion->descripcion }}</option>
+                        @else
+                        <option class="hidden" name="combo_habi[]" value={{ $habitacion->id }}>{{ $habitacion->descripcion }}</option>
+                        @endif
+                        @endforeach
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="persona">Persona</label>
+                    <input type="text" id="persona" readonly autocomplete="off">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin('persona')" tabindex="16">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-4 col-md-10">
+            <h5>Huespedes</h5>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10 form-group">
+                <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
+                    <table id="habitacion_huespedes" data-toggle="table" data-classes="table table-bordered table-hover table-md">
+                        <thead>
+                            <tr>
+                                <th data-sortable="true">Id</th>
+                                <th>Persona</th>
+                                <th>Id</th>
+                                <th>Habitacion</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($huespedes as $hues)
+                            <tr>
+                                <td>{{$hues->ciudad_id}}-{{$hues->nro_documento}}</td>
+                                <td>{{$hues->nombre}} {{$hues->apellido}}</td>
+                                <td>{{$hues->habitacion_id}}</td>
+                                <td>{{$hues->descripcion}}
+                                <input type="hidden" name="habitacion_huesped[]" value={{ $hues->habitacion_id }}>
+                                <input type="hidden" name="persona_ciudad[]" value={{ $hues->ciudad_id }}>
+                                <input type="hidden" name="persona_documento[]" value={{ $hues->nro_documento }}>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-2 form-group">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="add('huesped')" tabindex="17">Agregar</button>
+                </div>
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="remove('huesped')">Quitar</button>
+                </div>
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="edit('huesped')">Editar</button>
+                </div>
+            </div>
+        </div>
 
         <div class="container">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-10">
                     <div class="d-flex flex-wrap justify-content-md-around ">
                         <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
                         <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
-                        <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('ajuste.index') }}'" class="btn btn-dark">SALIR</button></div>
+                        <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('estadia.index') }}'" class="btn btn-dark">SALIR</button></div>
                     </div>
                 </div>
             </div>
@@ -404,7 +650,21 @@
     });
 
     function validateForm() {
-       
+        var taf = document.getElementsByName("tarifa[]");
+        if (taf.length == 0) {
+            alert("Cargar al menos una tarifa");
+            return false;
+        }
+        var habi = document.getElementsByName("habitacion[]");
+        if (habi.length == 0) {
+            alert("Cargar al menos una habitacion");
+            return false;
+        }
+        var hues1 = document.getElementsByName("persona_documento[]");
+        if (hues1.length == 0) {
+            alert("Cargar al menos un huesped");
+            return false;
+        }
         //console.log(taf);
         // console.log(taf.length);
         //console.log(x[0]);
@@ -417,17 +677,6 @@
     function mensaje_grabar(){
             return confirm('Desea grabar el registro');
         }
-
-        document.querySelector('#cantidad').addEventListener("keypress", function(evt) {
-        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
-            evt.preventDefault();
-        }
-    });
-    document.querySelector('#precio').addEventListener("keypress", function(evt) {
-        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
-            evt.preventDefault();
-        }
-    });
 </script>
 
 @endsection

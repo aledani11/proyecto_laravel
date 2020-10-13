@@ -22,7 +22,9 @@ class ajusteController extends Controller
                 'inventario.*',
                 'ar.nombre as nombre',
                 'ar.descripcion as descripcion',
-                'ca.descripcion as categoria'
+                'ca.descripcion as categoria',
+                'ar.stock_minimo',
+                'ar.stock_maximo'
             )
             ->leftJoin('articulo as ar', 'inventario.articulo_codigo', '=', 'ar.codigo')
             ->leftJoin('categoria as ca', 'ar.categoria_id', '=', 'ca.id')
@@ -56,7 +58,31 @@ class ajusteController extends Controller
     public function store(Request $request)
     {
         // dump(request()->all());
-          DB::table('ajuste')->insert(
+
+        $salida = DB::table('inventario')
+            ->select(
+                'inventario.*',
+                'ar.stock_minimo',
+                'ar.stock_maximo'
+            )
+            ->where('inventario.codigo', '=', request()->inventario)
+            ->leftJoin('articulo as ar', 'inventario.articulo_codigo', '=', 'ar.codigo')
+            ->get();
+        //dump($salida);
+        $stock_min = (int) ($salida[0]->stock_minimo);
+        $stock_max = (int) ($salida[0]->stock_maximo);
+        $canti = (int) request()->cantidad;
+        $stock = (int) ($salida[0]->stock);
+        if ($canti < $stock_min) {
+            request()->session()->flash('error_', 'Stock minimo alcanzado');
+            return redirect()->route('ajuste.create',"".request()->inventario);
+        }
+        if ($canti > $stock_max) {
+            request()->session()->flash('error_', 'Stock maximo superado');
+            return redirect()->route('ajuste.create',"".request()->inventario);
+        }
+
+        DB::table('ajuste')->insert(
             [
                 'inventario_codigo' => request()->inventario, 'motivo' => request()->motivo,
                 'fecha' => request()->fecha
@@ -71,7 +97,7 @@ class ajusteController extends Controller
                     'precio' => request()->precio
                 ]
             );
-       
+
         return redirect()->route('ajuste.index');
     }
 
@@ -129,7 +155,7 @@ class ajusteController extends Controller
                     'direccion' => request()->direccion, 'fecha_nacimiento' => request()->fecha_nacimiento,
                 ]
             );
-      
+
 
         return redirect()->route('personas.index');
     }
@@ -144,7 +170,7 @@ class ajusteController extends Controller
     {
         DB::table('persona')->where('nro_documento', '=', $id)->delete();
 
-            return redirect()->route('personas.index');
+        return redirect()->route('personas.index');
     }
 
     public function tarifa(Request $request)

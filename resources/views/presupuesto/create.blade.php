@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
 @endsection
 
-@section('title','Salida agregar')
+@section('title','Presupuesto agregar')
 
 @section('script')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -17,33 +17,29 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Salida agregar')
+@section('header', 'Presupuesto agregar')
 
 @section('content')
 
-<form onsubmit="return validateForm()" method="POST" action="{{route('salida.store')}}">
+<form onsubmit="return validateForm()" method="POST" action="{{route('presupuesto.store')}}">
     @csrf
 
     <div class="container" style="margin-top:30px">
         <div class="row">
-        @if (session('error_')!==null)
-        <div class="col-md-12 mb-3">
-            <div class="alert alert-danger">
-                <ul>
-                    <li>{{ session('error_') }}</li>
-                </ul>
-            </div>
-        </div>
-        @endif
             <div class="col-md-4">
+                <div class="form-group">
+                    <label for="numero"> Numero </label>
+                    <input type="text" id="numero" name="numero" required>
+                </div>
+                <div class="form-group">
+                    <label for="proveedor">Proveedor</label>
+                    <input type="text" id="proveedor" name="proveedor" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin('proveedor')">
+                </div>
                 <div class="form-group">
                     <label for="requisicion">Requisicion</label>
                     <input type="text" id="requisicion" name="requisicion" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
                     <input type="button" value="..." class=" btn-dark" onclick="openWin('requisicion')">
-                </div>
-                <div class="form-group">
-                    <label for="concepto"> Concepto </label>
-                    <input type="text" id="concepto" name="concepto" required>
                 </div>
             </div>
             <div class="col-md-4">
@@ -51,11 +47,27 @@
                     <label for="fecha">Fecha</label>
                     <input type="date" id="fecha" name="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
                 </div>
+                <div class="form-group">
+                    <label for="condicion">Condicion</label>
+                    <select id="condicion" required name="condicion" tabindex="2">
+                        <option value="">--Selecciona una opción--</option>
+                        <option value="Credito">Credito</option>
+                        <option value="Contado">Contado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="direccion"> Dirección </label>
+                    <input type="text" id="direccion" name="direccion" required>
+                </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="observaciones">Observaciones</label>
                     <textarea autofocus id="observaciones" cols="30" rows="4" name="observaciones" maxlength="100" required tabindex="1"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="descuento">Descuento</label>
+                    <input type="number" id="descuento" name="descuento" value="" min="0" max="100">
                 </div>
             </div>
         </div>
@@ -66,6 +78,10 @@
                     <label for="cantidad">Cantidad</label>
                     <input type="number" id="cantidad" value="" min="1" max="1000000000">
                 </div>
+                <div class="form-group">
+                    <label for="precio">Precio</label>
+                    <input type="number" id="precio" value="" min="0" max="1000000000">
+                </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
@@ -73,20 +89,32 @@
                     <input type="text" id="articulo" name="articulo" class="readonly" autocomplete="off" style="caret-color: transparent !important;">
                     <input type="button" value="..." class=" btn-dark" onclick="openWin('articulo')">
                 </div>
+                <div class="form-group">
+                    <label for="iva">Iva</label>
+                    <select id="iva">
+                        <option value="">--Selecciona una opción--</option>
+                        @foreach($ivas as $iva)
+                        <option value={{ $iva->porcentaje }}>{{ $iva->descripcion }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
         </div>
         <div class="form-group my-2 col-md-10">
-            <h5>Salida Detalle</h5>
+            <h5>Presupuesto Detalle</h5>
         </div>
         <div class="row">
             <div class="col-md-10 form-group">
                 <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
-                    <table id="salida_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
+                    <table id="orden_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
                         <thead>
                             <tr>
                                 <th>Id</th>
                                 <th>Articulo</th>
                                 <th>Cantidad</th>
+                                <th>Precio</th>
+                                <th>Importe</th>
+                                <th>Iva</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -97,15 +125,46 @@
 
             <div class="col-md-2 form-group">
                 <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" onclick="add('salida')" tabindex="8">Agregar</button>
+                    <button type="button" class="btn btn-dark form-group" onclick="add('orden')" tabindex="8">Agregar</button>
                 </div>
                 <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" onclick="remove('salida')">Quitar</button>
+                    <button type="button" class="btn btn-dark form-group" onclick="remove('orden')">Quitar</button>
                 </div>
                 <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" style="display: none;" onclick="edit('salida')">Editar</button>
+                    <button type="button" class="btn btn-dark form-group" style="display: none;" onclick="edit('orden')">Editar</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="row form-group">
+        <div class="col-6 form-group">
+        </div>
+        <div class="col-3 ">
+            <label for="importe" class="form-group1">
+                <span> Total iva</span>
+                <input type="text" id="total_iva" readonly>
+            </label>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-6 form-group">
+        </div>
+        <div class="col-3 ">
+            <label for="subtotal" class="form-group1">
+                <span> Subtotal</span>
+                <input type="text" id="subtotal" readonly>
+            </label>
+        </div>
+    </div>
+    <div class="row form-group">
+        <div class="col-6 form-group">
+        </div>
+        <div class="col-3 ">
+            <label for="total" class="form-group1">
+                <span> Total</span>
+                <input type="text" id="total" readonly>
+            </label>
         </div>
     </div>
 
@@ -115,7 +174,7 @@
                 <div class="d-flex flex-wrap justify-content-md-around ">
                     <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
                     <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
-                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('salida.index') }}'" class="btn btn-dark">SALIR</button></div>
+                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('presupuesto.index') }}'" class="btn btn-dark">SALIR</button></div>
                 </div>
             </div>
         </div>
@@ -134,19 +193,20 @@
 
     function add(table) {
 
-        if (table === "salida") {
+        if (table === "orden") {
             //console.log(val);
             var ca = document.getElementById("cantidad");
             var val = parseInt(document.getElementById("articulo").value);
-           // var pr = document.getElementById("precio");
-           // var iv = document.getElementById("iva");
+            var pr = document.getElementById("precio");
+            var iv = document.getElementById("iva");
             var x = [];
             //x[0] = de.value;
             x[0] = ca.value;
-            //x[1] = pr.value;
-           // x[2] = iv.value;
-           // x[3] = iv.text;
-            if (x[0] === "" || val === "") {
+            x[1] = pr.value;
+            x[2] = iv.value;
+            x[3] = iv.text;
+            if (x[0] === "" || x[1] === "" ||
+                x[2] === "" || val === "") {
                 alert("Cargar campos primero");
                 //console.log(x);
                 return false;
@@ -158,8 +218,8 @@
             }
             // var val = parseInt(document.getElementById('tarifa').value);
             //var path = "empty";
-            var path = "{{route('salida.articulo')}}";
-            var table = "#salida_table"
+            var path = "{{route('requisicion.articulo')}}";
+            var table = "#orden_table"
             //console.log(x);
             // addTable(x, table);
         }
@@ -190,7 +250,7 @@
         }
 
         function addTable(data, table) {
-            if (table === "#salida_table") {
+            if (table === "#orden_table") {
 
                 var name_articulo = document.getElementsByName("articulo_detalle[]");
                 for (let index = 0; index < name_articulo.length; index++) {
@@ -200,44 +260,40 @@
                         return false;
                     }
                 }
-                
-                if((data.stocks[0].stock - parseInt(x[0])) < data.articulos[0].stock_minimo){
-                    alert("Stock mimimo alcanzado");
-                        return false;
-                }
 
                 //id_monto += 1;
                 var importe = 0;
                 importe = (parseInt(x[0]) * parseInt(x[1]));
                 var iva = 0;
                 iva = parseInt(importe / parseInt(x[2]));
-               // console.log(data.stocks[0].stock);
                 $(table).bootstrapTable('insertRow', {
                     index: 0,
-                    row: [data.articulos[0].codigo, data.articulos[0].nombre, x[0] +
+                    row: [data.articulos[0].codigo, data.articulos[0].nombre, x[0], parseInt(x[1]).format(0, 3, '.', ','), importe.format(0, 3, '.', ','), iva.format(0, 3, '.', ',') +
                         '<input type="hidden" name ="articulo_detalle[]" value=' + data.articulos[0].codigo + '>' +
-                        '<input type="hidden" name ="cantidad_detalle[]" value=' + x[0] + '>' 
+                        '<input type="hidden" name ="precio_detalle[]" value=' + x[1] + '>' +
+                        '<input type="hidden" name ="cantidad_detalle[]" value=' + x[0] + '>' +
+                        '<input type="hidden" name ="iva_detalle[]" value=' + x[2] + '>'
                     ]
                 })
                 total_iva += iva;
                 subtotal += importe;
                 total = total_iva + subtotal;
 
-                //document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
-                //document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
-               // document.getElementById("total").value = total.format(0, 3, '.', ',');
+                document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
+                document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
+                document.getElementById("total").value = total.format(0, 3, '.', ',');
                 //document.getElementById("importe").value = (total.format(0, 3, '.', ',')).replace(".","");
 
                 document.getElementById("cantidad").value = "";
                 document.getElementById("articulo").value = "";
-               // document.getElementById("precio").value = "";
-                //document.getElementById("iva").value = "";
+                document.getElementById("precio").value = "";
+                document.getElementById("iva").value = "";
             }
         }
 
     }
     var id_delete = null;
-    $('#salida_table, #cheque_table').on('click-row.bs.table', function(e, row, $element, field) {
+    $('#orden_table, #cheque_table').on('click-row.bs.table', function(e, row, $element, field) {
         id_delete = row;
         //console.log(id_delete[4]);
         //$("#tarifa_table").bootstrapTable('remove', {field: 0, values: [1]});
@@ -248,12 +304,12 @@
         // console.log(d.length);
     })
 
-    $('#salida_table, #cheque_table, #habitacion_huespedes').on('click', 'tbody tr', function(event) {
+    $('#orden_table, #cheque_table, #habitacion_huespedes').on('click', 'tbody tr', function(event) {
         $(this).addClass('highlight').siblings().removeClass('highlight');
     });
 
     function remove_all() {
-        $("#salida_table").bootstrapTable('removeAll');
+        $("#orden_table").bootstrapTable('removeAll');
 
     }
 
@@ -266,21 +322,21 @@
         //const combo_habi_edit = document.getElementsByClassName("show");
         //console.log(combo_habi_edit);
         //console.log(combo_habi_edit);
-        if (table_remove === "salida") {
-            var table_rem = "#salida_table";
+        if (table_remove === "orden") {
+            var table_rem = "#orden_table";
 
             var importe = 0;
-           // importe = parseInt(id_delete[4].replace(".", ""));
+            importe = parseInt(id_delete[4].replace(".", ""));
             var iva = 0;
-           // iva = parseInt(id_delete[5].replace(".", ""));
+            iva = parseInt(id_delete[5].replace(".", ""));
 
             total_iva -= iva;
             subtotal -= importe;
             total = total_iva + subtotal;
 
-            //document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
-           // document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
-            //document.getElementById("total").value = total.format(0, 3, '.', ',');
+            document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
+            document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
+            document.getElementById("total").value = total.format(0, 3, '.', ',');
         }
         if (table_remove === "cheque") {
             var table_rem = "#cheque_table";
@@ -325,21 +381,21 @@
             return false;
         }
         //console.log(id_delete[0]);
-        if (table_edit === "salida") {
-            var table_rem = "#salida_table";
+        if (table_edit === "orden") {
+            var table_rem = "#orden_table";
 
             var importe = 0;
-           // importe = parseInt(id_delete[4].replace(".", ""));
+            importe = parseInt(id_delete[4].replace(".", ""));
             var iva = 0;
-          //  iva = parseInt(id_delete[5].replace(".", ""));
+            iva = parseInt(id_delete[5].replace(".", ""));
 
             total_iva -= iva;
             subtotal -= importe;
             total = total_iva + subtotal;
 
-           // document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
-           // document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
-            //document.getElementById("total").value = total.format(0, 3, '.', ',');
+            document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
+            document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
+            document.getElementById("total").value = total.format(0, 3, '.', ',');
         }
         if (table_edit === "cheque") {
             var table_edt = "#cheque_table";
@@ -368,8 +424,8 @@
         if (w == "articulo") {
             myWindow = window.open("{{ route('searcher.articulo') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
-        if (w == "orden") {
-            myWindow = window.open("{{ route('searcher.orden') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+        if (w == "proveedor") {
+            myWindow = window.open("{{ route('searcher.proveedor') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
         if (w == "requisicion") {
             myWindow = window.open("{{ route('searcher.requisicion') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
@@ -381,10 +437,8 @@
     function play() {
         // console.log("hola");
         var articulo = localStorage.getItem("articulo");
-        var orden = localStorage.getItem("orden");
+        var proveedor = localStorage.getItem("proveedor");
         var requisicion = localStorage.getItem("requisicion");
-        var ruc_orden = localStorage.getItem("ruc_orden");
-
 
         if (articulo != "nothing" && articulo != null) {
             document.getElementById("articulo").value = articulo;
@@ -392,16 +446,12 @@
         if (requisicion != "nothing" && requisicion != null) {
             document.getElementById("requisicion").value = requisicion;
         }
-        if (orden != "nothing" && orden != null) {
-            document.getElementById("orden").value = orden;
-        }
-        if (ruc_orden != "nothing" && ruc_orden != null) {
-            document.getElementById("ruc_orden").value = ruc_orden;
+        if (proveedor != "nothing" && proveedor != null) {
+            document.getElementById("proveedor").value = proveedor;
         }
         localStorage.removeItem("articulo");
         localStorage.removeItem("requisicion");
-        localStorage.removeItem("orden");
-        localStorage.removeItem("ruc_orden");
+        localStorage.removeItem("proveedor");
     }
 
     $(".readonly").on('keydown paste', function(e) {
@@ -411,7 +461,7 @@
     function validateForm() {
         var taf = document.getElementsByName("articulo_detalle[]");
         if (taf.length == 0) {
-            alert("Cargar al menos una salida detalle");
+            alert("Cargar al menos una orden detalle");
             return false;
         }
         //console.log(taf);
@@ -432,7 +482,16 @@
             evt.preventDefault();
         }
     });
-
+    document.querySelector('#numero').addEventListener("keypress", function(evt) {
+        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
+            evt.preventDefault();
+        }
+    });
+    document.querySelector('#precio').addEventListener("keypress", function(evt) {
+        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
+            evt.preventDefault();
+        }
+    });
 
 
 

@@ -85,12 +85,19 @@ Route::put('/requisicion/{requisicion}', 'requisicionController@update')->name('
 Route::get('/requisicion/anular/{requisicion}', 'requisicionController@destroy')->name('requisicion.destroy')->middleware('auth');
 Route::post('/requisicion_articulo', 'requisicionController@articulo')->name('requisicion.articulo')->middleware('auth');
 
+Route::get('/presupuesto','presupuestoController@index')->name('presupuesto.index')->middleware('auth');
+Route::post('/presupuesto', 'presupuestoController@store')->name('presupuesto.store')->middleware('auth');
+Route::get('/presupuesto/create', 'presupuestoController@create')->name('presupuesto.create')->middleware('auth');
+Route::get('/presupuesto/editar/{requisicion}', 'presupuestoController@edit')->name('presupuesto.edit')->middleware('auth');
+Route::put('/presupuesto/{requisicion}', 'presupuestoController@update')->name('presupuesto.update')->middleware('auth');
+Route::get('/presupuesto/anular/{requisicion}', 'presupuestoController@destroy')->name('presupuesto.destroy')->middleware('auth');
+
 Route::get('/orden','ordenController@index')->name('orden.index')->middleware('auth');
 Route::post('/orden', 'ordenController@store')->name('orden.store')->middleware('auth');
 Route::get('/orden/create', 'ordenController@create')->name('orden.create')->middleware('auth');
 Route::get('/orden/editar/{orden}', 'ordenController@edit')->name('orden.edit')->middleware('auth');
 Route::put('/orden/{orden}', 'ordenController@update')->name('orden.update')->middleware('auth');
-Route::get('/orden/anular/numero/{numero}/proveedor/{proveedor}', 'ordenController@destroy')->name('orden.destroy')->middleware('auth');
+Route::get('/orden/anular/{numero}', 'ordenController@destroy')->name('orden.destroy')->middleware('auth');
 
 Route::get('/factura_compra','factura_compraController@index')->name('factura_compra.index')->middleware('auth');
 Route::post('/factura_compra', 'factura_compraController@store')->name('factura_compra.store')->middleware('auth');
@@ -99,12 +106,20 @@ Route::get('/factura_compra/editar/{factura}', 'factura_compraController@edit')-
 Route::put('/factura_compra/{factura}', 'factura_compraController@update')->name('factura_compra.update')->middleware('auth');
 Route::get('/factura_compra/anular/{factura}', 'factura_compraController@destroy')->name('factura_compra.destroy')->middleware('auth');
 
+Route::get('/remision','remisionController@index')->name('remision.index')->middleware('auth');
+Route::post('/remision', 'remisionController@store')->name('remision.store')->middleware('auth');
+Route::get('/remision/create', 'remisionController@create')->name('remision.create')->middleware('auth');
+Route::get('/remision/editar/{requisicion}', 'remisionController@edit')->name('remision.edit')->middleware('auth');
+Route::put('/remision/{requisicion}', 'remisionController@update')->name('remision.update')->middleware('auth');
+Route::get('/remision/anular/{requisicion}', 'remisionController@destroy')->name('remision.destroy')->middleware('auth');
+
 Route::get('/entrada','entradaController@index')->name('entrada.index')->middleware('auth');
 Route::post('/entrada', 'entradaController@store')->name('entrada.store')->middleware('auth');
 Route::get('/entrada/create', 'entradaController@create')->name('entrada.create')->middleware('auth');
 Route::get('/entrada/editar/{entrada}', 'entradaController@edit')->name('entrada.edit')->middleware('auth');
 Route::put('/entrada/{entrada}', 'entradaController@update')->name('entrada.update')->middleware('auth');
-Route::get('/entrada/anular/numero/{numero}/proveedor/{proveedor}', 'entradaController@destroy')->name('entrada.destroy')->middleware('auth');
+Route::get('/entrada/anular/numero/{numero}', 'entradaController@destroy')->name('entrada.destroy')->middleware('auth');
+Route::post('/entrada_articulo', 'entradaController@articulo')->name('entrada.articulo')->middleware('auth');
 
 Route::get('/salida','salidaController@index')->name('salida.index')->middleware('auth');
 Route::post('/salida', 'salidaController@store')->name('salida.store')->middleware('auth');
@@ -169,9 +184,9 @@ Route::get('/recaudaciones/anular/{recaudaciones}', 'recaudacionesController@des
 Route::get('/personas','personasController@index')->name('personas.index')->middleware('auth');
 Route::post('/personas', 'personasController@store')->name('personas.store')->middleware('auth');
 Route::get('/personas/create', 'personasController@create')->name('personas.create')->middleware('auth');
-Route::get('/personas/editar/{habitacion}', 'personasController@edit')->name('personas.edit')->middleware('auth');
+Route::get('/personas/editar/{data1}/{data2}', 'personasController@edit')->name('personas.edit')->middleware('auth');
 Route::put('/personas/{habitacion}', 'personasController@update')->name('personas.update')->middleware('auth');
-Route::get('/personas/eliminar/{habitacion}', 'personasController@destroy')->name('personas.destroy')->middleware('auth');
+Route::get('/personas/eliminar/{data1}/{data2}', 'personasController@destroy')->name('personas.destroy')->middleware('auth');
 
 Route::get('/articulos','articulosController@index')->name('articulos.index')->middleware('auth');
 Route::post('/articulos', 'articulosController@store')->name('articulos.store')->middleware('auth');
@@ -435,9 +450,11 @@ Route::get('/searcher/personas', 'searcherController@personas')->name('searcher.
 Route::get('/searcher/cuentas_a_cobrar', 'searcherController@cuentas_a_cobrar')->name('searcher.cuentas_a_cobrar')->middleware('auth');
 Route::get('/searcher/apertura_cierre', 'searcherController@apertura_cierre')->name('searcher.apertura_cierre')->middleware('auth');
 Route::get('/searcher/factura', 'searcherController@factura')->name('searcher.factura')->middleware('auth');
+Route::get('/searcher/factura_compra', 'searcherController@factura_compra')->name('searcher.factura_compra')->middleware('auth');
 Route::get('/searcher/articulo', 'searcherController@articulo')->name('searcher.articulo')->middleware('auth');
 Route::get('/searcher/proveedor', 'searcherController@proveedor')->name('searcher.proveedor')->middleware('auth');
 Route::get('/searcher/requisicion', 'searcherController@requisicion')->name('searcher.requisicion')->middleware('auth');
+Route::get('/searcher/presupuesto', 'searcherController@presupuesto')->name('searcher.presupuesto')->middleware('auth');
 Route::get('/searcher/orden', 'searcherController@orden')->name('searcher.orden')->middleware('auth');
 Route::get('/searcher/huesped', 'searcherController@huesped')->name('searcher.huesped')->middleware('auth');
 Route::get('/searcher/spa', 'searcherController@spa')->name('searcher.spa')->middleware('auth');

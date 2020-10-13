@@ -30,6 +30,8 @@
                             <th>Categoria</th>
                             <th>Stock</th>
                             <th>Precio</th>
+                            <th>Stock minimo</th>
+                            <th>Stock maximo</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -41,7 +43,8 @@
                             <td>{{$inven->categoria}}</td>
                             <td>{{$inven->stock}}</td>
                             <td>{{number_format($inven->precio,0,'','.')}}</td>
-
+                            <td>{{$inven->stock_minimo}}</td>
+                            <td>{{$inven->stock_maximo}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -54,7 +57,7 @@
                 <a class="btn btn-dark form-group" style="display: none;" href="{{ route('personas.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-                <a id="anular" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('personas.destroy', 'empty') }}">Eliminar</a>
+                <a id="anular" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="asdf/asdf">Eliminar</a>
             </div>
             <div class="col-md-12">
                 <a id="modificar" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('ajuste.create', 'empty') }}">Ajuste</a>

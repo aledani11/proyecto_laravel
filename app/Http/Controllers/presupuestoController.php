@@ -6,7 +6,7 @@ use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class entradaController extends Controller
+class presupuestoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,16 +18,19 @@ class entradaController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //estado i=inactivo a=activo
-        $entrada = DB::table('entrada')
+        $presupuesto = DB::table('presupuesto')
             ->select(
-                'entrada.*',
+                'presupuesto.*',
+                'pr.ruc',
+                'pr.nombre'
             )
-            ->where('entrada.estado', '=', 'A')
+            ->where('presupuesto.estado', '=', 'A')
+            ->leftJoin('proveedor as pr', 'presupuesto.proveedor_ruc', '=', 'pr.ruc')
             ->get();
 
         //  dd($nota_credito);
 
-        return view('entrada.index', ['entradas' => $entrada]);
+        return view('presupuesto.index', ['presupuesto' => $presupuesto]);
     }
 
     /**
@@ -39,7 +42,7 @@ class entradaController extends Controller
     {
         $iva = DB::table('iva')->get();
 
-        return view('entrada.create', [
+        return view('presupuesto.create', [
             'ivas' => $iva,
         ]);
     }
@@ -52,14 +55,16 @@ class entradaController extends Controller
      */
     public function store(Request $request)
     {
-        // dump(request()->all());
-        //c=cobrado a=anulado
-
         try {
-            $id_entrada = DB::table('entrada')->insertGetId(
+            // dd(request()->all());
+            //c=cobrado a=anulado
+            DB::table('presupuesto')->insert(
                 [
+                    'numero' => request()->numero, 'proveedor_ruc' => request()->proveedor,
                     'fecha' => request()->fecha, 'estado' => "A",
-                    'concepto' => request()->concepto, 'observaciones' => request()->observaciones
+                    'observaciones' => request()->observaciones, 'condicion' => request()->condicion,
+                    'requisicion_numero' => request()->requisicion, 'descuento' => request()->descuento,
+                    'direccion' => request()->direccion
                 ]
             );
 
@@ -78,33 +83,25 @@ class entradaController extends Controller
                         ->get();
 
                     $data1[] = [
-                        'entrada_id' => $id_entrada,
+                        'presupuesto_numero' => request()->numero,
                         'articulo_codigo' => $input["articulo_detalle"][$key],
                         'precio' => $input["precio_detalle"][$key],
                         'cantidad' => $input["cantidad_detalle"][$key],
                         'iva_id' => $iva[0]->id
                     ];
-
-                    DB::table('inventario')
-                        ->where('articulo_codigo', $input["articulo_detalle"][$key])
-                        ->update(
-                            [
-                                'stock' => DB::raw('stock+' . $input["cantidad_detalle"][$key]), 'precio' => $input["precio_detalle"][$key],
-                            ]
-                        );
                 }
 
 
-                DB::table('entrada_detalle')->insert($data1);
+                DB::table('presupuesto_detalle')->insert($data1);
             }
         } catch (\Exception $e) {
             //request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');
-            //return redirect()->route('personas.index');
+           // return redirect()->route('personas.index');
         }
 
 
-        return redirect()->route('entrada.index');
+        return redirect()->route('presupuesto.index');
     }
 
     /**
@@ -305,47 +302,27 @@ class entradaController extends Controller
      * @param  \App\estadia  $estadia
      * @return \Illuminate\Http\Response
      */
-    public function destroy($numero)
+    public function destroy($id)
     {
-
         try {
             //dump($id);
             //i=inactivo a=activo 
-            DB::table('entrada')
+            DB::table('presupuesto')
                 ->where([
-                    ['id', '=', $numero],
+                    ['numero', '=', $id]
                 ])
                 ->update(
                     [
                         'estado' => "I"
                     ]
                 );
-
-            $entrada = DB::table('entrada_detalle')
-                ->select(
-                    'precio',
-                    'cantidad',
-                    'articulo_codigo'
-                )
-                ->where([['entrada_id', '=', $numero],])
-                ->get();
-
-            for ($i = 0; $i < count($entrada); $i++) {
-                DB::table('inventario')
-                    ->where('articulo_codigo', $entrada[$i]->articulo_codigo)
-                    ->update(
-                        [
-                            'stock' => DB::raw('stock-' . $entrada[$i]->cantidad)
-                        ]
-                    );
-            }
         } catch (\Exception $e) {
             //request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');
-            //return redirect()->route('personas.index');
+          //  return redirect()->route('personas.index');
         }
 
-        return redirect()->route('entrada.index');
+        return redirect()->route('presupuesto.index');
     }
 
     public function tarifa(Request $request)
@@ -378,26 +355,6 @@ class entradaController extends Controller
         //return view('estadia.create', ['tarifas' => $tarifa]);
 
         return ['personas' => $persona];
-        //return $request;
-    }
-
-    public function articulo(Request $request)
-    {
-
-        $articulo = DB::table('articulo')
-            ->select('codigo', 'nombre', 'stock_maximo')
-            ->where('codigo', '=', $request->id)
-            ->get();
-
-        $stock = DB::table('inventario')
-            ->select('stock')
-            ->where('articulo_codigo', '=', $request->id)
-            ->get();
-        //dd($tarifa);
-
-        //return view('estadia.create', ['tarifas' => $tarifa]);
-
-        return ['articulos' => $articulo, 'stocks' => $stock];
         //return $request;
     }
 }

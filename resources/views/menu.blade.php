@@ -86,10 +86,12 @@
                     <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle">Compra</a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ route('requisicion.index') }}" class="dropdown-item">Requisicion</a></li>
+                        <li><a href="{{ route('presupuesto.index') }}" class="dropdown-item">Presupuesto</a></li>
                         <li><a href="{{ route('orden.index') }}" class="dropdown-item">Orden de Compra</a></li>
+                        <li><a href="{{ route('factura_compra.index') }}" class="dropdown-item">Factura</a></li>
+                        <li><a href="{{ route('remision.index') }}" class="dropdown-item">Nota de remision</a></li>
                         <li><a href="{{ route('entrada.index') }}" class="dropdown-item">Entrada</a></li>
                         <li><a href="{{ route('salida.index') }}" class="dropdown-item">Salida</a></li>
-                        <li><a href="{{ route('factura_compra.index') }}" class="dropdown-item">Factura</a></li>
                         <li><a href="{{ route('ajuste.index') }}" class="dropdown-item">Ajuste</a></li>
                     </ul>
                 </li>

@@ -1,6 +1,6 @@
 @extends ('layout')
 
-@section('title','Orden de compra')
+@section('title','Presupuesto')
 
 @section('link')
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -12,43 +12,45 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Orden de compra')
+@section('header', 'Presupuesto')
 
 @section('content')
 
 <div class="container" style="margin-top:30px">
     <div class="row">
+        @if (session('error_')!==null)
+        <div class="col-md-12 mb-3">
+            <div class="alert alert-danger">
+                <ul>
+                    <li>{{ session('error_') }}</li>
+                </ul>
+            </div>
+        </div>
+        @endif
         <div class="col-md-10 form-group">
             <div>
-                @if (session('error_')!==null)
-                <div class="col-md-12 mb-3">
-                    <div class="alert alert-danger">
-                        <ul>
-                            <li>{{ session('error_') }}</li>
-                        </ul>
-                    </div>
-                </div>
-                @endif
                 <table id="eventsTable" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
                     <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Numero</th>
-                            <th>Fecha emision</th>
+                            <th>Fecha</th>
                             <th>Observaciones</th>
                             <th>Condicion</th>
                             <th>Proveedor</th>
                             <th>Ruc</th>
+                            <th>Requisicion nro</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($orden_de_compras as $orden)
+                        @foreach($presupuesto as $pre)
                         <tr>
-                            <td>{{$orden->numero}}</td>
-                            <td>{{ \Carbon\Carbon::parse($orden->fecha_de_emision)->format('d/m/Y')}}</td>
-                            <td>{{$orden->observaciones}}</td>
-                            <td>{{$orden->condicion}}</td>
-                            <td>{{$orden->nombre}}</td>
-                            <td>{{$orden->ruc}}</td>
+                            <td>{{$pre->numero}}</td>
+                            <td>{{ \Carbon\Carbon::parse($pre->fecha)->format('d/m/Y')}}</td>
+                            <td>{{$pre->observaciones}}</td>
+                            <td>{{$pre->condicion}}</td>
+                            <td>{{$pre->nombre}}</td>
+                            <td>{{$pre->ruc}}</td>
+                            <td>{{$pre->requisicion_numero}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -58,13 +60,13 @@
 
         <div class="col-md-2 form-group mt-5">
             <div class="col-md-12">
-                <a class="btn btn-dark form-group" href="{{ route('orden.create') }}">Agregar</a>
+                <a class="btn btn-dark form-group" href="{{ route('presupuesto.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-            <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('orden.destroy', 'empty') }}">Anular</a>
+                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('presupuesto.destroy', 'empty') }}">Anular</a>
             </div>
             <div class="col-md-12">
-                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('orden.edit', 'empty') }}">Modificar</a>
+                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('presupuesto.edit', 'empty') }}">Modificar</a>
             </div>
         </div>
     </div>

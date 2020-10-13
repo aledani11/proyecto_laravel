@@ -25,7 +25,7 @@ class searcherController extends Controller
             })
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.clientes', ['clientes' => $clientes]);
     }
@@ -120,7 +120,6 @@ class searcherController extends Controller
         // dd($estadia);
 
         return view('buscadores.estadias', ['estadias' => $estadia]);
-    
     }
     public function cuentas_a_cobrar()
     {
@@ -233,6 +232,7 @@ class searcherController extends Controller
                 'requisicion.*',
                 'ar.descripcion as area'
             )
+            ->where('requisicion.estado', '=', 'A')
             ->leftJoin('area as ar', 'requisicion.area_id', '=', 'ar.id')
             ->get();
 
@@ -258,6 +258,27 @@ class searcherController extends Controller
         return view('buscadores.orden', ['orden_de_compras' => $orden_de_compra]);
     }
 
+    public function factura_compra()
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        //a=activo i=inactivo
+            $factura_compra = DB::table('factura_compra')
+            ->select(
+                'factura_compra.*',
+                'pr.ruc',
+                'pr.nombre'
+            )
+            ->where('factura_compra.estado', '=', 'A')
+            ->leftJoin('orden_de_compra as od', 'factura_compra.orden_de_compra_numero', '=', 'od.numero')
+            ->leftJoin('proveedor as pr', 'od.proveedor_ruc', '=', 'pr.ruc')
+            ->get();
+
+        // dd($estadia);
+
+        return view('buscadores.factura_compra', ['factura_compra' => $factura_compra]);
+    }
+
     public function huesped()
     {
         //$estadia = estadia::all();
@@ -274,7 +295,7 @@ class searcherController extends Controller
             })
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.huespedes', ['huespedes' => $huespedes]);
     }
@@ -289,7 +310,7 @@ class searcherController extends Controller
             )
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.spa', ['spas' => $spa]);
     }
@@ -304,14 +325,14 @@ class searcherController extends Controller
                 'th.descripcion as tipo_habitacion',
                 'u.descripcion as ubicacion',
                 'e.descripcion as estado_habitacion'
-                )
+            )
             ->leftJoin('habitacion_nombres as hn', 'habitaciones.nombre', '=', 'hn.id')
             ->leftJoin('tipos_habitacion as th', 'habitaciones.id_tipo_hab', '=', 'th.id')
             ->leftJoin('ubicaciones as u', 'habitaciones.id_ubicacion', '=', 'u.id')
             ->leftJoin('habitacion_estado as e', 'habitaciones.estado_id', '=', 'e.id')
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.habitacion', ['habitaciones' => $habitacion]);
     }
@@ -325,7 +346,7 @@ class searcherController extends Controller
             )
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.producto', ['productos' => $productos]);
     }
@@ -340,7 +361,7 @@ class searcherController extends Controller
             )
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.turismo', ['turismos' => $turismo]);
     }
@@ -355,7 +376,7 @@ class searcherController extends Controller
             )
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.cama', ['camas' => $cama]);
     }
@@ -378,7 +399,7 @@ class searcherController extends Controller
             })
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.empleados', ['variables' => $empleado]);
     }
@@ -392,7 +413,7 @@ class searcherController extends Controller
             )
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.departamento', ['variables' => $departamento]);
     }
@@ -406,8 +427,27 @@ class searcherController extends Controller
             )
             ->get();
 
-         //dd($clientes);
+        //dd($clientes);
 
         return view('buscadores.pais', ['variables' => $pais]);
+    }
+    public function presupuesto()
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        //a=activo i=inactivo
+        $presupuesto = DB::table('presupuesto')
+            ->select(
+                'presupuesto.*',
+                'pr.ruc',
+                'pr.nombre'
+            )
+            ->where('presupuesto.estado', '=', 'A')
+            ->leftJoin('proveedor as pr', 'presupuesto.proveedor_ruc', '=', 'pr.ruc')
+            ->get();
+
+        // dd($estadia);
+
+        return view('buscadores.presupuesto', ['presupuestos' => $presupuesto]);
     }
 }

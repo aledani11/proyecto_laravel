@@ -54,33 +54,40 @@ class requisicionController extends Controller
      */
     public function store(Request $request)
     {
-         //dump(request()->all());
+        //dump(request()->all());
         //c=cobrado a=anulado
-        DB::table('requisicion')->insert(
-            [
-                'numero' => request()->numero, 'solicitante' => request()->solicitante,
-                'fecha' => request()->fecha, 'estado' => "A",
-                'area_id' => request()->area, 'observaciones' => request()->observaciones
-            ]
-        );
 
-        $input = $request->only([
-            'cantidad_detalle', 'articulo_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["cantidad_detalle"])) {
-            foreach ($input["cantidad_detalle"] as $key => $value) {
+        try {
+            DB::table('requisicion')->insert(
+                [
+                    'numero' => request()->numero, 'solicitante' => request()->solicitante,
+                    'fecha' => request()->fecha, 'estado' => "A",
+                    'area_id' => request()->area, 'observaciones' => request()->observaciones
+                ]
+            );
 
-                $data1[] = [
-                    'requisicion_numero' => request()->numero,
-                    'cantidad' => $input["cantidad_detalle"][$key],
-                    'articulo_codigo' => $input["articulo_detalle"][$key],
-                ];
+            $input = $request->only([
+                'cantidad_detalle', 'articulo_detalle'
+            ]);
+            //dump($input);
+            //dump($input["habitacion"][1]);
+            if (isset($input["cantidad_detalle"])) {
+                foreach ($input["cantidad_detalle"] as $key => $value) {
+
+                    $data1[] = [
+                        'requisicion_numero' => request()->numero,
+                        'cantidad' => $input["cantidad_detalle"][$key],
+                        'articulo_codigo' => $input["articulo_detalle"][$key],
+                    ];
+                }
+
+
+                DB::table('requisicion_detalle')->insert($data1);
             }
-
-
-            DB::table('requisicion_detalle')->insert($data1);
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+          //  return redirect()->route('personas.index');
         }
 
 
@@ -289,14 +296,21 @@ class requisicionController extends Controller
     {
         //dump($id);
         //i=inactivo a=activo 
-        DB::table('requisicion')
-            ->where('numero', $id)
-            ->update(
-                [
-                    'estado' => "I"
-                ]
-            );
-        
+        try {
+            DB::table('requisicion')
+                ->where('numero', $id)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
+
+            
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
+        }
         return redirect()->route('requisicion.index');
     }
 
@@ -322,7 +336,7 @@ class requisicionController extends Controller
         $articulo = DB::table('articulo')
             ->select('codigo', 'nombre')
             ->where('codigo', '=', $request->id)
-           ->get();
+            ->get();
         //dd($tarifa);
 
         //return view('estadia.create', ['tarifas' => $tarifa]);

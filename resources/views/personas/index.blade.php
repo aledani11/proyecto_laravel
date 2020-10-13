@@ -18,19 +18,19 @@
 @section('content')
 <div class="container" style="margin-top:30px">
     <div class="row">
-    @if (session('error_')!==null)
-  <div class="col-md-12 mb-3">
-    <div class="alert alert-danger">
-      <ul>
-        <li>{{ session('error_') }}</li>
-      </ul>
-    </div>
-  </div>
-  @endif
+        @if (session('error_')!==null)
+        <div class="col-md-12 mb-3">
+            <div class="alert alert-danger">
+                <ul>
+                    <li>{{ session('error_') }}</li>
+                </ul>
+            </div>
+        </div>
+        @endif
         <div class="col-md-10 form-group">
             <div>
                 <table id="eventsTable" data-show-print="true" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
-                <thead>
+                    <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Id</th>
                             <th>Tipo documento</th>
@@ -45,7 +45,7 @@
                     <tbody>
                         @foreach($personas as $persona)
                         <tr>
-                            <td>{{$persona->ciudad_id}}</td>
+                            <td>{{$persona->pais_id}}</td>
                             <td>{{$persona->tipo_documento}}</td>
                             <td>{{$persona->nro_documento}}</td>
                             <td>{{$persona->nombre}}</td>
@@ -65,10 +65,10 @@
                 <a class="btn btn-dark form-group" href="{{ route('personas.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('personas.destroy', 'empty') }}">Eliminar</a>
+                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('personas.destroy', ['empty', 'empty']) }}">Eliminar</a>
             </div>
             <div class="col-md-12">
-                <a id="modificar" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('personas.edit', 'empty') }}">Modificar</a>
+                <a id="modificar" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('personas.edit', ['empty', 'empty']) }}">Modificar</a>
             </div>
         </div>
     </div>
@@ -98,19 +98,29 @@
             });
         });
 */
-var id_sel;
+    var id_sel;
+    var url = "{{ route('personas.edit', ['empty', 'empty']) }}";
+    var url1 = "{{ route('personas.destroy', ['empty', 'empty']) }}";
     $('#eventsTable').on('click-row.bs.table', function(e, row) {
-        id_sel=row;
+        document.getElementById("modificar").setAttribute("href", url);
+        document.getElementById("anular").setAttribute("href", url1);
+        id_sel = row;
         // console.log(row.id);
         var a = document.getElementById("modificar").getAttribute("href");
         var f = document.getElementById("anular").getAttribute("href");
         //console.log(f);
-        var pos = a.lastIndexOf("/");
-        var pos1 = f.lastIndexOf("/");
-        var res = a.slice(0, pos + 1);
-        var res1 = f.slice(0, pos1 + 1);
-        var link = res.concat(row[2]);
-        var link1 = res1.concat(row[2]);
+        //var pos = a.lastIndexOf("/");
+        //var pos1 = f.lastIndexOf("/");
+        var pos = a.indexOf("empty");
+        var pos1 = f.indexOf("empty");
+        //var res = a.slice(0, pos + 1);
+        //var res1 = f.slice(0, pos1 + 1);
+        var res = a.slice(0, pos);
+        var res1 = f.slice(0, pos1);
+        //var link = res.concat(row[2]);
+        //var link1 = res1.concat(row[2]);
+        var link = res.concat(row[2], "/" + row.id);
+        var link1 = res1.concat(row[2], "/" + row.id);
         document.getElementById("modificar").setAttribute("href", link);
         document.getElementById("anular").setAttribute("href", link1);
     })
@@ -129,6 +139,7 @@ var id_sel;
             return false;
         }
     }
+
     function mensaje_modificar() {
         if (id_sel == null) {
             alert("Seleccionar fila primero");

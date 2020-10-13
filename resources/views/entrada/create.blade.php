@@ -26,13 +26,16 @@
 
     <div class="container" style="margin-top:30px">
         <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="orden">Orden de Compra</label>
-                    <input type="text" id="orden" name="orden" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
-                    <input type="button" value="..." class=" btn-dark" onclick="openWin('orden')">
-                    <input type="hidden" id="ruc_orden" name="ruc_orden" value="nothing">
+            @if (session('error_')!==null)
+            <div class="col-md-12 mb-3">
+                <div class="alert alert-danger">
+                    <ul>
+                        <li>{{ session('error_') }}</li>
+                    </ul>
                 </div>
+            </div>
+            @endif
+            <div class="col-md-4">
                 <div class="form-group">
                     <label for="concepto"> Concepto </label>
                     <input type="text" id="concepto" name="concepto" required>
@@ -198,7 +201,7 @@
             }
             // var val = parseInt(document.getElementById('tarifa').value);
             //var path = "empty";
-            var path = "{{route('requisicion.articulo')}}";
+            var path = "{{route('entrada.articulo')}}";
             var table = "#entrada_table"
             //console.log(x);
             // addTable(x, table);
@@ -231,6 +234,14 @@
 
         function addTable(data, table) {
             if (table === "#entrada_table") {
+
+                console.log(data.articulos[0].stock_minimo);
+                console.log(parseInt(x[0]));
+                console.log(data.stocks[0].stock);
+                if((data.stocks[0].stock + parseInt(x[0])) > data.articulos[0].stock_maximo){
+                    alert("Cantidad supera el stock maximo del articulo");
+                        return false;
+                }
 
                 var name_articulo = document.getElementsByName("articulo_detalle[]");
                 for (let index = 0; index < name_articulo.length; index++) {

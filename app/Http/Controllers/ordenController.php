@@ -55,43 +55,58 @@ class ordenController extends Controller
      */
     public function store(Request $request)
     {
-        // dump(request()->all());
-        //c=cobrado a=anulado
-        DB::table('orden_de_compra')->insert(
-            [
-                'numero' => request()->numero, 'proveedor_ruc' => request()->proveedor,
-                'fecha_de_emision' => request()->fecha, 'estado' => "A",
-                'observaciones' => request()->observaciones, 'condicion' => request()->condicion,
-                'requisicion_numero' => request()->requisicion
-            ]
-        );
+        try {
+            // dump(request()->all());
+            //c=cobrado a=anulado
+            DB::table('orden_de_compra')->insert(
+                [
+                    'numero' => request()->numero, 'proveedor_ruc' => request()->proveedor,
+                    'fecha_de_emision' => request()->fecha, 'estado' => "A",
+                    'observaciones' => request()->observaciones, 'condicion' => request()->condicion,
+                    'presupuesto_numero' => request()->presupuesto
+                ]
+            );
 
-        $input = $request->only([
-            'articulo_detalle', 'precio_detalle',
-            'cantidad_detalle', 'iva_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["articulo_detalle"])) {
-            foreach ($input["articulo_detalle"] as $key => $value) {
+            $input = $request->only([
+                'articulo_detalle', 'precio_detalle',
+                'cantidad_detalle', 'iva_detalle'
+            ]);
+            //dump($input);
+            //dump($input["habitacion"][1]);
+            if (isset($input["articulo_detalle"])) {
+                foreach ($input["articulo_detalle"] as $key => $value) {
 
-                $iva = DB::table('iva')
-                    ->select('iva.id')
-                    ->where('porcentaje', '=',$input["iva_detalle"][$key])
-                    ->get();
+                    $iva = DB::table('iva')
+                        ->select('iva.id')
+                        ->where('porcentaje', '=', $input["iva_detalle"][$key])
+                        ->get();
 
-                $data1[] = [
-                    'orden_de_compra_numero' => request()->numero,
-                    'orden_de_compra_proveedor_codigo' => request()->proveedor,
-                    'articulo_codigo' => $input["articulo_detalle"][$key],
-                    'precio' => $input["precio_detalle"][$key],
-                    'cantidad' => $input["cantidad_detalle"][$key],
-                    'iva_id' => $iva[0]->id
-                ];
+                    $data1[] = [
+                        'orden_de_compra_numero' => request()->numero,
+                        'articulo_codigo' => $input["articulo_detalle"][$key],
+                        'precio' => $input["precio_detalle"][$key],
+                        'cantidad' => $input["cantidad_detalle"][$key],
+                        'iva_id' => $iva[0]->id
+                    ];
+                }
+
+
+                DB::table('orden_detalle')->insert($data1);
+
+                DB::table('presupuesto')
+                    ->where([
+                        ['numero', '=', request()->presupuesto]
+                    ])
+                    ->update(
+                        [
+                            'estado' => "I"
+                        ]
+                    );
             }
-
-
-            DB::table('orden_detalle')->insert($data1);
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
         }
 
 
@@ -296,21 +311,41 @@ class ordenController extends Controller
      * @param  \App\estadia  $estadia
      * @return \Illuminate\Http\Response
      */
-    public function destroy($numero,$proveedor)
+    public function destroy($numero)
     {
-        //dump($id);
-        //i=inactivo a=activo 
-        DB::table('orden_de_compra')
-        ->where([
-                ['numero', '=', $numero],
-                ['proveedor_ruc', '=', $proveedor]
-            ])
-            ->update(
-                [
-                    'estado' => "I"
-                ]
-            );
-        
+        try {
+            //dump($id);
+            //i=inactivo a=activo 
+            DB::table('orden_de_compra')
+                ->where([
+                    ['numero', '=', $numero]
+                ])
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
+
+            $presupuesto = DB::table('orden_de_compra')
+                ->select('orden_de_compra.presupuesto_numero')
+                ->where('numero', '=', $numero)
+                ->get();
+
+            DB::table('presupuesto')
+                ->where([
+                    ['numero', '=',$presupuesto[0]->presupuesto_numero]
+                ])
+                ->update(
+                    [
+                        'estado' => "A"
+                    ]
+                );
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
+        }
+
         return redirect()->route('orden.index');
     }
 

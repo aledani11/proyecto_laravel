@@ -25,7 +25,8 @@ class factura_compraController extends Controller
                 'pr.nombre'
             )
             ->where('factura_compra.estado', '=', 'A')
-            ->leftJoin('proveedor as pr', 'factura_compra.orden_de_compra_proveedor_ruc', '=', 'pr.ruc')
+            ->leftJoin('orden_de_compra as od', 'factura_compra.orden_de_compra_numero', '=', 'od.numero')
+            ->leftJoin('proveedor as pr', 'od.proveedor_ruc', '=', 'pr.ruc')
             ->get();
 
         //  dd($nota_credito);
@@ -57,62 +58,72 @@ class factura_compraController extends Controller
     {
         // dump(request()->all());
         //c=cobrado a=anulado
-        DB::table('factura_compra')->insert(
-            [
-                'numero' => request()->codigo, 'fecha' => request()->fecha,
-                'orden_de_compra_proveedor_ruc' => request()->ruc_orden, 'estado' => "A",
-                'orden_de_compra_numero' => request()->orden_de_compra, 'condicion' => request()->condicion,
-                'can_cuo' => request()->cancuo,'plazo' => request()->plazo
-            ]
-        );
+        try {
+            $id_fac = DB::table('factura_compra')->insertGetId(
+                [
+                    'numero' => request()->codigo, 'fecha' => request()->fecha,
+                    'estado' => "A",
+                    'orden_de_compra_numero' => request()->orden_de_compra, 'condicion' => request()->condicion,
+                    'can_cuo' => request()->cancuo, 'plazo' => request()->plazo
+                ]
+            );
 
-        $input = $request->only([
-            'articulo_detalle', 'precio_detalle',
-            'cantidad_detalle', 'iva_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["articulo_detalle"])) {
-            foreach ($input["articulo_detalle"] as $key => $value) {
+            $input = $request->only([
+                'articulo_detalle', 'precio_detalle',
+                'cantidad_detalle', 'iva_detalle'
+            ]);
+            //dump($input);
+            //dump($input["habitacion"][1]);
+            if (isset($input["articulo_detalle"])) {
+                foreach ($input["articulo_detalle"] as $key => $value) {
 
-                $iva = DB::table('iva')
-                    ->select('iva.id')
-                    ->where('porcentaje', '=',$input["iva_detalle"][$key])
-                    ->get();
+                    $iva = DB::table('iva')
+                        ->select('iva.id')
+                        ->where('porcentaje', '=', $input["iva_detalle"][$key])
+                        ->get();
 
-                $data1[] = [
-                    'factura_compra_numero' => request()->codigo,
-                    'factura_compra_fecha' => request()->fecha,
-                    'factura_compra_orden_de_compra_proveedor_ruc' => request()->ruc_orden,
-                    'articulo_codigo' => $input["articulo_detalle"][$key],
-                    'precio' => $input["precio_detalle"][$key],
-                    'cantidad' => $input["cantidad_detalle"][$key],
-                    'iva_id' => $iva[0]->id
-                ];
+                    $data1[] = [
+                        'factura_compra_id' => $id_fac,
+                        'articulo_codigo' => $input["articulo_detalle"][$key],
+                        'precio' => $input["precio_detalle"][$key],
+                        'cantidad' => $input["cantidad_detalle"][$key],
+                        'iva_id' => $iva[0]->id
+                    ];
+                }
+
+
+                DB::table('factura_c_detalle')->insert($data1);
             }
 
+            $cancuo = (int) $request->cancuo;
+            if ($cancuo == 0) $cancuo = 1;
+            $fecha = $request->fecha;
+            $monto = (int) (((int) str_replace('.', '', request()->monto)) / $cancuo);
+            for ($i = 0; $i < $cancuo; $i++) {
 
-            DB::table('factura_c_detalle')->insert($data1);
-        }
+                $fecha = date('Y-m-d', strtotime($fecha . ' + ' . $request->plazo . ' days'));
 
-        $cancuo = (int) $request->cancuo;
-        if ($cancuo == 0) $cancuo = 1;
-        $fecha = $request->fecha;
-        $monto = (int) (((int) str_replace('.', '', request()->monto)) / $cancuo);
-        for ($i = 0; $i < $cancuo; $i++) {
+                DB::table('cuentas_a_pagar')
+                    ->insert([
+                        'numero_cuotas' => $i + 1,
+                        'estado' => 'A',
+                        'fecha_a_pagar' => $fecha,
+                        'monto' => $monto,
+                        'factura_compra_id' => $id_fac,
+                    ]);
+            }
 
-            $fecha = date('Y-m-d', strtotime($fecha . ' + ' . $request->plazo . ' days'));
-
-            DB::table('cuentas_a_pagar')
-                ->insert([
-                    'numero_cuotas' => $i + 1,
-                    'estado' => 'A',
-                    'fecha_a_pagar' => $fecha,
-                    'monto' => $monto,
-                    'factura_compra_numero' => request()->codigo,
-                    'factura_compra_fecha' => request()->fecha,
-                    'factura_compra_orden_de_compra_proveedor_ruc' => request()->ruc_orden
-                ]);
+            DB::table('orden_de_compra')
+                ->where('numero', $request->orden_de_compra)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
         }
 
         return redirect()->route('factura_compra.index');
@@ -318,23 +329,44 @@ class factura_compraController extends Controller
      */
     public function destroy($id)
     {
-        //dump($id);
-        //i=inactivo a=activo 
-        DB::table('factura_compra')
-        ->where('numero', $id)
-        ->update(
-            [
-                'estado' => "I"
-            ]
-        );
-    DB::table('cuentas_a_pagar')
-        ->where('factura_compra_numero', $id)
-        ->update(
-            [
-                'estado' => "I"
-            ]
-        );
-    return redirect()->route('factura_compra.index');
+        try {
+            //dump($id);
+            //i=inactivo a=activo 
+            DB::table('factura_compra')
+                ->where('id', $id)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
+            DB::table('cuentas_a_pagar')
+                ->where('factura_compra_id', $id)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
+
+            $orden = DB::table('factura_compra')
+                ->select('orden_de_compra_numero')
+                ->where('id', '=', $id)
+                ->get();
+
+            DB::table('orden_de_compra')
+                ->where([
+                    ['numero', '=', $orden[0]->orden_de_compra_numero]
+                ])
+                ->update(
+                    [
+                        'estado' => "A"
+                    ]
+                );
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
+        }
+        return redirect()->route('factura_compra.index');
     }
 
     public function tarifa(Request $request)

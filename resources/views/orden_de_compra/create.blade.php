@@ -37,9 +37,9 @@
                     <input type="button" value="..." class=" btn-dark" onclick="openWin('proveedor')">
                 </div>
                 <div class="form-group">
-                    <label for="requisicion">Requisicion</label>
-                    <input type="text" id="requisicion" name="requisicion" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
-                    <input type="button" value="..." class=" btn-dark" onclick="openWin('requisicion')">
+                    <label for="presupuesto">Presupuesto</label>
+                    <input type="text" id="presupuesto" name="presupuesto" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin('presupuesto')">
                 </div>
             </div>
             <div class="col-md-4">
@@ -134,7 +134,7 @@
         </div>
         <div class="col-3 ">
             <label for="importe" class="form-group1">
-                <span> total_iva</span>
+                <span> Total iva</span>
                 <input type="text" id="total_iva" readonly>
             </label>
         </div>
@@ -419,8 +419,8 @@
         if (w == "proveedor") {
             myWindow = window.open("{{ route('searcher.proveedor') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
-        if (w == "requisicion") {
-            myWindow = window.open("{{ route('searcher.requisicion') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+        if (w == "presupuesto") {
+            myWindow = window.open("{{ route('searcher.presupuesto') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
     }
 
@@ -430,19 +430,19 @@
         // console.log("hola");
         var articulo = localStorage.getItem("articulo");
         var proveedor = localStorage.getItem("proveedor");
-        var requisicion = localStorage.getItem("requisicion");
+        var presupuesto = localStorage.getItem("presupuesto");
 
         if (articulo != "nothing" && articulo != null) {
             document.getElementById("articulo").value = articulo;
         }
-        if (requisicion != "nothing" && requisicion != null) {
-            document.getElementById("requisicion").value = requisicion;
+        if (presupuesto != "nothing" && presupuesto != null) {
+            document.getElementById("presupuesto").value = presupuesto;
         }
         if (proveedor != "nothing" && proveedor != null) {
             document.getElementById("proveedor").value = proveedor;
         }
         localStorage.removeItem("articulo");
-        localStorage.removeItem("requisicion");
+        localStorage.removeItem("presupuesto");
         localStorage.removeItem("proveedor");
     }
 

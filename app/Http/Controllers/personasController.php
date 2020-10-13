@@ -78,8 +78,9 @@ class personasController extends Controller
                 ]
             );
         } catch (\Exception $e) {
-            request()->session()->flash('error_', $e->getMessage());
-            return redirect()->route('personas.index');
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_','Error en base de datos');
+            //return redirect()->route('personas.index');
         }
 
         return redirect()->route('personas.index');
@@ -102,14 +103,16 @@ class personasController extends Controller
      * @param  \App\estadia  $estadia
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($cedula,$pais_id)
     {
         $ciudad = DB::table('ciudad')->get();
         $tipo_documento = DB::table('tipo_documento')->get();
 
         $personas = DB::table('persona')
-            ->where('nro_documento', '=', $id)
-            ->get();
+        ->where([
+            ['nro_documento', '=', $cedula],
+            ['pais_id', '=', $pais_id]
+        ])->get();
 
         //dd($reservas);
         return view('personas.update', [
@@ -150,10 +153,11 @@ class personasController extends Controller
                         'nro_documento' => request()->numero, 'pais_id' => $paisid[0]->pais_id
                     ]
                 );
-        } catch (\Exception $e) {
-            request()->session()->flash('error_', $e->getMessage());
-            return redirect()->route('personas.index');
-        }
+            } catch (\Exception $e) {
+                //request()->session()->flash('error_', $e->getMessage());
+                request()->session()->flash('error_','Error en base de datos');
+                return redirect()->route('personas.index');
+            }
 
 
         return redirect()->route('personas.index');
@@ -165,18 +169,19 @@ class personasController extends Controller
      * @param  \App\estadia  $estadia
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($cedula,$pais_id)
     {
         try {
             DB::table('persona')
                 ->where([
-                    ['nro_documento', '=', $id],
-                    ['pais_id', '=', 4]
+                    ['nro_documento', '=', $cedula],
+                    ['pais_id', '=', $pais_id]
                 ])->delete();
-        } catch (\Exception $e) {
-            request()->session()->flash('error_', $e->getMessage());
-            return redirect()->route('personas.index');
-        }
+            } catch (\Exception $e) {
+                //request()->session()->flash('error_', $e->getMessage());
+                request()->session()->flash('error_','Error en base de datos');
+                //return redirect()->route('personas.index');
+            }
         return redirect()->route('personas.index');
     }
 

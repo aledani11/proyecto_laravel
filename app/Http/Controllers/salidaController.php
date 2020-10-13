@@ -57,42 +57,86 @@ class salidaController extends Controller
      */
     public function store(Request $request)
     {
-        // dump(request()->all());
-        //c=cobrado a=anulado
-        DB::table('salida')->insert(
-            [
-                'requisicion_numero' => request()->requisicion,
-                'fecha' => request()->fecha, 'estado' => "A",
-                'concepto' => request()->concepto, 'observaciones' => request()->observaciones
-            ]
-        );
+        try {
 
-        $input = $request->only([
-            'articulo_detalle',
-            'cantidad_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["articulo_detalle"])) {
-            foreach ($input["articulo_detalle"] as $key => $value) {
+            $input = $request->only([
+                'articulo_detalle',
+                'cantidad_detalle'
+            ]);
 
-                $data1[] = [
-                    'salida_requisicion_numero' => request()->requisicion,
-                    'articulo_codigo' => $input["articulo_detalle"][$key],
-                    'cantidad' => $input["cantidad_detalle"][$key]
-                ];
-                
-                DB::table('inventario')
-                    ->where('articulo_codigo', $input["articulo_detalle"][$key])
-                    ->update(
-                        [
-                            'stock' => DB::raw('stock-'. $input["cantidad_detalle"][$key])
-                        ]
-                    );
+            if (isset($input["articulo_detalle"])) {
+                foreach ($input["articulo_detalle"] as $key => $value) {
+                    $salida = DB::table('inventario')
+                        ->select(
+                            'inventario.*',
+                            'ar.stock_minimo',
+                            'ar.stock_maximo'
+                        )
+                        ->where('ar.codigo', '=', $input["articulo_detalle"][$key])
+                        ->leftJoin('articulo as ar', 'inventario.articulo_codigo', '=', 'ar.codigo')
+                        ->get();
+                        //dump($salida);
+                $stock_min = (int) ($salida[0]->stock_minimo);
+                $canti = (int) $input["cantidad_detalle"][$key];
+                $stock= (int) ($salida[0]->stock);
+                if(($stock-$canti)<$stock_min){
+                    request()->session()->flash('error_', 'Stock minimo alcanzado');
+                    return redirect()->route('salida.create');
+                }
+                //dump($stock,$canti, $stock_min);
+                //dump($salida[0]->stock_minimo);
+                }
             }
 
+            // dump(request()->all());
+            //c=cobrado a=anulado
+            DB::table('salida')->insert(
+                [
+                    'requisicion_numero' => request()->requisicion,
+                    'fecha' => request()->fecha, 'estado' => "A",
+                    'concepto' => request()->concepto, 'observaciones' => request()->observaciones
+                ]
+            );
 
-            DB::table('salida_detalle')->insert($data1);
+            $input = $request->only([
+                'articulo_detalle',
+                'cantidad_detalle'
+            ]);
+            //dump($input);
+            //dump($input["habitacion"][1]);
+            if (isset($input["articulo_detalle"])) {
+                foreach ($input["articulo_detalle"] as $key => $value) {
+
+                    $data1[] = [
+                        'salida_requisicion_numero' => request()->requisicion,
+                        'articulo_codigo' => $input["articulo_detalle"][$key],
+                        'cantidad' => $input["cantidad_detalle"][$key]
+                    ];
+
+                    DB::table('inventario')
+                        ->where('articulo_codigo', $input["articulo_detalle"][$key])
+                        ->update(
+                            [
+                                'stock' => DB::raw('stock-' . $input["cantidad_detalle"][$key])
+                            ]
+                        );
+                }
+
+
+                DB::table('salida_detalle')->insert($data1);
+
+                DB::table('requisicion')
+                ->where('numero', $request->requisicion)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
         }
 
 
@@ -299,33 +343,50 @@ class salidaController extends Controller
      */
     public function destroy($id)
     {
-        //dump($id);
-        //i=inactivo a=activo 
-        DB::table('salida')
-        ->where('requisicion_numero', $id)
-            ->update(
-                [
-                    'estado' => "I"
-                ]
-            );
+        try {
+            //dump($id);
+            //i=inactivo a=activo 
 
             $salida = DB::table('salida_detalle')
-            ->select(
-                'cantidad',
-                'articulo_codigo'
-            )
-            ->where('salida_requisicion_numero', $id)
-            ->get();
+                ->select(
+                    'cantidad',
+                    'articulo_codigo'
+                )
+                ->where('salida_requisicion_numero', $id)
+                ->get();
 
-            for ($i=0; $i < count($salida); $i++) { 
+                DB::table('salida_detalle')
+                ->where('salida_requisicion_numero', $id)
+                ->delete();
+
+                DB::table('salida')
+                ->where('requisicion_numero', $id)
+                ->delete();
+
+            for ($i = 0; $i < count($salida); $i++) {
                 DB::table('inventario')
-                ->where('articulo_codigo', $salida[$i]->articulo_codigo)
+                    ->where('articulo_codigo', $salida[$i]->articulo_codigo)
+                    ->update(
+                        [
+                            'stock' => DB::raw('stock+' . $salida[$i]->cantidad)
+                        ]
+                    );
+            }
+
+            DB::table('requisicion')
+                ->where([
+                    ['numero', '=', $id]
+                ])
                 ->update(
                     [
-                        'stock' => DB::raw('stock+'. $salida[$i]->cantidad)
+                        'estado' => "A"
                     ]
                 );
-            }
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
+        }
 
         return redirect()->route('salida.index');
     }
@@ -350,14 +411,14 @@ class salidaController extends Controller
     {
 
         $articulo = DB::table('articulo')
-            ->select('codigo', 'nombre')
+            ->select('codigo', 'nombre', 'stock_minimo')
             ->where('codigo', '=', $request->id)
-           ->get();
+            ->get();
 
-           $stock = DB::table('inventario')
+        $stock = DB::table('inventario')
             ->select('stock')
-            ->where('codigo', '=', $request->id)
-           ->get();
+            ->where('articulo_codigo', '=', $request->id)
+            ->get();
         //dd($tarifa);
 
         //return view('estadia.create', ['tarifas' => $tarifa]);
