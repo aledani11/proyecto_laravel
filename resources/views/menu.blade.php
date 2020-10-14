@@ -93,6 +93,8 @@
                         <li><a href="{{ route('entrada.index') }}" class="dropdown-item">Entrada</a></li>
                         <li><a href="{{ route('salida.index') }}" class="dropdown-item">Salida</a></li>
                         <li><a href="{{ route('ajuste.index') }}" class="dropdown-item">Ajuste</a></li>
+                        <li><a href="{{ route('nota_credito_c.index') }}" class="dropdown-item">Nota de credito</a></li>
+                        <li><a href="{{ route('nota_debito_c.index') }}" class="dropdown-item">Nota de debito</a></li>
                     </ul>
                 </li>
                 @endif

@@ -98,6 +98,7 @@ Route::get('/orden/create', 'ordenController@create')->name('orden.create')->mid
 Route::get('/orden/editar/{orden}', 'ordenController@edit')->name('orden.edit')->middleware('auth');
 Route::put('/orden/{orden}', 'ordenController@update')->name('orden.update')->middleware('auth');
 Route::get('/orden/anular/{numero}', 'ordenController@destroy')->name('orden.destroy')->middleware('auth');
+Route::post('/orden_presupuesto', 'ordenController@presupuesto')->name('orden.presupuesto')->middleware('auth');
 
 Route::get('/factura_compra','factura_compraController@index')->name('factura_compra.index')->middleware('auth');
 Route::post('/factura_compra', 'factura_compraController@store')->name('factura_compra.store')->middleware('auth');
@@ -105,6 +106,7 @@ Route::get('/factura_compra/create', 'factura_compraController@create')->name('f
 Route::get('/factura_compra/editar/{factura}', 'factura_compraController@edit')->name('factura_compra.edit')->middleware('auth');
 Route::put('/factura_compra/{factura}', 'factura_compraController@update')->name('factura_compra.update')->middleware('auth');
 Route::get('/factura_compra/anular/{factura}', 'factura_compraController@destroy')->name('factura_compra.destroy')->middleware('auth');
+Route::post('/factura_orden', 'factura_compraController@orden')->name('factura.orden')->middleware('auth');
 
 Route::get('/remision','remisionController@index')->name('remision.index')->middleware('auth');
 Route::post('/remision', 'remisionController@store')->name('remision.store')->middleware('auth');
@@ -112,6 +114,7 @@ Route::get('/remision/create', 'remisionController@create')->name('remision.crea
 Route::get('/remision/editar/{requisicion}', 'remisionController@edit')->name('remision.edit')->middleware('auth');
 Route::put('/remision/{requisicion}', 'remisionController@update')->name('remision.update')->middleware('auth');
 Route::get('/remision/anular/{requisicion}', 'remisionController@destroy')->name('remision.destroy')->middleware('auth');
+Route::post('/remision_factura', 'remisionController@factura')->name('remision.factura')->middleware('auth');
 
 Route::get('/entrada','entradaController@index')->name('entrada.index')->middleware('auth');
 Route::post('/entrada', 'entradaController@store')->name('entrada.store')->middleware('auth');
@@ -128,6 +131,23 @@ Route::get('/salida/editar/{salida}', 'salidaController@edit')->name('salida.edi
 Route::put('/salida/{salida}', 'salidaController@update')->name('salida.update')->middleware('auth');
 Route::get('/salida/anular/{salida}', 'salidaController@destroy')->name('salida.destroy')->middleware('auth');
 Route::post('/salida_articulo', 'salidaController@articulo')->name('salida.articulo')->middleware('auth');
+Route::post('/salida_requisicion', 'salidaController@requisicion')->name('salida.requisicion')->middleware('auth');
+
+Route::get('/nota_credito_c','nota_credito_cController@index')->name('nota_credito_c.index')->middleware('auth');
+Route::post('/nota_credito_c', 'nota_credito_cController@store')->name('nota_credito_c.store')->middleware('auth');
+Route::get('/nota_credito_c/create', 'nota_credito_cController@create')->name('nota_credito_c.create')->middleware('auth');
+Route::get('/nota_credito_c/editar/{salida}', 'nota_credito_cController@edit')->name('nota_credito_c.edit')->middleware('auth');
+Route::put('/nota_credito_c/{salida}', 'nota_credito_cController@update')->name('nota_credito_c.update')->middleware('auth');
+Route::get('/nota_credito_c/anular/{salida}', 'nota_credito_cController@destroy')->name('nota_credito_c.destroy')->middleware('auth');
+Route::post('/nota_credito_c_factura', 'nota_credito_cController@rfactura')->name('nota_credito_c.requisicion')->middleware('auth');
+
+Route::get('/nota_debito_c','nota_debito_cController@index')->name('nota_debito_c.index')->middleware('auth');
+Route::post('/nota_debito_c', 'nota_debito_cController@store')->name('nota_debito_c.store')->middleware('auth');
+Route::get('/nota_debito_c/create', 'nota_debito_cController@create')->name('nota_debito_c.create')->middleware('auth');
+Route::get('/nota_debito_c/editar/{salida}', 'nota_debito_cController@edit')->name('nota_debito_c.edit')->middleware('auth');
+Route::put('/nota_debito_c/{salida}', 'nota_debito_cController@update')->name('nota_debito_c.update')->middleware('auth');
+Route::get('/nota_debito_c/anular/{salida}', 'nota_debito_cController@destroy')->name('nota_debito_c.destroy')->middleware('auth');
+Route::post('/nota_debito_c_factura', 'nota_debito_cController@rfactura')->name('nota_debito_c.requisicion')->middleware('auth');
 
 Route::get('/servicios_spa','servicios_spaController@index')->name('servicios_spa.index')->middleware('auth');
 Route::post('/servicios_spa', 'servicios_spaController@store')->name('servicios_spa.store')->middleware('auth');

@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
 @endsection
 
-@section('title','Nota de remision agregar')
+@section('title','Nota de credito compra agregar')
 
 @section('script')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -17,11 +17,11 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Nota de remision agregar')
+@section('header', 'Nota de credito compra agregar')
 
 @section('content')
 
-<form onsubmit="return validateForm()" method="POST" action="{{route('remision.store')}}">
+<form onsubmit="return validateForm()" method="POST" action="{{route('nota_credito_c.store')}}">
     @csrf
 
     <div class="container" style="margin-top:30px">
@@ -37,8 +37,8 @@
                     <input type="button" value="..." class=" btn-dark" onclick="openWin('factura')">
                 </div>
                 <div class="form-group">
-                    <label for="direccion"> Dirección partida </label>
-                    <input type="text" id="direccion" name="direccion" required>
+                    <label for="concepto"> Concepto </label>
+                    <input type="text" id="concepto" name="concepto" required>
                 </div>
             </div>
             <div class="col-md-4">
@@ -47,8 +47,8 @@
                     <input type="date" id="fechae" name="fechae" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
                 </div>
                 <div class="form-group">
-                    <label for="nombre_conductor"> Nombre Conductor </label>
-                    <input type="text" id="nombre_conductor" name="nombre_conductor" required>
+                    <label for="nombre"> Nombre </label>
+                    <input type="text" id="nombre" name="nombre" required>
                 </div>
             </div>
             <div class="col-md-4">
@@ -57,8 +57,8 @@
                     <input type="date" id="fechar" name="fechar" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
                 </div>
                 <div class="form-group">
-                    <label for="ci_conductor"> Ci conductor </label>
-                    <input type="text" id="ci_conductor" name="ci_conductor" required>
+                    <label for="ruc"> Ruc </label>
+                    <input type="text" id="ruc" name="ruc" required>
                 </div>
             </div>
         </div>
@@ -92,7 +92,7 @@
             </div>
         </div>
         <div class="form-group my-2 col-md-10">
-            <h5>Remision Detalle</h5>
+            <h5>Nota Credito Compra Detalle</h5>
         </div>
         <div class="row">
             <div class="col-md-10 form-group">
@@ -154,7 +154,7 @@
         <div class="col-3 ">
             <label for="total" class="form-group1">
                 <span> Total</span>
-                <input type="text" id="total" readonly>
+                <input type="text" id="total" name="monto" readonly>
             </label>
         </div>
     </div>
@@ -165,7 +165,7 @@
                 <div class="d-flex flex-wrap justify-content-md-around ">
                     <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
                     <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
-                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('remision.index') }}'" class="btn btn-dark">SALIR</button></div>
+                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('nota_credito_c.index') }}'" class="btn btn-dark">SALIR</button></div>
                 </div>
             </div>
         </div>
@@ -246,16 +246,16 @@
             });
             path = "empty";
         }
-        
+
         function add_data(data) {
-            
+
             //console.log(data);
             //var data1 = {array: ["hola","hola"]};
             //console.log(data1);
             //data.articulos.shift();
             //console.log(data);
             //x[0] = de.value;
-            lenght_data= data.articulos.length;
+            lenght_data = data.articulos.length;
             for (let index = 0; index < lenght_data; index++) {
                 x[0] = data.articulos[0].cantidad;
                 x[1] = data.articulos[0].precio;

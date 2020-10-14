@@ -133,7 +133,7 @@
 
 
     function add(table) {
-
+    var x=[];
         if (table === "salida") {
             //console.log(val);
             var ca = document.getElementById("cantidad");
@@ -164,7 +164,56 @@
             // addTable(x, table);
         }
 
+        if (table === "salida_requisicion") {
+            remove_all()
+            var path = "{{route('salida.requisicion')}}";
+            var table = "#salida_table"
+            var val = parseInt(document.getElementById("requisicion").value);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: 'POST',
+                url: path,
+                data: {
+                    id: val
+                },
+                success: function(data) {
+                    //alert(data.presupuesto_);
+                    console.log(data);
+                    //alert(data.tarifas[0].descripcion);
+                    //$('#tarifa_table').bootstrapTable('insertRow', {index: 0, row: [1,"hola"]})
+                    //console.log([1,"hola"]);
+                    //addTable(data, table)
+                    add_data(data);
+                    //var x = [];
+                    //x[0] = de.value;
 
+                }
+            });
+            path = "empty";
+        }
+        
+        function add_data(data) {
+            
+            //console.log(data);
+            //var data1 = {array: ["hola","hola"]};
+            //console.log(data1);
+            //data.articulos.shift();
+            //console.log(data);
+            //x[0] = de.value;
+            lenght_data= data.articulos.length;
+            for (let index = 0; index < lenght_data; index++) {
+                x[0] = data.articulos[0].cantidad;
+                addTable(data, table);
+                //console.log(data);
+                data.articulos.shift();
+                data.stocks.shift();
+                //console.log(data);
+            }
+        }
 
         if (path !== "empty") {
             $.ajaxSetup({
@@ -254,7 +303,9 @@
 
     function remove_all() {
         $("#salida_table").bootstrapTable('removeAll');
-
+        total_iva = 0;
+        subtotal = 0;
+        total = total_iva + subtotal;
     }
 
     function remove(table_remove) {
@@ -385,19 +436,15 @@
         var requisicion = localStorage.getItem("requisicion");
         var ruc_orden = localStorage.getItem("ruc_orden");
 
+        if (requisicion != "nothing" && requisicion != null) {
+            document.getElementById("requisicion").value = requisicion;
+            add("salida_requisicion");
+        }
 
         if (articulo != "nothing" && articulo != null) {
             document.getElementById("articulo").value = articulo;
         }
-        if (requisicion != "nothing" && requisicion != null) {
-            document.getElementById("requisicion").value = requisicion;
-        }
-        if (orden != "nothing" && orden != null) {
-            document.getElementById("orden").value = orden;
-        }
-        if (ruc_orden != "nothing" && ruc_orden != null) {
-            document.getElementById("ruc_orden").value = ruc_orden;
-        }
+       
         localStorage.removeItem("articulo");
         localStorage.removeItem("requisicion");
         localStorage.removeItem("orden");

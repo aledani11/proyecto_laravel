@@ -59,44 +59,51 @@ class ajusteController extends Controller
     {
         // dump(request()->all());
 
-        $salida = DB::table('inventario')
-            ->select(
-                'inventario.*',
-                'ar.stock_minimo',
-                'ar.stock_maximo'
-            )
-            ->where('inventario.codigo', '=', request()->inventario)
-            ->leftJoin('articulo as ar', 'inventario.articulo_codigo', '=', 'ar.codigo')
-            ->get();
-        //dump($salida);
-        $stock_min = (int) ($salida[0]->stock_minimo);
-        $stock_max = (int) ($salida[0]->stock_maximo);
-        $canti = (int) request()->cantidad;
-        $stock = (int) ($salida[0]->stock);
-        if ($canti < $stock_min) {
-            request()->session()->flash('error_', 'Stock minimo alcanzado');
-            return redirect()->route('ajuste.create',"".request()->inventario);
-        }
-        if ($canti > $stock_max) {
-            request()->session()->flash('error_', 'Stock maximo superado');
-            return redirect()->route('ajuste.create',"".request()->inventario);
-        }
+        try {
 
-        DB::table('ajuste')->insert(
-            [
-                'inventario_codigo' => request()->inventario, 'motivo' => request()->motivo,
-                'fecha' => request()->fecha
-            ]
-        );
+            $salida = DB::table('inventario')
+                ->select(
+                    'inventario.*',
+                    'ar.stock_minimo',
+                    'ar.stock_maximo'
+                )
+                ->where('inventario.codigo', '=', request()->inventario)
+                ->leftJoin('articulo as ar', 'inventario.articulo_codigo', '=', 'ar.codigo')
+                ->get();
+            //dump($salida);
+            $stock_min = (int) ($salida[0]->stock_minimo);
+            $stock_max = (int) ($salida[0]->stock_maximo);
+            $canti = (int) request()->cantidad;
+            $stock = (int) ($salida[0]->stock);
+            if ($canti < $stock_min) {
+                request()->session()->flash('error_', 'Stock minimo alcanzado');
+                return redirect()->route('ajuste.create', "" . request()->inventario);
+            }
+            if ($canti > $stock_max) {
+                request()->session()->flash('error_', 'Stock maximo superado');
+                return redirect()->route('ajuste.create', "" . request()->inventario);
+            }
 
-        DB::table('inventario')
-            ->where('codigo', request()->inventario)
-            ->update(
+            DB::table('ajuste')->insert(
                 [
-                    'stock' => request()->cantidad,
-                    'precio' => request()->precio
+                    'inventario_codigo' => request()->inventario, 'motivo' => request()->motivo,
+                    'fecha' => request()->fecha
                 ]
             );
+
+            DB::table('inventario')
+                ->where('codigo', request()->inventario)
+                ->update(
+                    [
+                        'stock' => request()->cantidad,
+                        'precio' => request()->precio
+                    ]
+                );
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //return redirect()->route('personas.index');
+        }
 
         return redirect()->route('ajuste.index');
     }

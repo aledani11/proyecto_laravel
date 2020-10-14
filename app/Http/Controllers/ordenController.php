@@ -333,7 +333,7 @@ class ordenController extends Controller
 
             DB::table('presupuesto')
                 ->where([
-                    ['numero', '=',$presupuesto[0]->presupuesto_numero]
+                    ['numero', '=', $presupuesto[0]->presupuesto_numero]
                 ])
                 ->update(
                     [
@@ -379,6 +379,37 @@ class ordenController extends Controller
         //return view('estadia.create', ['tarifas' => $tarifa]);
 
         return ['personas' => $persona];
+        //return $request;
+    }
+
+    public function presupuesto(Request $request)
+    {
+
+        $presupuesto = DB::table('presupuesto')
+            ->select(
+                'condicion',
+                'proveedor_ruc',
+            )
+            ->where('numero', '=', $request->id)
+            ->get();
+
+        $presupuesto_detalle = DB::table('presupuesto_detalle')
+            ->select(
+                'ar.codigo',
+                'ar.nombre',
+                'presupuesto_detalle.cantidad',
+                'presupuesto_detalle.precio',
+                'iv.porcentaje'
+            )
+            ->where('presupuesto_numero', '=', $request->id)
+            ->leftJoin('articulo as ar', 'presupuesto_detalle.articulo_codigo', '=', 'ar.codigo')
+            ->leftJoin('iva as iv', 'presupuesto_detalle.iva_id', '=', 'iv.id')
+            ->get();
+
+        return [
+            'presupuesto' => $presupuesto,
+            'articulos' => $presupuesto_detalle,
+        ];
         //return $request;
     }
 }

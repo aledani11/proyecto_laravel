@@ -401,4 +401,32 @@ class factura_compraController extends Controller
         return ['personas' => $persona];
         //return $request;
     }
+    public function orden(Request $request)
+    {
+        $orden = DB::table('orden_de_compra')
+            ->select(
+                'condicion'
+            )
+            ->where('numero', '=', $request->id)
+            ->get();
+
+        $orden_detalle = DB::table('orden_detalle')
+            ->select(
+                'ar.codigo',
+                'ar.nombre',
+                'orden_detalle.cantidad',
+                'orden_detalle.precio',
+                'iv.porcentaje'
+            )
+            ->where('orden_de_compra_numero', '=', $request->id)
+            ->leftJoin('articulo as ar', 'orden_detalle.articulo_codigo', '=', 'ar.codigo')
+            ->leftJoin('iva as iv', 'orden_detalle.iva_id', '=', 'iv.id')
+            ->get();
+
+        return [
+            'orden' => $orden,
+            'articulos' => $orden_detalle,
+        ];
+        //return $request;
+    }
 }

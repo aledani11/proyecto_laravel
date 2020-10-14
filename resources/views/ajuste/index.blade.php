@@ -19,10 +19,19 @@
 
 <div class="container" style="margin-top:30px">
     <div class="row">
+        @if (session('error_')!==null)
+        <div class="col-md-12 mb-3">
+            <div class="alert alert-danger">
+                <ul>
+                    <li>{{ session('error_') }}</li>
+                </ul>
+            </div>
+        </div>
+        @endif
         <div class="col-md-10 form-group">
             <div>
                 <table id="eventsTable" data-show-print="true" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
-                <thead>
+                    <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Id</th>
                             <th>Articulo</th>
@@ -90,9 +99,9 @@
             });
         });
 */
-var id_sel;
+    var id_sel;
     $('#eventsTable').on('click-row.bs.table', function(e, row) {
-        id_sel=row;
+        id_sel = row;
         // console.log(row.id);
         var a = document.getElementById("modificar").getAttribute("href");
         var f = document.getElementById("anular").getAttribute("href");
@@ -121,6 +130,7 @@ var id_sel;
             return false;
         }
     }
+
     function mensaje_modificar() {
         if (id_sel == null) {
             alert("Seleccionar fila primero");

@@ -1,6 +1,6 @@
 @extends ('layout')
 
-@section('title','Entrada')
+@section('title','Nota credito compra')
 
 @section('link')
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -12,13 +12,13 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Entrada')
+@section('header', 'Nota credito compra')
 
 @section('content')
 
 <div class="container" style="margin-top:30px">
     <div class="row">
-    @if (session('error_')!==null)
+        @if (session('error_')!==null)
         <div class="col-md-12 mb-3">
             <div class="alert alert-danger">
                 <ul>
@@ -32,19 +32,25 @@
                 <table id="eventsTable" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
                     <thead>
                         <tr>
-                            <th data-sortable="true" data-field="id">Id</th>
+                            <th data-sortable="true" data-field="id">Numero</th>
                             <th>Fecha</th>
-                            <th>Concepto</th>
-                            <th>Observaciones</th>
+                            <th>Importe</th>
+                            <th>Proveedor</th>
+                            <th>Ruc</th>
+                            <th>Factura id</th>
+                            <th>Factura nro</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($entradas as $entrada)
+                        @foreach($n_credito_compra as $pre)
                         <tr>
-                            <td>{{$entrada->id}}</td>
-                            <td>{{ \Carbon\Carbon::parse($entrada->fecha)->format('d/m/Y')}}</td>
-                            <td>{{$entrada->concepto}}</td>
-                            <td>{{$entrada->observaciones}}</td>
+                            <td>{{$pre->numero}}</td>
+                            <td>{{ \Carbon\Carbon::parse($pre->fecha_registro)->format('d/m/Y')}}</td>
+                            <td>{{number_format($pre->importe,0,'','.')}}</td>
+                            <td>{{$pre->nombre}}</td>
+                            <td>{{$pre->ruc}}</td>
+                            <td>{{$pre->factura_compra_id}}</td>
+                            <td>{{$pre->fc_numero}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -54,13 +60,13 @@
 
         <div class="col-md-2 form-group mt-5">
             <div class="col-md-12">
-                <a class="btn btn-dark form-group" href="{{ route('entrada.create') }}">Agregar</a>
+                <a class="btn btn-dark form-group" href="{{ route('nota_credito_c.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-            <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('entrada.destroy', 'empty') }}">Anular</a>
+                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('nota_credito_c.destroy', 'empty') }}">Anular</a>
             </div>
             <div class="col-md-12">
-                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('entrada.edit', 'empty') }}">Modificar</a>
+                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('presupuesto.edit', 'empty') }}">Modificar</a>
             </div>
         </div>
     </div>

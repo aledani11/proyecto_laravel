@@ -227,7 +227,9 @@
 
     function remove_all() {
         $("#nota_table").bootstrapTable('removeAll');
-
+        total_iva = 0;
+        subtotal = 0;
+        total = total_iva + subtotal;
     }
 
     function remove(table_remove) {

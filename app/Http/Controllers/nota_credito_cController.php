@@ -6,7 +6,7 @@ use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class remisionController extends Controller
+class nota_credito_cController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,22 +18,22 @@ class remisionController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //estado i=inactivo a=activo
-        $nota_de_remision = DB::table('nota_de_remision')
+        $n_credito_compra = DB::table('n_credito_compra')
             ->select(
-                'nota_de_remision.*',
+                'n_credito_compra.*',
                 'fc.numero as fc_numero',
                 'pr.ruc',
                 'pr.nombre'
             )
-            ->where('nota_de_remision.estado', '=', 'A')
-            ->leftJoin('factura_compra as fc', 'nota_de_remision.factura_compra_id', '=', 'fc.id')
+            ->where('n_credito_compra.estado', '=', 'A')
+            ->leftJoin('factura_compra as fc', 'n_credito_compra.factura_compra_id', '=', 'fc.id')
             ->leftJoin('orden_de_compra as or', 'fc.orden_de_compra_numero', '=', 'or.numero')
             ->leftJoin('proveedor as pr', 'or.proveedor_ruc', '=', 'pr.ruc')
             ->get();
 
         //  dd($nota_credito);
 
-        return view('remision.index', ['nota_de_remision' => $nota_de_remision]);
+        return view('nota_credito_c.index', ['n_credito_compra' => $n_credito_compra]);
     }
 
     /**
@@ -45,7 +45,7 @@ class remisionController extends Controller
     {
         $iva = DB::table('iva')->get();
 
-        return view('remision.create', [
+        return view('nota_credito_c.create', [
             'ivas' => $iva,
         ]);
     }
@@ -59,14 +59,49 @@ class remisionController extends Controller
     public function store(Request $request)
     {
         try {
-            // dd(request()->all());
+
+            $c_a_pagar = DB::table('cuentas_a_pagar')
+                ->select('cuentas_a_pagar.*')
+                ->where([
+                    ['factura_compra_id', '=', request()->factura],
+                    ['estado', '=', "A"],
+                ])->get();
+            $monto_c = 0;
+            $can = 0;
+            foreach ($c_a_pagar as $key => $value) {
+                $monto_c += (int)$c_a_pagar[$key]->monto;
+                $can += 1;
+            }
+            //dump($monto_c);
+            $monto = ((int) str_replace('.', '', request()->monto));
+            //dump($monto);
+            if ($monto_c >= $monto) {
+                //dump("modificar");
+                DB::table('cuentas_a_pagar')
+                    ->where([
+                        ['factura_compra_id', '=', request()->factura],
+                        ['estado', '=', "A"],
+                    ])
+                    ->update(
+                        [
+                            'monto' => (($monto_c - $monto) / $can)
+                        ]
+                    );
+            } else {
+                // dump("error");
+                request()->session()->flash('error_', 'Monto mayor a total cuentas a pagar');
+                return redirect()->route('nota_credito_c.index');
+            }
+
+            //dd(request()->all());
             //c=cobrado a=anulado
-            DB::table('nota_de_remision')->insert(
+            DB::table('n_credito_compra')->insert(
                 [
                     'numero' => request()->numero, 'factura_compra_id' => request()->factura,
                     'fecha_emision' => request()->fechae, 'estado' => "A",
-                    'nombre_conductor' => request()->nombre_conductor, 'ci_conductor' => request()->ci_conductor,
-                    'direccion_partida' => request()->direccion, 'fecha_registro' => request()->fechar
+                    'nombre' => request()->nombre, 'ruc' => request()->ruc,
+                    'concepto' => request()->concepto, 'fecha_registro' => request()->fechar,
+                    'importe' => ((int) str_replace('.', '', request()->monto))
                 ]
             );
 
@@ -85,7 +120,7 @@ class remisionController extends Controller
                         ->get();
 
                     $data1[] = [
-                        'nota_de_remision_numero' => request()->numero,
+                        'n_credito_compra_numero' => request()->numero,
                         'articulo_codigo' => $input["articulo_detalle"][$key],
                         'precio' => $input["precio_detalle"][$key],
                         'cantidad' => $input["cantidad_detalle"][$key],
@@ -94,16 +129,16 @@ class remisionController extends Controller
                 }
 
 
-                DB::table('remision_detalle')->insert($data1);
+                DB::table('n_credito_c_detalle')->insert($data1);
             }
         } catch (\Exception $e) {
-            //request()->session()->flash('error_', $e->getMessage());
-            request()->session()->flash('error_', 'Error en base de datos');
-           // return redirect()->route('personas.index');
+            request()->session()->flash('error_', $e->getMessage());
+            //request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
         }
 
 
-        return redirect()->route('remision.index');
+        return redirect()->route('nota_credito_c.index');
     }
 
     /**
@@ -309,22 +344,48 @@ class remisionController extends Controller
         try {
             //dump($id);
             //i=inactivo a=activo 
-            DB::table('nota_de_remision')
+
+            $n_credito_c = DB::table('n_credito_compra')
+                ->select('n_credito_compra.*')
+                ->where('numero', '=', $id)
+                ->get();
+
+            $can = DB::table('cuentas_a_pagar')
                 ->where([
-                    ['numero', '=', $id]
+                    ['factura_compra_id', '=', $n_credito_c[0]->factura_compra_id],
+                    ['estado', '=', "A"],
+                ])
+                ->count();
+
+            DB::table('cuentas_a_pagar')
+                ->where([
+                    ['factura_compra_id', '=', $n_credito_c[0]->factura_compra_id],
+                    ['estado', '=', "A"],
                 ])
                 ->update(
                     [
-                        'estado' => "I"
+                        'monto' => DB::raw('monto+' . (((int)$n_credito_c[0]->importe) / $can))
                     ]
                 );
+
+            DB::table('n_credito_c_detalle')
+                ->where([
+                    ['n_credito_compra_numero', '=', $id]
+                ])
+                ->delete();
+
+            DB::table('n_credito_compra')
+                ->where([
+                    ['numero', '=', $id]
+                ])
+                ->delete();
         } catch (\Exception $e) {
-            //request()->session()->flash('error_', $e->getMessage());
-            request()->session()->flash('error_', 'Error en base de datos');
-          //  return redirect()->route('personas.index');
+            request()->session()->flash('error_', $e->getMessage());
+            //request()->session()->flash('error_', 'Error en base de datos');
+            //  return redirect()->route('personas.index');
         }
 
-        return redirect()->route('remision.index');
+        return redirect()->route('nota_credito_c.index');
     }
 
     public function tarifa(Request $request)
