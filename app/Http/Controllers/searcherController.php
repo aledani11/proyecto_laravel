@@ -20,7 +20,7 @@ class searcherController extends Controller
                 'pe.apellido'
             )
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('clientes.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('clientes.persona_pais', '=', 'pe.pais_id');
                 $join->on('clientes.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();
@@ -290,7 +290,7 @@ class searcherController extends Controller
                 'pe.apellido'
             )
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('huespedes.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('huespedes.persona_pais', '=', 'pe.pais_id');
                 $join->on('huespedes.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();
@@ -394,7 +394,7 @@ class searcherController extends Controller
             )
             ->leftJoin('cargo as car', 'empleado.cargo_id', '=', 'car.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('empleado.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('empleado.persona_pais', '=', 'pe.pais_id');
                 $join->on('empleado.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();

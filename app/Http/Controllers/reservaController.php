@@ -33,7 +33,7 @@ class reservaController extends Controller
             ->leftJoin('tipo_reserva as te', 'reservas.tipo_reserva_id', '=', 'te.id')
             ->leftJoin('clientes as cl', 'reservas.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('cl.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
                 $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();
@@ -77,7 +77,7 @@ class reservaController extends Controller
         $id = DB::table('reservas')->insertGetId(
             [
                 'id_operador' => request()->operador, 'comentarios' => request()->comentarios,
-                'tipo_cliente_id' => request()->tipo_cliente, 'usuario_id' => 1,
+                'tipo_cliente_id' => request()->tipo_cliente,
                 'tipo_reserva_id' => request()->tipo_reserva, 'fecha' => request()->fecha,
                 'clientes_id' => request()->cliente
             ]
@@ -120,7 +120,7 @@ class reservaController extends Controller
 
         DB::table('reserva_habitaciones')->insert($data1);
 
-        $input = $request->only(['persona_ciudad', 'persona_documento', 'habitacion_huesped']);
+        $input = $request->only(['persona_ciudad', 'persona_documento', 'habitacion_huesped', 'persona_pais']);
 
         foreach ($input["persona_ciudad"] as $key => $value) {
             //$data2[] = [
@@ -131,7 +131,7 @@ class reservaController extends Controller
             DB::table('reserva_personas')->insert(
                 [
                     'reservas_id' => $id,
-                    'persona_ciudad_id' => $input["persona_ciudad"][$key],
+                    'persona_pais' => $input["persona_pais"][$key],
                     'persona_nro_documento' => $input["persona_documento"][$key],
                     'habitacion_id' => $input["habitacion_huesped"][$key]
                 ]

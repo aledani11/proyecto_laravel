@@ -407,6 +407,7 @@
                         e.options[e.selectedIndex].text +
                         '<input type="hidden" name ="habitacion_huesped[]" value=' + e.options[e.selectedIndex].value + '>' +
                         '<input type="hidden" name ="persona_ciudad[]" value=' + val[0] + '>' +
+                        '<input type="hidden" name ="persona_pais[]" value=' + data.personas[0].pais_id + '>' +
                         '<input type="hidden" name ="persona_documento[]" value=' + val[1] + '>'
                     ]
                 })

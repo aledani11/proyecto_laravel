@@ -33,7 +33,7 @@ class estadiaController extends Controller
             ->leftJoin('tipo_estadia as te', 'estadia.tipo_estadia_id', '=', 'te.id')
             ->leftJoin('clientes as cl', 'estadia.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('cl.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
                 $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();
@@ -77,7 +77,7 @@ class estadiaController extends Controller
         $id = DB::table('estadia')->insertGetId(
             [
                 'id_operador' => request()->operador, 'comentarios' => request()->comentarios,
-                'tipo_cliente_id' => request()->tipo_cliente, 'usuario_id' => 1,
+                'tipo_cliente_id' => request()->tipo_cliente,
                 'Tipo_estadia_id' => request()->tipo_estadia, 'fecha' => request()->fecha,
                 'clientes_id' => request()->cliente
             ]
@@ -125,7 +125,7 @@ class estadiaController extends Controller
 
         DB::table('estadia_habitaciones')->insert($data1);
 
-        $input = $request->only(['persona_ciudad', 'persona_documento', 'habitacion_huesped']);
+        $input = $request->only(['persona_ciudad', 'persona_documento', 'habitacion_huesped', 'persona_pais']);
 
         foreach ($input["persona_ciudad"] as $key => $value) {
             //$data2[] = [
@@ -134,7 +134,7 @@ class estadiaController extends Controller
             //];
             $id_huesped = DB::table('huespedes')->insertGetId(
                 [
-                    'persona_ciudad_id' => $input["persona_ciudad"][$key],
+                    'persona_pais' => $input["persona_pais"][$key],
                     'persona_nro_documento' => $input["persona_documento"][$key],
                     'estadia_id' => $id
                 ]
@@ -382,7 +382,7 @@ class estadiaController extends Controller
     {
 
         $persona = DB::table('persona')
-            ->select('nombre', 'apellido')
+            ->select('nombre', 'apellido', 'pais_id')
             ->where([
                 ['ciudad_id', '=', $request->id[0]],
                 ['nro_documento', '=', $request->id[1]],
