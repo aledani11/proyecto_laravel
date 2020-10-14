@@ -50,7 +50,7 @@ class searcherController extends Controller
             ->leftJoin('tipo_reserva as tr', 'reservas.tipo_reserva_id', '=', 'tr.id')
             ->leftJoin('clientes as cl', 'reservas.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('cl.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
                 $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();
@@ -112,7 +112,7 @@ class searcherController extends Controller
             ->leftJoin('tipo_estadia as te', 'estadia.Tipo_estadia_id', '=', 'te.id')
             ->leftJoin('clientes as cl', 'estadia.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('cl.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
                 $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();

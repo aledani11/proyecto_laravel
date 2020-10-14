@@ -32,6 +32,7 @@ Route::put('/estadia/{estadia}', 'estadiaController@update')->name('estadia.upda
 Route::get('/estadia/anular/{estadia}', 'estadiaController@destroy')->name('estadia.destroy')->middleware('auth');
 Route::post('/estadia_tarifa', 'estadiaController@tarifa')->name('estadia.tarifa')->middleware('auth');
 Route::post('/estadia_persona', 'estadiaController@persona')->name('estadia.persona')->middleware('auth');
+Route::post('/estadia_reserva', 'estadiaController@reserva')->name('estadia.reserva')->middleware('auth');
 
 Route::get('/reserva','reservaController@index')->name('reserva.index')->middleware('auth');
 Route::post('/reserva', 'reservaController@store')->name('reserva.store')->middleware('auth');

@@ -380,8 +380,8 @@ class nota_debito_cController extends Controller
                 ])
                 ->delete();
         } catch (\Exception $e) {
-            request()->session()->flash('error_', $e->getMessage());
-            //request()->session()->flash('error_', 'Error en base de datos');
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
             //  return redirect()->route('personas.index');
         }
 

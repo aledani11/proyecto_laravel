@@ -74,79 +74,92 @@ class estadiaController extends Controller
     public function store(Request $request)
     {
         // dump(request()->all());
-        $id = DB::table('estadia')->insertGetId(
-            [
-                'id_operador' => request()->operador, 'comentarios' => request()->comentarios,
-                'tipo_cliente_id' => request()->tipo_cliente,
-                'Tipo_estadia_id' => request()->tipo_estadia, 'fecha' => request()->fecha,
-                'clientes_id' => request()->cliente
-            ]
-        );
-        //dump($request->all());
-
-        if (request()->reserva !== null) {
-            DB::table('estadia_reserva')->insert(
-                ['reservas_id' => request()->reserva, 'estadia_id' => $id,]
+        try {
+            $id = DB::table('estadia')->insertGetId(
+                [
+                    'id_operador' => request()->operador, 'comentarios' => request()->comentarios,
+                    'tipo_cliente_id' => request()->tipo_cliente,
+                    'Tipo_estadia_id' => request()->tipo_estadia, 'fecha' => request()->fecha,
+                    'clientes_id' => request()->cliente
+                ]
             );
-        }
+            //dump($request->all());
 
-        foreach ($request->tarifa as $key => $value) {
-            $data[] = [
-                'estadia_id' => $id,
-                'tarifa_id' => $value[0],
-            ];
-        }
-        //dump($data);
-        DB::table('estadia_tarifas')->insert($data);
-        // dump($request->all()["f_entrada"]);
-        $input = $request->only(['habitacion', 'f_entrada', 'f_salida', 'h_entrada', 'h_salida']);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        foreach ($input["habitacion"] as $key => $value) {
-            $data1[] = [
-                'id_estadia' => $id,
-                'id_habitacion' => $value,
-                'entrada' => $input["f_entrada"][$key],
-                'salida' => $input["f_salida"][$key],
-                'hora_entrada' => $input["h_entrada"][$key],
-                'hora_salida' => $input["h_salida"][$key]
-            ];
-            //dump($key);
-            //dump($value);
-            //dump($input["f_entrada"][$key]);
-        }
+            if (request()->reserva !== null) {
+                DB::table('estadia_reserva')->insert(
+                    ['reservas_id' => request()->reserva, 'estadia_id' => $id,]
+                );
+                DB::table('reservas')
+                    ->where('id', request()->reserva)
+                    ->update(
+                        [
+                            'estado' => "I"
+                        ]
+                    );
+            }
 
-        /* $data = array(
+            foreach ($request->tarifa as $key => $value) {
+                $data[] = [
+                    'estadia_id' => $id,
+                    'tarifa_id' => $value[0],
+                ];
+            }
+            //dump($data);
+            DB::table('estadia_tarifas')->insert($data);
+            // dump($request->all()["f_entrada"]);
+            $input = $request->only(['habitacion', 'f_entrada', 'f_salida', 'h_entrada', 'h_salida']);
+            //dump($input);
+            //dump($input["habitacion"][1]);
+            foreach ($input["habitacion"] as $key => $value) {
+                $data1[] = [
+                    'id_estadia' => $id,
+                    'id_habitacion' => $value,
+                    'entrada' => $input["f_entrada"][$key],
+                    'salida' => $input["f_salida"][$key],
+                    'hora_entrada' => $input["h_entrada"][$key],
+                    'hora_salida' => $input["h_salida"][$key]
+                ];
+                //dump($key);
+                //dump($value);
+                //dump($input["f_entrada"][$key]);
+            }
+
+            /* $data = array(
            array('id_estadia'=> [1,1], 'id_habitacion'=>  $input["habitacion"], 'entrada'=> $input["f_entrada"]),
            // array('id_estadia'=>["1","1"], 'id_habitacion'=> ["1","1"]),
         );*/
 
-        //dump($data);
+            //dump($data);
 
-        DB::table('estadia_habitaciones')->insert($data1);
+            DB::table('estadia_habitaciones')->insert($data1);
 
-        $input = $request->only(['persona_ciudad', 'persona_documento', 'habitacion_huesped', 'persona_pais']);
+            $input = $request->only(['persona_ciudad', 'persona_documento', 'habitacion_huesped', 'persona_pais']);
 
-        foreach ($input["persona_ciudad"] as $key => $value) {
-            //$data2[] = [
-            // 'persona_ciudad_id' => $input["persona_ciudad"][$key],
-            // 'persona_nro_documento' =>$input["persona_documento"][$key],
-            //];
-            $id_huesped = DB::table('huespedes')->insertGetId(
-                [
-                    'persona_pais' => $input["persona_pais"][$key],
-                    'persona_nro_documento' => $input["persona_documento"][$key],
-                    'estadia_id' => $id
-                ]
-            );
+            foreach ($input["persona_ciudad"] as $key => $value) {
+                //$data2[] = [
+                // 'persona_ciudad_id' => $input["persona_ciudad"][$key],
+                // 'persona_nro_documento' =>$input["persona_documento"][$key],
+                //];
+                $id_huesped = DB::table('huespedes')->insertGetId(
+                    [
+                        'persona_pais' => $input["persona_pais"][$key],
+                        'persona_nro_documento' => $input["persona_documento"][$key],
+                        'estadia_id' => $id
+                    ]
+                );
 
-            DB::table('estadia_huespedes')->insert(
-                [
-                    'id_estadia' => $id,
-                    'huespedes_id' => $id_huesped,
-                    'habitacion_id' => $input["habitacion_huesped"][$key]
-                ]
-            );
+                DB::table('estadia_huespedes')->insert(
+                    [
+                        'id_estadia' => $id,
+                        'huespedes_id' => $id_huesped,
+                        'habitacion_id' => $input["habitacion_huesped"][$key]
+                    ]
+                );
+            }
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //  return redirect()->route('personas.index');
         }
 
         return redirect()->route('estadia.index');
@@ -259,17 +272,18 @@ class estadiaController extends Controller
             $reservas = DB::table('estadia_reserva')
                 ->where('estadia_id', '=', request()->codigo)
                 ->get();
-           // dump($reservas);
+            // dump($reservas);
             if (isset($reservas[0])) {
                 DB::table('estadia_reserva')->where('estadia_id', request()->codigo)
                     ->update(
                         ['reservas_id' => request()->reserva]
                     );
-            }else{ 
+            } else {
                 DB::table('estadia_reserva')
                     ->insert(
-                        ['reservas_id' => request()->reserva
-                        ,'estadia_id' => request()->codigo]
+                        [
+                            'reservas_id' => request()->reserva, 'estadia_id' => request()->codigo
+                        ]
                     );
             }
         } else {
@@ -351,15 +365,36 @@ class estadiaController extends Controller
      */
     public function destroy($id)
     {
-        //dump($id);
-        DB::table('estadia')
-            ->where('id', $id)
-            ->update(
-                [
-                    'estado' =>"I"
-                ]
-            );
-            return redirect()->route('estadia.index');
+        try {
+            //dump($id);
+            DB::table('estadia')
+                ->where('id', $id)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
+
+            $reserva_id = DB::table('estadia_reserva')
+                ->select('reservas_id')
+                ->where('estadia_id', $id)
+                ->get();
+
+            if (isset($reserva_id[0]->reservas_id)) {
+                DB::table('reservas')
+                    ->where('id', $reserva_id[0]->reservas_id)
+                    ->update(
+                        [
+                            'estado' => "A"
+                        ]
+                    );
+            }
+        } catch (\Exception $e) {
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            //  return redirect()->route('personas.index');
+        }
+        return redirect()->route('estadia.index');
     }
 
     public function tarifa(Request $request)
@@ -392,6 +427,59 @@ class estadiaController extends Controller
         //return view('estadia.create', ['tarifas' => $tarifa]);
 
         return ['personas' => $persona];
+        //return $request;
+    }
+    public function reserva(Request $request)
+    {
+        $reserva = DB::table('reservas')
+            ->select(
+                'reservas.*',
+            )
+            ->where('id', '=', $request->id)
+            ->get();
+
+            $reserva_tarifas = DB::table('reserva_tarifas')
+                ->select(
+                    'reserva_tarifas.*',
+                )
+                ->where('id_reserva', '=', $request->id)
+                ->get();
+
+            foreach ($reserva_tarifas as $key => $value) {
+                $art_cod[] = (int) ($reserva_tarifas[$key]->id_tarifa);
+            }
+
+            $tarifa = DB::table('tarifas')
+            ->select('tn.descripcion', 'tarifas.id', 'tarifas.habitacion_id')
+            ->whereIn('tarifas.id', $art_cod)
+            ->leftJoin('tarifas_nombres as tn', 'tarifas.tarifas_nombres_id', '=', 'tn.id')
+            ->get();
+
+            $reserva_habitaciones = DB::table('reserva_habitaciones')
+            ->select(
+                'reserva_habitaciones.*',
+                'h.descripcion'
+            )
+            ->where('id_reserva', '=', $request->id)
+            ->leftJoin('habitaciones as h', 'reserva_habitaciones.id_habitaciones', '=', 'h.id')
+            ->get();
+
+            $persona = DB::table('reserva_personas')
+            ->select('pe.*','reserva_personas.habitacion_id', 'h.descripcion')
+            ->where('reservas_id', '=', $request->id)
+            ->leftJoin('habitaciones as h', 'reserva_personas.habitacion_id', '=', 'h.id')
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('reserva_personas.persona_pais', '=', 'pe.pais_id');
+                $join->on('reserva_personas.persona_nro_documento', '=', 'pe.nro_documento');
+            })
+            ->get();
+
+        return [
+            'reservas' => $reserva,
+            'tarifas' => $tarifa,
+            'reserva_habitaciones' => $reserva_habitaciones,
+            'personas' => $persona
+        ];
         //return $request;
     }
 }

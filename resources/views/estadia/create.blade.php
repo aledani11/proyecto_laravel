@@ -272,7 +272,7 @@
 
 <script>
     function add(table) {
-
+        var x = [];
         if (table === "tarifa") {
             var val = parseInt(document.getElementById('tarifa').value);
             //console.log(val);
@@ -323,6 +323,102 @@
             var table = "#habitacion_table"
             //console.log(x);
             addTable(x, table);
+        }
+
+        if (table === "estadia_reserva") {
+            remove_all()
+            var path = "{{route('estadia.reserva')}}";
+            //var table = "#orden_table"
+            var val = parseInt(document.getElementById("reserva").value);
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: 'POST',
+                url: path,
+                data: {
+                    id: val
+                },
+                success: function(data) {
+                    //alert(data.presupuesto_);
+                    //console.log(data);
+                    //alert(data.tarifas[0].descripcion);
+                    //$('#tarifa_table').bootstrapTable('insertRow', {index: 0, row: [1,"hola"]})
+                    //console.log([1,"hola"]);
+                    //addTable(data, table)
+                    document.getElementById("cliente").value=data.reservas[0].clientes_id;
+                    document.getElementById("operador").value = data.reservas[0].id_operador;
+                    document.getElementById("tipoc").value = data.reservas[0].tipo_cliente_id;
+                    add_data(data);
+                    //var x = [];
+                    //x[0] = de.value;
+
+                }
+            });
+            path = "empty";
+        }
+        
+        function add_data(data) {
+            
+            //console.log(data);
+            //var data1 = {array: ["hola","hola"]};
+            //console.log(data1);
+            //data.articulos.shift();
+            //console.log(data);
+            //x[0] = de.value;
+            var table = "#tarifa_table"
+            var path = "empty";
+            lenght_data= data.tarifas.length;
+            for (let index = 0; index < lenght_data; index++) {
+                //x[0] = data.articulos[0].cantidad;
+                //x[1] = data.articulos[0].precio;
+                //x[2] = data.articulos[0].porcentaje;
+                addTable(data, table);
+                //console.log(data);
+                data.tarifas.shift();
+                //console.log(data);
+            }
+            var table = "#habitacion_table"
+            var path = "empty";
+            lenght_data= data.reserva_habitaciones.length;
+            for (let index = 0; index < lenght_data; index++) {
+                x[0] = data.reserva_habitaciones[0].id_habitaciones;
+                x[1] = data.reserva_habitaciones[0].descripcion;
+                x[2] = data.reserva_habitaciones[0].entrada;
+                x[3] = data.reserva_habitaciones[0].salida;
+                x[4] = data.reserva_habitaciones[0].hora_entrada;
+                x[5] = data.reserva_habitaciones[0].hora_salida;
+                addTable(x, table);
+                //addTable(data, table);
+                //console.log(data);
+                data.reserva_habitaciones.shift();
+                //console.log(data);
+            }
+            var table = "empty";
+            var path = "empty";
+            lenght_data= data.personas.length;
+            for (let index = 0; index < lenght_data; index++) {
+                $("#habitacion_huespedes").bootstrapTable('insertRow', {
+                    index: 0,
+                    row: [data.personas[0].ciudad_id+"-"+data.personas[0].nro_documento,
+                        data.personas[0].nombre + " " + data.personas[0].apellido,
+                        data.personas[0].habitacion_id,
+                        data.personas[0].descripcion +
+                        '<input type="hidden" name ="habitacion_huesped[]" value=' + data.personas[0].habitacion_id + '>' +
+                        '<input type="hidden" name ="persona_ciudad[]" value=' + data.personas[0].ciudad_id + '>' +
+                        '<input type="hidden" name ="persona_pais[]" value=' + data.personas[0].pais_id + '>' +
+                        '<input type="hidden" name ="persona_documento[]" value=' + data.personas[0].nro_documento + '>'
+                    ]
+                })
+                //addTable(x, table);
+                //addTable(data, table);
+                //console.log(data);
+                data.personas.shift();
+                //console.log(data);
+            }
+
         }
 
         if (path !== "empty") {
@@ -572,6 +668,7 @@
         }
         if (reservas != "nothing" && reservas != null) {
             document.getElementById("reserva").value = reservas;
+            add("estadia_reserva")
         }
         if (tarifas != "nothing" && tarifas != null) {
             document.getElementById("tarifa").value = tarifas;
