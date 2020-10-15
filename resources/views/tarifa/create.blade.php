@@ -63,7 +63,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="temp">Temporada</label>
-                    <select id="temp" name="temp" require >
+                    <select id="temp" name="temp" require>
                         <option value="">--Selecciona una opción--</option>
                         @foreach($temporadas as $temporada)
                         <option value={{ $temporada->id }}>{{ $temporada->descripcion }}</option>
@@ -76,25 +76,76 @@
                 </div>
                 <div class="form-group">
                     <label for="precio"> Precio </label>
-                    <input type="number" id="precio" name="precio" value="0" min="0" max="100" required>
+                    <input type="number" id="precio" name="precio" value="0" min="0" max="10000000000" required>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="container">
+
         <div class="row">
-            <div class="col-md-10">
-                <div class="d-flex flex-wrap justify-content-md-around ">
-                    <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
-                    <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
-                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('tarifa.index') }}'" class="btn btn-dark">SALIR</button></div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="servicio">Servicio</label>
+                    <select id="servicio" tabindex="15">
+                        <option value="">--Selecciona una opción--</option>
+                        <option value="Lavanderia">Lavanderia</option>
+                        <option value="Consumicion">Consumicion</option>
+                        <option value="Traslado">Traslado</option>
+                        <option value="Turismo">Turismo</option>
+                        <option value="Spa_sauna">Spa y Sauna</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="porcentaje">Porcentaje</label>
+                    <input type="number" id="porcentaje" value="0" min="0" max="100">
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group mb-4 col-md-10">
+            <h5>Promocion</h5>
+        </div>
+
+        <div class="row">
+            <div class="col-md-10 form-group">
+                <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
+                    <table id="promocion" data-toggle="table" data-classes="table table-bordered table-hover table-md">
+                        <thead>
+                            <tr>
+                                <th data-sortable="true">Servicio</th>
+                                <th>Porcentaje</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-md-2 form-group">
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="add('promocion')" tabindex="17">Agregar</button>
+                </div>
+                <div class="col-md-12">
+                    <button type="button" class="btn btn-dark form-group" onclick="remove('promocion')">Quitar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="d-flex flex-wrap justify-content-md-around ">
+                        <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
+                        <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
+                        <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('tarifa.index') }}'" class="btn btn-dark">SALIR</button></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    </div>
-
 </form>
 
 <script>
@@ -107,33 +158,30 @@
 
     function add(table) {
 
-        if (table === "orden") {
+        if (table === "promocion") {
             //console.log(val);
-            var ca = document.getElementById("cantidad");
-            var val = parseInt(document.getElementById("articulo").value);
-            var pr = document.getElementById("precio");
-            var iv = document.getElementById("iva");
+            var ca = document.getElementById("porcentaje");
+            var pr = document.getElementById("servicio");
             var x = [];
             //x[0] = de.value;
             x[0] = ca.value;
             x[1] = pr.value;
-            x[2] = iv.value;
-            x[3] = iv.text;
-            if (x[0] === "" || x[1] === "" ||
-                x[2] === "" || val === "") {
+            if (x[0] === "" || x[1] === "" ) {
                 alert("Cargar campos primero");
                 //console.log(x);
                 return false;
             }
-            if (parseInt(x[0]) <= 0) {
-                alert("Cantidad debe ser mayor a cero");
+            if (parseInt(x[0]) < 0 || parseInt(x[0]) > 100) {
+                alert("Porcentaje debe estar entre 0 y 100");
                 //console.log(x);
                 return false;
             }
             // var val = parseInt(document.getElementById('tarifa').value);
             //var path = "empty";
-            var path = "{{route('requisicion.articulo')}}";
-            var table = "#orden_table"
+            var path = "empty";
+            var table = "#promocion"
+            data = null;
+            addTable(data, table)
             //console.log(x);
             // addTable(x, table);
         }
@@ -164,50 +212,36 @@
         }
 
         function addTable(data, table) {
-            if (table === "#orden_table") {
+            if (table === "#promocion") {
 
-                var name_articulo = document.getElementsByName("articulo_detalle[]");
+                var name_articulo = document.getElementsByName("servicios_detalle[]");
                 for (let index = 0; index < name_articulo.length; index++) {
                     const element = name_articulo[index];
-                    if (element.value == data.articulos[0].codigo) {
-                        alert("Codigo ya ingresado");
+                    if (element.value == x[1]) {
+                        alert("Servicio ya ingresado");
                         return false;
                     }
                 }
 
                 //id_monto += 1;
-                var importe = 0;
-                importe = (parseInt(x[0]) * parseInt(x[1]));
-                var iva = 0;
-                iva = parseInt(importe / parseInt(x[2]));
+                
                 $(table).bootstrapTable('insertRow', {
                     index: 0,
-                    row: [data.articulos[0].codigo, data.articulos[0].nombre, x[0], parseInt(x[1]).format(0, 3, '.', ','), importe.format(0, 3, '.', ','), iva.format(0, 3, '.', ',') +
-                        '<input type="hidden" name ="articulo_detalle[]" value=' + data.articulos[0].codigo + '>' +
-                        '<input type="hidden" name ="precio_detalle[]" value=' + x[1] + '>' +
-                        '<input type="hidden" name ="cantidad_detalle[]" value=' + x[0] + '>' +
-                        '<input type="hidden" name ="iva_detalle[]" value=' + x[2] + '>'
+                    row: [x[1], x[0] +
+                        '<input type="hidden" name ="servicios_detalle[]" value=' + x[1] + '>' +
+                        '<input type="hidden" name ="porcentaje_detalle[]" value=' + x[0] + '>'
                     ]
                 })
-                total_iva += iva;
-                subtotal += importe;
-                total = total_iva + subtotal;
+                
 
-                document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
-                document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
-                document.getElementById("total").value = total.format(0, 3, '.', ',');
-                //document.getElementById("importe").value = (total.format(0, 3, '.', ',')).replace(".","");
-
-                document.getElementById("cantidad").value = "";
-                document.getElementById("articulo").value = "";
-                document.getElementById("precio").value = "";
-                document.getElementById("iva").value = "";
+                document.getElementById("porcentaje").value = "0";
+                document.getElementById("servicio").value = "";
             }
         }
 
     }
     var id_delete = null;
-    $('#orden_table, #cheque_table').on('click-row.bs.table', function(e, row, $element, field) {
+    $('#orden_table, #promocion').on('click-row.bs.table', function(e, row, $element, field) {
         id_delete = row;
         //console.log(id_delete[4]);
         //$("#tarifa_table").bootstrapTable('remove', {field: 0, values: [1]});
@@ -218,12 +252,12 @@
         // console.log(d.length);
     })
 
-    $('#orden_table, #cheque_table, #habitacion_huespedes').on('click', 'tbody tr', function(event) {
+    $('#orden_table, #cheque_table, #promocion').on('click', 'tbody tr', function(event) {
         $(this).addClass('highlight').siblings().removeClass('highlight');
     });
 
     function remove_all() {
-        $("#orden_table").bootstrapTable('removeAll');
+        $("#promocion").bootstrapTable('removeAll');
 
     }
 
@@ -259,8 +293,8 @@
             document.getElementById("te").value = total_entregado.format(0, 3, '.', ',');
             entregado();
         }
-        if (table_remove === "habitacion") {
-            var table_rem = "#habitacion_table";
+        if (table_remove === "promocion") {
+            var table_rem = "#promocion";
         }
         $(table_rem).bootstrapTable('remove', {
             field: 0,
@@ -373,7 +407,7 @@
     });
 
     function validateForm() {
-        
+
         //console.log(taf);
         // console.log(taf.length);
         //console.log(x[0]);
@@ -408,7 +442,11 @@
         }
     });
 
-
+    document.querySelector('#porcentaje').addEventListener("keypress", function(evt) {
+        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
+            evt.preventDefault();
+        }
+    });
 
     Number.prototype.format = function(n, x, s, c) {
         var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',

@@ -39,29 +39,53 @@
                             <a href="#" role="button" data-toggle="dropdown" class="dropdown-item dropdown-toggle">Servicios</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ route('productos.index') }}" class="dropdown-item">Productos</a></li>
-                                <li><a href="{{ route('cama.index') }}" class="dropdown-item">Cama</a></li>
-                                <li><a href="{{ route('caracteristicas.index') }}" class="dropdown-item">Caractristicas</a></li>
-                                <li><a href="{{ route('cargo.index') }}" class="dropdown-item">Cargo</a></li>
-                                <li><a href="{{ route('ciudad.index') }}" class="dropdown-item">Ciudad</a></li>
-                                <li><a href="{{ route('departamento.index') }}" class="dropdown-item">Departamento</a></li>
-                                <li><a href="{{ route('habitacion_estado.index') }}" class="dropdown-item">Habitacion Estado</a></li>
-                                <li><a href="{{ route('habitacion_nombres.index') }}" class="dropdown-item">Habitacion Nombres</a></li>
-                                <li><a href="{{ route('habitaciones.index') }}" class="dropdown-item">Habitaciones</a></li>
-                                <li><a href="{{ route('operador_turistico.index') }}" class="dropdown-item">Operador Turistico</a></li>
-                                <li><a href="{{ route('pais.index') }}" class="dropdown-item">Pais</a></li>
-                                <li><a href="{{ route('personas.index') }}" class="dropdown-item">Persona</a></li>
                                 <li><a href="{{ route('spa_sauna.index') }}" class="dropdown-item">Spa y Sauna</a></li>
-                                <li><a href="{{ route('tarifa.index') }}" class="dropdown-item">Tarifas</a></li>
-                                <li><a href="{{ route('tarifas_nombres.index') }}" class="dropdown-item">Tarifas Nombres</a></li>
-                                <li><a href="{{ route('temporadas.index') }}" class="dropdown-item">Temporadas</a></li>
-                                <li><a href="{{ route('tipo_cliente.index') }}" class="dropdown-item">Tipo cliente</a></li>
-                                <li><a href="{{ route('tipo_documento.index') }}" class="dropdown-item">Tipo documento</a></li>
-                                <li><a href="{{ route('tipo_estadia.index') }}" class="dropdown-item">Tipo estadia</a></li>
-                                <li><a href="{{ route('tipos_habitacion.index') }}" class="dropdown-item">Tipo habitacion</a></li>
-                                <li><a href="{{ route('tipo_reserva.index') }}" class="dropdown-item">Tipo reserva</a></li>
                                 <li><a href="{{ route('turismo.index') }}" class="dropdown-item">Turismo</a></li>
-                                <li><a href="{{ route('ubicaciones.index') }}" class="dropdown-item">Ubicaciones</a></li>
-                                <li><a href="{{ route('clientes.index') }}" class="dropdown-item">Clientes</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a href="#" role="button" data-toggle="dropdown" class="dropdown-item dropdown-toggle">Tarifa</a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{{ route('tarifa.index') }}" class="dropdown-item">Tarifas</a></li>
+                                <li><a href="{{ route('temporadas.index') }}" class="dropdown-item">Temporadas</a></li>
+                                <li><a href="{{ route('tarifas_nombres.index') }}" class="dropdown-item">Tarifas Nombres</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a href="#" role="button" data-toggle="dropdown" class="dropdown-item dropdown-toggle">Habitaciones</a>
+                            <ul class="dropdown-menu">
+                            <li><a href="{{ route('habitaciones.index') }}" class="dropdown-item">Habitaciones</a></li>
+                            <li><a href="{{ route('habitacion_estado.index') }}" class="dropdown-item">Habitacion Estado</a></li>
+                            <li><a href="{{ route('ubicaciones.index') }}" class="dropdown-item">Ubicaciones</a></li>
+                            <li><a href="{{ route('habitacion_nombres.index') }}" class="dropdown-item">Habitacion Nombres</a></li>
+                            <li><a href="{{ route('tipos_habitacion.index') }}" class="dropdown-item">Tipo habitacion</a></li>
+                            <li><a href="{{ route('caracteristicas.index') }}" class="dropdown-item">Caractristicas</a></li>
+                            <li><a href="{{ route('cama.index') }}" class="dropdown-item">Cama</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a href="#" role="button" data-toggle="dropdown" class="dropdown-item dropdown-toggle">Alojamiento y reserva</a>
+                            <ul class="dropdown-menu">
+                            <li><a href="{{ route('clientes.index') }}" class="dropdown-item">Clientes</a></li>
+                            <li><a href="{{ route('operador_turistico.index') }}" class="dropdown-item">Operador Turistico</a></li>
+                            <li><a href="{{ route('tipo_cliente.index') }}" class="dropdown-item">Tipo cliente</a></li>
+                            <li><a href="{{ route('tipo_reserva.index') }}" class="dropdown-item">Tipo reserva</a></li>
+                            <li><a href="{{ route('tipo_estadia.index') }}" class="dropdown-item">Tipo estadia</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="dropdown-submenu">
+                            <a href="#" role="button" data-toggle="dropdown" class="dropdown-item dropdown-toggle">Personas</a>
+                            <ul class="dropdown-menu">
+                            <li><a href="{{ route('personas.index') }}" class="dropdown-item">Persona</a></li>
+                            <li><a href="{{ route('pais.index') }}" class="dropdown-item">Pais</a></li>
+                            <li><a href="{{ route('departamento.index') }}" class="dropdown-item">Departamento</a></li>
+                            <li><a href="{{ route('ciudad.index') }}" class="dropdown-item">Ciudad</a></li>
+                            <li><a href="{{ route('tipo_documento.index') }}" class="dropdown-item">Tipo documento</a></li>
+                            <li><a href="{{ route('cargo.index') }}" class="dropdown-item">Cargo</a></li>
                             </ul>
                         </li>
 
@@ -105,8 +129,8 @@
                     <ul class="dropdown-menu">
                         <li><a href="{{ route('reserva.index') }}" class="dropdown-item">Reserva</a></li>
                         <li><a href="{{ route('estadia.index') }}" class="dropdown-item">Estadia</a></li>
-                        <li><a href="{{ route('servicios_spa.index') }}" class="dropdown-item">Servicios Spa Sauna</a></li>
                         <li><a href="{{ route('servicios_consumicion.index') }}" class="dropdown-item">Servicios Consumicion</a></li>
+                        <li><a href="{{ route('servicios_spa.index') }}" class="dropdown-item">Servicios Spa Sauna</a></li>
                         <li><a href="{{ route('servicios_turismo.index') }}" class="dropdown-item">Servicios Turismo</a></li>
                     </ul>
                 </li>
@@ -116,12 +140,12 @@
 
                     <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle">Facturacion</a>
                     <ul class="dropdown-menu">
-                    <li><a href="{{ route('apertura.index') }}" class="dropdown-item">Apertura y Cierre</a></li>
-                    <li><a href="{{ route('arqueo.index') }}" class="dropdown-item">Arqueo</a></li>
-                    <li><a href="{{ route('cobros.index') }}" class="dropdown-item">Cobros</a></li>
-                    <li><a href="{{ route('factura.index') }}" class="dropdown-item">Factura</a></li>
-                    <li><a href="{{ route('nota_de_credito.index') }}" class="dropdown-item">Nota De Credito</a></li>
-                    <li><a href="{{ route('recaudaciones.index') }}" class="dropdown-item">Recaudaciones a Depositar</a></li>
+                        <li><a href="{{ route('apertura.index') }}" class="dropdown-item">Apertura y Cierre</a></li>
+                        <li><a href="{{ route('arqueo.index') }}" class="dropdown-item">Arqueo</a></li>
+                        <li><a href="{{ route('cobros.index') }}" class="dropdown-item">Cobros</a></li>
+                        <li><a href="{{ route('factura.index') }}" class="dropdown-item">Factura</a></li>
+                        <li><a href="{{ route('nota_de_credito.index') }}" class="dropdown-item">Nota De Credito</a></li>
+                        <li><a href="{{ route('recaudaciones.index') }}" class="dropdown-item">Recaudaciones a Depositar</a></li>
                     </ul>
                 </li>
                 @endif

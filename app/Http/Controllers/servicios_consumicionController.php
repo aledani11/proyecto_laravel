@@ -18,20 +18,20 @@ class servicios_consumicionController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //estado i=inactivo a=activo
-        $servicios = DB::table('servicios')
+        $servicios = DB::table('s_consumicion')
             ->select(
-                'servicios.*',
-                'nom.nombre as nombres'
-             //   'ha.descripcion as habitacion'
-              //  'pr.producto as producto'
+                's_consumicion.*',
+                'pe.nombre',
+                'pe.apellido',
+                'cl.ruc'
             )
-           // ->where('servicios.estado', '=', 'A')
-           ->groupBy('servicios.id')
-            ->leftJoin('servicios_nombres as nom', 'servicios.nombre_id', '=', 'nom.id')
-            ->rightJoin('servicios_consumicion as sc', 'servicios.id', '=', 'sc.servicio_id')
-            //->leftJoin('habitaciones as ha', 'sc.habitacion_id', '=', 'ha.id')
-            //->leftJoin('productos as pr', 'sc.producto_id', '=', 'pr.id')
-            
+            ->where('s_consumicion.estado', '=', 'A')
+            ->leftJoin('estadia as es', 's_consumicion.estadia_id', '=', 'es.id')
+            ->leftJoin('clientes as cl', 'es.clientes_id', '=', 'cl.id')
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
+                $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
+            })
             ->get();
 
         //  dd($nota_credito);
@@ -46,10 +46,13 @@ class servicios_consumicionController extends Controller
      */
     public function create()
     {
-        $nombres = DB::table('servicios_nombres')->get();
+        $productos = DB::table('productos')->get();
+        $habitacion = DB::table('habitaciones')
+            ->select('id', 'descripcion')->get();
 
         return view('servicios_consumicion.create', [
-            'nombres' => $nombres,
+            'producto' => $productos,
+            'habitacion' => $habitacion,
         ]);
     }
 
@@ -61,52 +64,43 @@ class servicios_consumicionController extends Controller
      */
     public function store(Request $request)
     {
-        // dump(request()->all());
-        //c=cobrado a=anulado
-        $id = DB::table('servicios')->insertGetId(
-            [
-                'nombre_id' => request()->nombre, 'descripcion' => request()->descripcion,
-                'fecha' => request()->fecha, 'usuario_id' => 1,
-                'realizado' => request()->realizado, 'total' => request()->total
-            ]
-        );
 
-        $input = $request->only([
-            'huesped_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["huesped_detalle"])) {
-            foreach ($input["huesped_detalle"] as $key => $value) {
+        try {
+            // dump(request()->all());
+            //c=cobrado a=anulado
+            $id = DB::table('s_consumicion')->insertGetId(
+                [
+                    'estadia_id' => request()->estadia, 'descripcion' => request()->descripcion,
+                    'fecha' => request()->fecha, 'estado' => "A",
+                    'realizado' => request()->realizado,
+                ]
+            );
 
-                $data[] = [
-                    'id_servicios' => $id,
-                    'huesped_id' => $input["huesped_detalle"][$key]
-                ];
+            $input = $request->only([
+                'producto_detalle', 'cantidad_detalle', 'habitacion_detalle', 'promocion_detalle', 'huespedes_detalle'
+            ]);
+            //dump($input);
+            //dump($input["habitacion"][1]);
+            if (isset($input["producto_detalle"])) {
+                foreach ($input["producto_detalle"] as $key => $value) {
+
+                    $data1[] = [
+                        's_consumicion_id' => $id,
+                        'producto_id' => $input["producto_detalle"][$key],
+                        'cantidad' => $input["cantidad_detalle"][$key],
+                        'habitacion_id' => $input["habitacion_detalle"][$key],
+                        'huesped_id' => $input["huespedes_detalle"][$key],
+                        'promocion' => $input["promocion_detalle"][$key]
+                    ];
+                }
+
+
+                DB::table('consumicion_detalle')->insert($data1);
             }
-
-
-            DB::table('servicios_detalle')->insert($data);
-        }
-
-        $input = $request->only([
-            'producto_detalle', 'cantidad_detalle','habitacion_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["producto_detalle"])) {
-            foreach ($input["producto_detalle"] as $key => $value) {
-
-                $data1[] = [
-                    'servicio_id' => $id,
-                    'producto_id' => $input["producto_detalle"][$key],
-                    'cantidad' => $input["cantidad_detalle"][$key],
-                    'habitacion_id' => $input["habitacion_detalle"][$key]
-                ];
-            }
-
-
-            DB::table('servicios_consumicion')->insert($data1);
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
         }
 
 
@@ -315,13 +309,37 @@ class servicios_consumicionController extends Controller
     {
         //dump($id);
         //i=inactivo a=activo 
-        
+        try {
 
-            DB::table('servicios_detalle')->where('id_servicios', '=', $id)->delete();
-            DB::table('servicios_consumicion')->where('servicio_id', '=', $id)->delete();
-            DB::table('servicios')->where('id', '=', $id)->delete();
+            DB::table('consumicion_detalle')->where('s_consumicion_id', '=', $id)->delete();
+            DB::table('s_consumicion')->where('id', '=', $id)->delete();
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
 
-        
+        return redirect()->route('servicios_consumicion.index');
+    }
+
+    public function realizado($id)
+    {
+        try {
+            //dump($id);
+            //i=inactivo a=activo 
+
+            DB::table('s_consumicion')
+                ->where('id', '=', $id)->update(
+                    [
+                        'realizado' => "Si"
+                    ]
+                );
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
+
         return redirect()->route('servicios_consumicion.index');
     }
 
@@ -342,8 +360,8 @@ class servicios_consumicionController extends Controller
     }
 
     public function huesped(Request $request)
-    {        
-            $huespedes = DB::table('huespedes')
+    {
+        $huespedes = DB::table('huespedes')
             ->select(
                 'huespedes.id',
                 'pe.nombre',
@@ -361,15 +379,15 @@ class servicios_consumicionController extends Controller
     }
 
     public function producto(Request $request)
-    {        
-            $productos = DB::table('productos')
+    {
+        $productos = DB::table('productos')
             ->select(
                 'productos.*'
             )
             ->where('id', '=', $request->id[0])
             ->get();
 
-            $habitaciones = DB::table('habitaciones')
+        $habitaciones = DB::table('habitaciones')
             ->select(
                 'habitaciones.id',
                 'habitaciones.descripcion'
@@ -377,7 +395,38 @@ class servicios_consumicionController extends Controller
             ->where('id', '=', $request->id[1])
             ->get();
 
-        return ['productos' => $productos, 'habitaciones' => $habitaciones];
+        $huespedes = DB::table('huespedes')
+            ->select(
+                'huespedes.id',
+                'pe.nombre',
+                'pe.apellido'
+            )
+            ->where('huespedes.id', '=', $request->id[2])
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('huespedes.persona_pais', '=', 'pe.pais_id');
+                $join->on('huespedes.persona_nro_documento', '=', 'pe.nro_documento');
+            })->get();
+
+        $tarifa_id = DB::table('tarifas')
+            ->select(
+                'tarifas.id'
+            )
+            ->where('habitacion_id', '=', $request->id[1])
+            ->get();
+
+        $promocion = DB::table('promocion')
+            ->select(
+                'promocion.porcentaje',
+            )
+            ->where([
+                ['tarifas_id', '=', $tarifa_id[0]->id],
+                ['servicio', '=', "Consumicion"]
+            ])->get();
+
+        return [
+            'productos' => $productos, 'habitaciones' => $habitaciones,
+            'huespedes' => $huespedes, 'promocion' => $promocion
+        ];
         //return $request;
     }
 }

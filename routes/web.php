@@ -166,6 +166,7 @@ Route::get('/servicios_consumicion/editar/{servicios}', 'servicios_consumicionCo
 Route::put('/servicios_consumicion/{servicios}', 'servicios_consumicionController@update')->name('servicios_consumicion.update')->middleware('auth');
 Route::get('/servicios_consumicion/anular/{servicios}', 'servicios_consumicionController@destroy')->name('servicios_consumicion.destroy')->middleware('auth');
 Route::post('/servicios_producto', 'servicios_consumicionController@producto')->name('servicios_consumicion.producto')->middleware('auth');
+Route::get('/consumicion_realizado/{id}', 'servicios_consumicionController@realizado')->name('consumicion.realizado')->middleware('auth');
 
 Route::get('/servicios_turismo','servicios_turismoController@index')->name('servicios_turismo.index')->middleware('auth');
 Route::post('/servicios_turismo', 'servicios_turismoController@store')->name('servicios_turismo.store')->middleware('auth');
@@ -478,8 +479,10 @@ Route::get('/searcher/requisicion', 'searcherController@requisicion')->name('sea
 Route::get('/searcher/presupuesto', 'searcherController@presupuesto')->name('searcher.presupuesto')->middleware('auth');
 Route::get('/searcher/orden', 'searcherController@orden')->name('searcher.orden')->middleware('auth');
 Route::get('/searcher/huesped', 'searcherController@huesped')->name('searcher.huesped')->middleware('auth');
+Route::get('/searcher/huesped/{id}', 'searcherController@huesped1')->name('searcher.huesped1')->middleware('auth');
 Route::get('/searcher/spa', 'searcherController@spa')->name('searcher.spa')->middleware('auth');
 Route::get('/searcher/habitacion', 'searcherController@habitacion')->name('searcher.habitacion')->middleware('auth');
+Route::get('/searcher/habitacion/{id}', 'searcherController@habitacion1')->name('searcher.habitacion1')->middleware('auth');
 Route::get('/searcher/producto', 'searcherController@producto')->name('searcher.producto')->middleware('auth');
 Route::get('/searcher/turismo', 'searcherController@turismo')->name('searcher.turismo')->middleware('auth');
 Route::get('/searcher/cama', 'searcherController@cama')->name('searcher.cama')->middleware('auth');

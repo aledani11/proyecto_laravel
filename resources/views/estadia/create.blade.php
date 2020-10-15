@@ -327,6 +327,10 @@
 
         if (table === "estadia_reserva") {
             remove_all()
+            for (let index = 0; index < document.getElementsByName("combo_habi[]").length; index++) {
+                document.getElementsByName("combo_habi[]")[index].setAttribute("class", "hidden");
+            }
+            $('.hidden').hide();
             var path = "{{route('estadia.reserva')}}";
             //var table = "#orden_table"
             var val = parseInt(document.getElementById("reserva").value);
@@ -348,7 +352,7 @@
                     //$('#tarifa_table').bootstrapTable('insertRow', {index: 0, row: [1,"hola"]})
                     //console.log([1,"hola"]);
                     //addTable(data, table)
-                    document.getElementById("cliente").value=data.reservas[0].clientes_id;
+                    document.getElementById("cliente").value = data.reservas[0].clientes_id;
                     document.getElementById("operador").value = data.reservas[0].id_operador;
                     document.getElementById("tipoc").value = data.reservas[0].tipo_cliente_id;
                     add_data(data);
@@ -359,9 +363,9 @@
             });
             path = "empty";
         }
-        
+
         function add_data(data) {
-            
+
             //console.log(data);
             //var data1 = {array: ["hola","hola"]};
             //console.log(data1);
@@ -370,7 +374,7 @@
             //x[0] = de.value;
             var table = "#tarifa_table"
             var path = "empty";
-            lenght_data= data.tarifas.length;
+            lenght_data = data.tarifas.length;
             for (let index = 0; index < lenght_data; index++) {
                 //x[0] = data.articulos[0].cantidad;
                 //x[1] = data.articulos[0].precio;
@@ -382,7 +386,7 @@
             }
             var table = "#habitacion_table"
             var path = "empty";
-            lenght_data= data.reserva_habitaciones.length;
+            lenght_data = data.reserva_habitaciones.length;
             for (let index = 0; index < lenght_data; index++) {
                 x[0] = data.reserva_habitaciones[0].id_habitaciones;
                 x[1] = data.reserva_habitaciones[0].descripcion;
@@ -398,11 +402,11 @@
             }
             var table = "empty";
             var path = "empty";
-            lenght_data= data.personas.length;
+            lenght_data = data.personas.length;
             for (let index = 0; index < lenght_data; index++) {
                 $("#habitacion_huespedes").bootstrapTable('insertRow', {
                     index: 0,
-                    row: [data.personas[0].ciudad_id+"-"+data.personas[0].nro_documento,
+                    row: [data.personas[0].ciudad_id + "-" + data.personas[0].nro_documento,
                         data.personas[0].nombre + " " + data.personas[0].apellido,
                         data.personas[0].habitacion_id,
                         data.personas[0].descripcion +
@@ -712,9 +716,9 @@
     $('.hidden').hide();
     $('.show').show();
 
-    function mensaje_grabar(){
-            return confirm('Desea grabar el registro');
-        }
+    function mensaje_grabar() {
+        return confirm('Desea grabar el registro');
+    }
 </script>
 
 @endsection

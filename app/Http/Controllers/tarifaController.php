@@ -61,7 +61,7 @@ class tarifaController extends Controller
     {
         // dump(request()->all());
         //c=cobrado a=anulado
-        DB::table('tarifas')->insert(
+        $tarifa_id =DB::table('tarifas')->insertGetId(
             [
                 'tarifas_nombres_id' => request()->nombre, 'temporada_id' => request()->temp,
                 'habitacion_id' => request()->habitacion, 'cantidad_personas' => request()->canp,
@@ -69,6 +69,25 @@ class tarifaController extends Controller
                 'hora_limite' => request()->hlimite, 'precio' => request()->precio
             ]
         );
+
+        $input = $request->only([
+            'servicios_detalle', 'porcentaje_detalle',
+        ]);
+        //dump($input);
+        //dump($input["habitacion"][1]);
+        if (isset($input["servicios_detalle"])) {
+            foreach ($input["servicios_detalle"] as $key => $value) {
+
+                $data1[] = [
+                    'tarifas_id' => $tarifa_id,
+                    'servicio' => $input["servicios_detalle"][$key],
+                    'porcentaje' => $input["porcentaje_detalle"][$key],
+                ];
+            }
+
+
+            DB::table('promocion')->insert($data1);
+        }
 
 
         return redirect()->route('tarifa.index');
@@ -276,6 +295,7 @@ class tarifaController extends Controller
     {
         //dump($id);
         //i=inactivo a=activo 
+        DB::table('promocion')->where('tarifas_id', '=', $id)->delete();
         DB::table('tarifas')->where('id', '=', $id)->delete();
 
         

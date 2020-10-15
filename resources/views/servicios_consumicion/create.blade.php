@@ -32,13 +32,9 @@
                     <input type="text" id="id" name="id">
                 </div>
                 <div class="form-group">
-                    <label for="nombre">Nombre</label>
-                    <select id="nombre" required name="nombre">
-                        <option value="">--Selecciona una opción--</option>
-                        @foreach($nombres as $nombre)
-                        <option value={{ $nombre->id }}>{{ $nombre->nombre }}</option>
-                        @endforeach
-                    </select>
+                    <label for="estadia">Estadia</label>
+                    <input type="text" id="estadia" name="estadia" class="readonly" autocomplete="off" style="caret-color: transparent !important;">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin('estadias')" tabindex="5">
                 </div>
             </div>
             <div class="col-md-4">
@@ -56,57 +52,9 @@
                     <label for="realizado">Realizado</label>
                     <select id="realizado" required name="realizado">
                         <option value="">--Selecciona una opción--</option>
-                        <option value="SI">Si</option>
-                        <option value="NO">No</option>
+                        <option value="Si">Si</option>
+                        <option selected value="No">No</option>
                     </select>
-                </div>
-                <div class="form-group">
-                    <label for="total"> Total </label>
-                    <input type="number" id="total" name="total" value="0" min="0" max="1000000000" readonly>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="form-group">
-                    <label for="huesped">Huesped</label>
-                    <input type="text" id="huesped" class="readonly" autocomplete="off" style="caret-color: transparent !important;">
-                    <input type="button" value="..." class=" btn-dark" onclick="openWin('huesped')">
-                </div>
-            </div>
-            <div class="col-md-4">
-            </div>
-        </div>
-
-        <div class="form-group my-2 col-md-10">
-            <h5>Servicio Detalle</h5>
-        </div>
-        <div class="row">
-            <div class="col-md-10 form-group">
-                <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
-                    <table id="huesped_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Huesped</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="col-md-2 form-group">
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" onclick="add('huesped')" tabindex="8">Agregar</button>
-                </div>
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" onclick="remove('huesped')">Quitar</button>
-                </div>
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" style="display: none;" onclick="edit('huesped')">Editar</button>
                 </div>
             </div>
         </div>
@@ -120,7 +68,7 @@
                 <div class="form-group">
                     <label for="habitacion">Habitacion</label>
                     <input type="text" id="habitacion" class="readonly" autocomplete="off" style="caret-color: transparent !important;">
-                    <input type="button" value="..." class=" btn-dark" onclick="openWin('habitacion')">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin1('habitacion')">
                 </div>
             </div>
             <div class="col-md-4">
@@ -128,6 +76,11 @@
                     <label for="producto">Producto</label>
                     <input type="text" id="producto" class="readonly" autocomplete="off" style="caret-color: transparent !important;">
                     <input type="button" value="..." class=" btn-dark" onclick="openWin('producto')">
+                </div>
+                <div class="form-group">
+                    <label for="huesped">Huesped</label>
+                    <input type="text" id="huesped" class="readonly" autocomplete="off" style="caret-color: transparent !important;">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin1('huesped')">
                 </div>
             </div>
         </div>
@@ -146,6 +99,8 @@
                                 <th>Cantidad</th>
                                 <th>Precio</th>
                                 <th>Habitacion</th>
+                                <th>Huesped</th>
+                                <th>Promocion</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -216,11 +171,12 @@
             var can = document.getElementById("cantidad").value;
             //var val = parseInt(document.getElementById("producto").value);
             //var habi = parseInt(document.getElementById("habitacion").value);
-            var val= [];
+            var val = [];
             val[0] = parseInt(document.getElementById("producto").value);
             val[1] = parseInt(document.getElementById("habitacion").value);
+            val[2] = parseInt(document.getElementById("huesped").value);
             //console.log(val);
-            if (can === "" || isNaN(val[0]) || isNaN(val[1])) {
+            if (can === "" || isNaN(val[0]) || isNaN(val[1]) || isNaN(val[2])) {
                 alert("Cargar campos primero");
                 //console.log(x);
                 return false;
@@ -230,7 +186,7 @@
                 //console.log(x);
                 return false;
             }
-            
+
             // var val = parseInt(document.getElementById('tarifa').value);
             //var path = "empty";
             var path = "{{route('servicios_consumicion.producto')}}";
@@ -238,8 +194,6 @@
             //console.log(x);
             // addTable(x, table);
         }
-
-
 
         if (path !== "empty") {
             $.ajaxSetup({
@@ -312,26 +266,35 @@
                         return false;
                     }
                 }
-                
+
+                var promocion = 0;
+                if (data.promocion.length) {
+                    promocion = data.promocion[0].porcentaje;
+                }
+
                 $(table).bootstrapTable('insertRow', {
                     index: 0,
-                    row: [data.productos[0].id, data.productos[0].producto, can, data.productos[0].precio.format(0, 3, '.', ','), data.habitaciones[0].descripcion+
+                    row: [data.productos[0].id, data.productos[0].producto, can, data.productos[0].precio.format(0, 3, '.', ','),
+                        data.habitaciones[0].descripcion, data.huespedes[0].nombre + " " + data.huespedes[0].apellido, promocion+"%" +
                         '<input type="hidden" name ="producto_detalle[]" value=' + data.productos[0].id + '>' +
-                        '<input type="hidden" name ="cantidad_detalle[]" value=' + parseInt(can) + '>'+ 
-                        '<input type="hidden" name ="habitacion_detalle[]" value=' + data.habitaciones[0].id + '>' 
+                        '<input type="hidden" name ="cantidad_detalle[]" value=' + parseInt(can) + '>' +
+                        '<input type="hidden" name ="huespedes_detalle[]" value=' + data.huespedes[0].id + '>' +
+                        '<input type="hidden" name ="promocion_detalle[]" value=' + promocion + '>' +
+                        '<input type="hidden" name ="habitacion_detalle[]" value=' + data.habitaciones[0].id + '>'
                     ]
                 })
-                
-                total += parseInt(parseInt(can) * data.productos[0].precio);
+
+                //total += parseInt(parseInt(can) * data.productos[0].precio);
 
                 //document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
                 //document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
-                document.getElementById("total").value = total;
+                //document.getElementById("total").value = total;
                 //document.getElementById("importe").value = (total.format(0, 3, '.', ',')).replace(".","");
 
                 document.getElementById("cantidad").value = "";
                 document.getElementById("producto").value = "";
                 document.getElementById("habitacion").value = "";
+                document.getElementById("huesped").value = "";
             }
         }
 
@@ -353,7 +316,6 @@
     });
 
     function remove_all() {
-        $("#huesped_table").bootstrapTable('removeAll');
         $("#consumicion_table").bootstrapTable('removeAll');
 
     }
@@ -370,7 +332,7 @@
         if (table_remove === "consumicion") {
             var table_rem = "#consumicion_table";
 
-            total -=  ( parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
+            total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
 
             document.getElementById("total").value = total;
         }
@@ -416,7 +378,7 @@
         if (table_edit === "consumicion") {
             var table_rem = "#consumicion_table";
 
-            total -=  ( parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
+            total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
 
             document.getElementById("total").value = total;
         }
@@ -440,14 +402,32 @@
     }
 
     function openWin(w) {
-        if (w == "huesped") {
-            myWindow = window.open("{{ route('searcher.huesped') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
-        }
-        if (w == "habitacion") {
-            myWindow = window.open("{{ route('searcher.habitacion') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+        if (w == "estadias") {
+            myWindow = window.open("{{ route('searcher.estadias') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
         if (w == "producto") {
             myWindow = window.open("{{ route('searcher.producto') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+        }
+    }
+
+    function openWin1(w) {
+        if (w == "habitacion") {
+            var link = "{{ route('searcher.habitacion1','0') }}";
+            if (document.getElementById("estadia").value !== null && document.getElementById("estadia").value !== "") {
+                var position = link.lastIndexOf("/");
+                var resultado = link.slice(0, position + 1);
+                var link = resultado.concat(document.getElementById("estadia").value);
+            }
+            myWindow = window.open(link, "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+        }
+        if (w == "huesped") {
+            var link = "{{ route('searcher.huesped1','0') }}";
+            if (document.getElementById("estadia").value !== null && document.getElementById("estadia").value !== "") {
+                var position = link.lastIndexOf("/");
+                var resultado = link.slice(0, position + 1);
+                var link = resultado.concat(document.getElementById("estadia").value);
+            }
+            myWindow = window.open(link, "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
     }
 
@@ -455,12 +435,17 @@
 
     function play() {
         // console.log("hola");
-        var huesped = localStorage.getItem("huesped");
+        var estadias = localStorage.getItem("estadias");
         var habitacion = localStorage.getItem("habitacion");
         var producto = localStorage.getItem("producto");
+        var huesped = localStorage.getItem("huesped");
 
-        if (huesped != "nothing" && huesped != null) {
-            document.getElementById("huesped").value = huesped;
+
+        if (estadias != "nothing" && estadias != null) {
+            document.getElementById("estadia").value = estadias;
+            document.getElementById("huesped").value = "";
+            document.getElementById("habitacion").value = "";
+            remove_all()
         }
         if (producto != "nothing" && producto != null) {
             document.getElementById("producto").value = producto;
@@ -468,6 +453,10 @@
         if (habitacion != "nothing" && habitacion != null) {
             document.getElementById("habitacion").value = habitacion;
         }
+        if (huesped != "nothing" && huesped != null) {
+            document.getElementById("huesped").value = huesped;
+        }
+        localStorage.removeItem("estadias");
         localStorage.removeItem("huesped");
         localStorage.removeItem("producto");
         localStorage.removeItem("habitacion");
@@ -478,11 +467,6 @@
     });
 
     function validateForm() {
-        var taf = document.getElementsByName("huesped_detalle[]");
-        if (taf.length == 0) {
-            alert("Cargar al menos un huesped");
-            return false;
-        }
         var taf1 = document.getElementsByName("producto_detalle[]");
         if (taf1.length == 0) {
             alert("Cargar al menos un producto detalle");
@@ -500,19 +484,6 @@
     function mensaje_grabar() {
         return confirm('Desea grabar el registro');
     }
-
-    document.querySelector('#cantidad').addEventListener("keypress", function(evt) {
-        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
-            evt.preventDefault();
-        }
-    });
-    document.querySelector('#total').addEventListener("keypress", function(evt) {
-        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
-            evt.preventDefault();
-        }
-    });
-
-
 
 
     Number.prototype.format = function(n, x, s, c) {

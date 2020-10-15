@@ -300,6 +300,53 @@ class searcherController extends Controller
         return view('buscadores.huespedes', ['huespedes' => $huespedes]);
     }
 
+    public function huesped1(Request $request)
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        $huespedes = DB::table('huespedes')
+            ->select(
+                'huespedes.*',
+                'pe.nombre',
+                'pe.apellido'
+            )
+            ->where('estadia_id', '=', $request->id)
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('huespedes.persona_pais', '=', 'pe.pais_id');
+                $join->on('huespedes.persona_nro_documento', '=', 'pe.nro_documento');
+            })
+            ->get();
+
+        //dd($clientes);
+
+        return view('buscadores.huespedes1', ['huespedes' => $huespedes]);
+    }
+
+    public function habitacion1(Request $request)
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        $habitacion = DB::table('habitaciones')
+            ->select(
+                'habitaciones.*',
+                'hn.nombre',
+                'th.descripcion as tipo_habitacion',
+                'u.descripcion as ubicacion',
+                'e.descripcion as estado_habitacion'
+            )
+            ->where('eh.id_estadia', '=', $request->id)
+            ->leftJoin('habitacion_nombres as hn', 'habitaciones.nombre', '=', 'hn.id')
+            ->leftJoin('tipos_habitacion as th', 'habitaciones.id_tipo_hab', '=', 'th.id')
+            ->leftJoin('ubicaciones as u', 'habitaciones.id_ubicacion', '=', 'u.id')
+            ->leftJoin('habitacion_estado as e', 'habitaciones.estado_id', '=', 'e.id')
+            ->leftJoin('estadia_habitaciones as eh', 'habitaciones.id', '=', 'eh.id_habitacion')
+            ->get();
+
+        //dd($clientes);
+
+        return view('buscadores.habitacion1', ['habitaciones' => $habitacion]);
+    }
+
     public function spa()
     {
         //$estadia = estadia::all();
