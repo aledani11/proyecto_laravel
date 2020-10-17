@@ -24,7 +24,7 @@ class clientesController extends Controller
                 'pe.apellido'
             )
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('clientes.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('clientes.persona_pais', '=', 'pe.pais_id');
                 $join->on('clientes.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();

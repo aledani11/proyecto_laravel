@@ -416,7 +416,7 @@ class servicios_consumicionController extends Controller
 
         $promocion = DB::table('promocion')
             ->select(
-                'promocion.porcentaje',
+                'promocion.porcentaje'
             )
             ->where([
                 ['tarifas_id', '=', $tarifa_id[0]->id],

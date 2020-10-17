@@ -130,6 +130,7 @@
                         <li><a href="{{ route('reserva.index') }}" class="dropdown-item">Reserva</a></li>
                         <li><a href="{{ route('estadia.index') }}" class="dropdown-item">Estadia</a></li>
                         <li><a href="{{ route('servicios_consumicion.index') }}" class="dropdown-item">Servicios Consumicion</a></li>
+                        <li><a href="{{ route('servicios_traslado.index') }}" class="dropdown-item">Servicios Traslado</a></li>
                         <li><a href="{{ route('servicios_spa.index') }}" class="dropdown-item">Servicios Spa Sauna</a></li>
                         <li><a href="{{ route('servicios_turismo.index') }}" class="dropdown-item">Servicios Turismo</a></li>
                     </ul>

@@ -388,7 +388,7 @@ class ordenController extends Controller
         $presupuesto = DB::table('presupuesto')
             ->select(
                 'condicion',
-                'proveedor_ruc',
+                'proveedor_ruc'
             )
             ->where('numero', '=', $request->id)
             ->get();

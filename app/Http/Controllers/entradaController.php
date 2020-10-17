@@ -20,7 +20,7 @@ class entradaController extends Controller
         //estado i=inactivo a=activo
         $entrada = DB::table('entrada')
             ->select(
-                'entrada.*',
+                'entrada.*'
             )
             ->where('entrada.estado', '=', 'A')
             ->get();

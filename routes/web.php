@@ -168,6 +168,15 @@ Route::get('/servicios_consumicion/anular/{servicios}', 'servicios_consumicionCo
 Route::post('/servicios_producto', 'servicios_consumicionController@producto')->name('servicios_consumicion.producto')->middleware('auth');
 Route::get('/consumicion_realizado/{id}', 'servicios_consumicionController@realizado')->name('consumicion.realizado')->middleware('auth');
 
+Route::get('/servicios_traslado','servicios_trasladoController@index')->name('servicios_traslado.index')->middleware('auth');
+Route::post('/servicios_traslado', 'servicios_trasladoController@store')->name('servicios_traslado.store')->middleware('auth');
+Route::get('/servicios_traslado/create', 'servicios_trasladoController@create')->name('servicios_traslado.create')->middleware('auth');
+Route::get('/servicios_traslado/editar/{servicios}', 'servicios_trasladoController@edit')->name('servicios_traslado.edit')->middleware('auth');
+Route::put('/servicios_traslado/{servicios}', 'servicios_trasladoController@update')->name('servicios_traslado.update')->middleware('auth');
+Route::get('/servicios_traslado/anular/{servicios}', 'servicios_trasladoController@destroy')->name('servicios_traslado.destroy')->middleware('auth');
+Route::post('/servicios_traslados', 'servicios_trasladoController@traslado')->name('servicios_traslado.producto')->middleware('auth');
+Route::get('/traslado_realizado/{id}', 'servicios_trasladoController@realizado')->name('traslado.realizado')->middleware('auth');
+
 Route::get('/servicios_turismo','servicios_turismoController@index')->name('servicios_turismo.index')->middleware('auth');
 Route::post('/servicios_turismo', 'servicios_turismoController@store')->name('servicios_turismo.store')->middleware('auth');
 Route::get('/servicios_turismo/create', 'servicios_turismoController@create')->name('servicios_turismo.create')->middleware('auth');

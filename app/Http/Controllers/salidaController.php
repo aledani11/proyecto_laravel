@@ -432,7 +432,7 @@ class salidaController extends Controller
                 ->select(
                     'ar.codigo',
                     'ar.nombre','ar.stock_minimo',
-                    'requisicion_detalle.cantidad',
+                    'requisicion_detalle.cantidad'
                 )
                 ->where('requisicion_numero', '=', $request->id)
                 ->leftJoin('articulo as ar', 'requisicion_detalle.articulo_codigo', '=', 'ar.codigo')
