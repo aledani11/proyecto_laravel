@@ -62,8 +62,13 @@
         <div class="row">
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="cantidad">Cantidad</label>
-                    <input type="number" id="cantidad" value="" min="1" max="1000000000">
+                    <label for="traslado">Traslado</label>
+                    <select id="traslado">
+                        <option value="">--Selecciona una opción--</option>
+                        @foreach($traslado as $iva)
+                        <option value={{ $iva->id }}>{{ $iva->descripcion }}</option>
+                        @endforeach
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="habitacion">Habitacion</label>
@@ -73,9 +78,8 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="producto">Producto</label>
-                    <input type="text" id="producto" class="readonly" autocomplete="off" style="caret-color: transparent !important;">
-                    <input type="button" value="..." class=" btn-dark" onclick="openWin('producto')">
+                    <label for="destino"> Destino </label>
+                    <input type="text" id="destino" name="destino">
                 </div>
                 <div class="form-group">
                     <label for="huesped">Huesped</label>
@@ -83,10 +87,21 @@
                     <input type="button" value="..." class=" btn-dark" onclick="openWin1('huesped')">
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label for="direccion"> Direccion </label>
+                    <input type="text" id="direccion" name="direccion">
+                </div>
+                <div class="form-group">
+                    <label for="hora"> Hora </label>
+                    <input type="time" id="hora" name="hora">
+                </div>
+
+            </div>
         </div>
 
         <div class="form-group my-2 col-md-10">
-            <h5>Consumicion</h5>
+            <h5>Traslado</h5>
         </div>
         <div class="row">
             <div class="col-md-10 form-group">
@@ -95,8 +110,7 @@
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
+                                <th>Traslado</th>
                                 <th>Precio</th>
                                 <th>Habitacion</th>
                                 <th>Huesped</th>
@@ -168,28 +182,31 @@
 
         if (table === "consumicion") {
             //console.log(val);
-            var can = document.getElementById("cantidad").value;
+            //var can = document.getElementById("cantidad").value;
             //var val = parseInt(document.getElementById("producto").value);
             //var habi = parseInt(document.getElementById("habitacion").value);
             var val = [];
-            val[0] = parseInt(document.getElementById("producto").value);
+            val[0] = parseInt(document.getElementById("traslado").value);
             val[1] = parseInt(document.getElementById("habitacion").value);
             val[2] = parseInt(document.getElementById("huesped").value);
+            val[3] = document.getElementById("destino").value;
+            val[4] = document.getElementById("direccion").value;
+            val[5] = document.getElementById("hora").value;
             //console.log(val);
-            if (can === "" || isNaN(val[0]) || isNaN(val[1]) || isNaN(val[2])) {
+            if (isNaN(val[0]) || isNaN(val[1]) || isNaN(val[2])) {
                 alert("Cargar campos primero");
                 //console.log(x);
                 return false;
             }
-            if (parseInt(can) <= 0) {
-                alert("Cantidad debe ser mayor a cero");
+            if ( val[3]==="" || val[4]==="" || val[5]==="") {
+                alert("Cargar campos primero");
                 //console.log(x);
                 return false;
             }
 
             // var val = parseInt(document.getElementById('tarifa').value);
             //var path = "empty";
-            var path = "{{route('servicios_consumicion.producto')}}";
+            var path = "{{route('servicios_traslado.producto')}}";
             var table = "#consumicion_table"
             //console.log(x);
             // addTable(x, table);
@@ -258,11 +275,11 @@
             }
             if (table === "#consumicion_table") {
 
-                var name_articulo = document.getElementsByName("producto_detalle[]");
+                var name_articulo = document.getElementsByName("huespedes_detalle[]");
                 for (let index = 0; index < name_articulo.length; index++) {
                     const element = name_articulo[index];
-                    if (element.value == data.productos[0].id) {
-                        alert("Codigo ya ingresado");
+                    if (element.value == data.huespedes[0].id) {
+                        alert("Huesped ya ingresado");
                         return false;
                     }
                 }
@@ -274,10 +291,12 @@
 
                 $(table).bootstrapTable('insertRow', {
                     index: 0,
-                    row: [data.productos[0].id, data.productos[0].producto, can, data.productos[0].precio.format(0, 3, '.', ','),
-                        data.habitaciones[0].descripcion, data.huespedes[0].nombre + " " + data.huespedes[0].apellido, promocion+"%" +
-                        '<input type="hidden" name ="producto_detalle[]" value=' + data.productos[0].id + '>' +
-                        '<input type="hidden" name ="cantidad_detalle[]" value=' + parseInt(can) + '>' +
+                    row: [data.traslado[0].id, data.traslado[0].descripcion, data.traslado[0].precio.format(0, 3, '.', ','),
+                        data.habitaciones[0].descripcion, data.huespedes[0].nombre + " " + data.huespedes[0].apellido, promocion + "%" +
+                        '<input type="hidden" name ="traslado_detalle[]" value=' + data.traslado[0].id + '>' +
+                        '<input type="hidden" name ="destino_detalle[]" value=' + val[3] + '>' +
+                        '<input type="hidden" name ="direccion_detalle[]" value=' + val[4] + '>' +
+                        '<input type="hidden" name ="hora_detalle[]" value=' + val[5] + '>' +
                         '<input type="hidden" name ="huespedes_detalle[]" value=' + data.huespedes[0].id + '>' +
                         '<input type="hidden" name ="promocion_detalle[]" value=' + promocion + '>' +
                         '<input type="hidden" name ="habitacion_detalle[]" value=' + data.habitaciones[0].id + '>'
@@ -291,8 +310,10 @@
                 //document.getElementById("total").value = total;
                 //document.getElementById("importe").value = (total.format(0, 3, '.', ',')).replace(".","");
 
-                document.getElementById("cantidad").value = "";
-                document.getElementById("producto").value = "";
+                document.getElementById("destino").value = "";
+                document.getElementById("direccion").value = "";
+                document.getElementById("hora").value = "";
+                document.getElementById("traslado").value = "";
                 document.getElementById("habitacion").value = "";
                 document.getElementById("huesped").value = "";
             }
@@ -419,13 +440,17 @@
                 var link = resultado.concat(document.getElementById("estadia").value);
             }
             myWindow = window.open(link, "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+            document.getElementById("huesped").value = "";
         }
         if (w == "huesped") {
-            var link = "{{ route('searcher.huesped1','0') }}";
-            if (document.getElementById("estadia").value !== null && document.getElementById("estadia").value !== "") {
+            var link = "{{ route('searcher.huesped1',['0','0']) }}";
+            if (document.getElementById("estadia").value !== null && document.getElementById("estadia").value !== "" 
+                && document.getElementById("habitacion").value !== "" && document.getElementById("habitacion").value !== null) {
                 var position = link.lastIndexOf("/");
-                var resultado = link.slice(0, position + 1);
-                var link = resultado.concat(document.getElementById("estadia").value);
+                var resultado = link.slice(0, position);
+                var position = resultado.lastIndexOf("/");
+                var resultado = resultado.slice(0, position + 1);
+                var link = resultado.concat(document.getElementById("estadia").value,"/"+document.getElementById("habitacion").value);
             }
             myWindow = window.open(link, "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
@@ -467,9 +492,9 @@
     });
 
     function validateForm() {
-        var taf1 = document.getElementsByName("producto_detalle[]");
+        var taf1 = document.getElementsByName("traslado_detalle[]");
         if (taf1.length == 0) {
-            alert("Cargar al menos un producto detalle");
+            alert("Cargar al menos un traslado detalle");
             return false;
         }
         //console.log(taf);

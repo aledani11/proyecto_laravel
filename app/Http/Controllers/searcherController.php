@@ -263,7 +263,7 @@ class searcherController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //a=activo i=inactivo
-            $factura_compra = DB::table('factura_compra')
+        $factura_compra = DB::table('factura_compra')
             ->select(
                 'factura_compra.*',
                 'pr.ruc',
@@ -310,14 +310,18 @@ class searcherController extends Controller
                 'pe.nombre',
                 'pe.apellido'
             )
-            ->where('estadia_id', '=', $request->id)
+            ->where([
+                ['estadia_id', '=', $request->id],
+                ['eh.habitacion_id', '=', $request->id1]
+            ])
             ->leftJoin('persona as pe', function ($join) {
                 $join->on('huespedes.persona_pais', '=', 'pe.pais_id');
                 $join->on('huespedes.persona_nro_documento', '=', 'pe.nro_documento');
             })
+            ->leftJoin('estadia_huespedes as eh', 'huespedes.id', '=', 'eh.huespedes_id')
             ->get();
 
-        //dd($clientes);
+        //dd($huespedes);
 
         return view('buscadores.huespedes1', ['huespedes' => $huespedes]);
     }

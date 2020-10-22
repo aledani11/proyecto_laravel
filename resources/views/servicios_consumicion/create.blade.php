@@ -261,8 +261,9 @@
                 var name_articulo = document.getElementsByName("producto_detalle[]");
                 for (let index = 0; index < name_articulo.length; index++) {
                     const element = name_articulo[index];
-                    if (element.value == data.productos[0].id) {
-                        alert("Codigo ya ingresado");
+                    const element1 = document.getElementsByName("habitacion_detalle[]")[index];
+                    if (element.value == data.productos[0].id && element1.value == data.habitaciones[0].id) {
+                        alert("Habitacion y producto ya ingresado");
                         return false;
                     }
                 }
@@ -419,13 +420,17 @@
                 var link = resultado.concat(document.getElementById("estadia").value);
             }
             myWindow = window.open(link, "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+            document.getElementById("huesped").value = "";
         }
         if (w == "huesped") {
-            var link = "{{ route('searcher.huesped1','0') }}";
-            if (document.getElementById("estadia").value !== null && document.getElementById("estadia").value !== "") {
+            var link = "{{ route('searcher.huesped1',['0','0']) }}";
+            if (document.getElementById("estadia").value !== null && document.getElementById("estadia").value !== "" 
+                && document.getElementById("habitacion").value !== "" && document.getElementById("habitacion").value !== null) {
                 var position = link.lastIndexOf("/");
-                var resultado = link.slice(0, position + 1);
-                var link = resultado.concat(document.getElementById("estadia").value);
+                var resultado = link.slice(0, position);
+                var position = resultado.lastIndexOf("/");
+                var resultado = resultado.slice(0, position + 1);
+                var link = resultado.concat(document.getElementById("estadia").value,"/"+document.getElementById("habitacion").value);
             }
             myWindow = window.open(link, "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }

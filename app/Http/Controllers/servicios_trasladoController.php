@@ -18,15 +18,15 @@ class servicios_trasladoController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //estado i=inactivo a=activo
-        $servicios = DB::table('s_turismo')
+        $servicios = DB::table('s_traslado')
             ->select(
-                's_turismo.*',
+                's_traslado.*',
                 'pe.nombre',
                 'pe.apellido',
                 'cl.ruc'
             )
-            ->where('s_turismo.estado', '=', 'A')
-            ->leftJoin('estadia as es', 's_turismo.estadia_id', '=', 'es.id')
+            ->where('s_traslado.estado', '=', 'A')
+            ->leftJoin('estadia as es', 's_traslado.estadia_id', '=', 'es.id')
             ->leftJoin('clientes as cl', 'es.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
                 $join->on('cl.persona_pais', '=', 'pe.pais_id');
@@ -46,7 +46,11 @@ class servicios_trasladoController extends Controller
      */
     public function create()
     {
-        return view('servicios_traslado.create');
+        $iva = DB::table('traslado')->get();
+
+        return view('servicios_traslado.create', [
+            'traslado' => $iva,
+        ]);
     }
 
     /**
@@ -61,7 +65,7 @@ class servicios_trasladoController extends Controller
         try {
             // dump(request()->all());
             //c=cobrado a=anulado
-            $id = DB::table('s_consumicion')->insertGetId(
+            $id = DB::table('s_traslado')->insertGetId(
                 [
                     'estadia_id' => request()->estadia, 'descripcion' => request()->descripcion,
                     'fecha' => request()->fecha, 'estado' => "A",
@@ -70,17 +74,19 @@ class servicios_trasladoController extends Controller
             );
 
             $input = $request->only([
-                'producto_detalle', 'cantidad_detalle', 'habitacion_detalle', 'promocion_detalle', 'huespedes_detalle'
+                'traslado_detalle', 'direccion_detalle','destino_detalle','hora_detalle', 'habitacion_detalle', 'promocion_detalle', 'huespedes_detalle'
             ]);
             //dump($input);
             //dump($input["habitacion"][1]);
-            if (isset($input["producto_detalle"])) {
-                foreach ($input["producto_detalle"] as $key => $value) {
+            if (isset($input["traslado_detalle"])) {
+                foreach ($input["traslado_detalle"] as $key => $value) {
 
                     $data1[] = [
-                        's_consumicion_id' => $id,
-                        'producto_id' => $input["producto_detalle"][$key],
-                        'cantidad' => $input["cantidad_detalle"][$key],
+                        's_traslado_id' => $id,
+                        'traslado_id' => $input["traslado_detalle"][$key],
+                        'hora' => $input["hora_detalle"][$key],
+                        'direccion' => $input["direccion_detalle"][$key],
+                        'destino' => $input["destino_detalle"][$key],
                         'habitacion_id' => $input["habitacion_detalle"][$key],
                         'huesped_id' => $input["huespedes_detalle"][$key],
                         'promocion' => $input["promocion_detalle"][$key]
@@ -88,7 +94,7 @@ class servicios_trasladoController extends Controller
                 }
 
 
-                DB::table('consumicion_detalle')->insert($data1);
+                DB::table('traslado_detalle')->insert($data1);
             }
         } catch (\Exception $e) {
             // request()->session()->flash('error_', $e->getMessage());
@@ -97,7 +103,7 @@ class servicios_trasladoController extends Controller
         }
 
 
-        return redirect()->route('servicios_consumicion.index');
+        return redirect()->route('servicios_traslado.index');
     }
 
     /**
@@ -304,15 +310,15 @@ class servicios_trasladoController extends Controller
         //i=inactivo a=activo 
         try {
 
-            DB::table('consumicion_detalle')->where('s_consumicion_id', '=', $id)->delete();
-            DB::table('s_consumicion')->where('id', '=', $id)->delete();
+            DB::table('traslado_detalle')->where('s_traslado_id', '=', $id)->delete();
+            DB::table('s_traslado')->where('id', '=', $id)->delete();
         } catch (\Exception $e) {
             // request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');
             // return redirect()->route('personas.index');
         }
 
-        return redirect()->route('servicios_consumicion.index');
+        return redirect()->route('servicios_traslado.index');
     }
 
     public function realizado($id)
@@ -321,7 +327,7 @@ class servicios_trasladoController extends Controller
             //dump($id);
             //i=inactivo a=activo 
 
-            DB::table('s_consumicion')
+            DB::table('s_traslado')
                 ->where('id', '=', $id)->update(
                     [
                         'realizado' => "Si"
@@ -333,7 +339,7 @@ class servicios_trasladoController extends Controller
             // return redirect()->route('personas.index');
         }
 
-        return redirect()->route('servicios_consumicion.index');
+        return redirect()->route('servicios_traslado.index');
     }
 
     public function tarifa(Request $request)
@@ -373,9 +379,9 @@ class servicios_trasladoController extends Controller
 
     public function producto(Request $request)
     {
-        $productos = DB::table('productos')
+        $productos = DB::table('traslado')
             ->select(
-                'productos.*'
+                'traslado.*'
             )
             ->where('id', '=', $request->id[0])
             ->get();
@@ -413,11 +419,11 @@ class servicios_trasladoController extends Controller
             )
             ->where([
                 ['tarifas_id', '=', $tarifa_id[0]->id],
-                ['servicio', '=', "Consumicion"]
+                ['servicio', '=', "Traslado"]
             ])->get();
 
         return [
-            'productos' => $productos, 'habitaciones' => $habitaciones,
+            'traslado' => $productos, 'habitaciones' => $habitaciones,
             'huespedes' => $huespedes, 'promocion' => $promocion
         ];
         //return $request;
