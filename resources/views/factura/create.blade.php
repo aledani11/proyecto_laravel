@@ -167,7 +167,7 @@
             </div>
             <div class="col-3 ">
                 <label for="total2" class="form-group1">
-                    <span> Total factura</span>
+                    <span> Total </span>
                     <input type="text" id="total2" readonly>
                 </label>
             </div>
@@ -297,6 +297,24 @@
                             data.consumicion[index].precio.format(0, 3, '.', ','),
                             data.consumicion[index].cantidad,
                             (data.consumicion[index].precio / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ',')
+                        ]
+                    })
+                   // iva_total1 += (data.servicios[index].precio_servi / 11);
+                   // subtotal1 += data.servicios[index].precio_servi;
+
+                }
+
+
+                for (let index = 0; index < data.traslado.length; index++) {
+                  //  var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
+                  //  console.log(descri_tari1);
+                 //   var descri_tari="Tarifa-".concat(descri_tari1);
+                    $("#servicios_table").bootstrapTable('insertRow', {
+                        index: 0,
+                        row: ['Traslado '+data.traslado[index].descripcion,
+                            data.traslado[index].precio.format(0, 3, '.', ','),
+                            1,
+                            (data.traslado[index].precio / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ',')
                         ]
                     })
                    // iva_total1 += (data.servicios[index].precio_servi / 11);

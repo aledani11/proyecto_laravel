@@ -34,7 +34,7 @@ class cobrosController extends Controller
             ->leftJoin('factura as fa', 'co.factura_numero', '=', 'fa.numero')
             ->leftJoin('clientes as cl', 'fa.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('cl.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
                 $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();

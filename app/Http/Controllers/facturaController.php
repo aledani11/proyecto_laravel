@@ -66,7 +66,7 @@ class facturaController extends Controller
                 ->get();
             $user_numero = DB::table('user_numero')
                 ->select(
-                    'ca.numero',
+                    'ca.numero'
                 )
                 ->where('user_id', '=', $id)
                 ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
@@ -80,7 +80,7 @@ class facturaController extends Controller
             $nro = $sucursal[0]->numero . "-" . $user_numero[0]->numero . "-" . $nro3;
             $timbrado = DB::table('timbrado')
                 ->select(
-                    'timbrado.nro',
+                    'timbrado.nro'
                 )
                 ->where('id', '=', $numero[0]->timbrado)
                 ->get();
@@ -470,10 +470,22 @@ class facturaController extends Controller
                 ->leftJoin('consumicion_detalle as cd', 's_consumicion.id', '=', 'cd.s_consumicion_id')
                 ->leftJoin('productos as pr', 'cd.producto_id', '=', 'pr.id')
                 ->get();
+
+            $traslado = DB::table('s_traslado')
+                ->select(
+                    'tr.descripcion',
+                    'tr.precio',
+                    'ha.descripcion as habitacion'
+                )
+                ->where('s_traslado.estadia_id', '=', $request->id)
+                ->leftJoin('traslado_detalle as td', 's_traslado.id', '=', 'td.s_traslado_id')
+                ->leftJoin('traslado as tr', 'td.traslado_id', '=', 'tr.id')
+                ->leftJoin('habitaciones as ha', 'td.habitacion_id', '=', 'ha.id')
+                ->get();
         } catch (\Exception $e) {
             // request()->session()->flash('error_', $e->getMessage());
             // request()->session()->flash('error_', 'Error en base de datos');
-             return ['error' => $e->getMessage()];
+            return ['error' => $e->getMessage()];
         }
         /*  $servicios = DB::table('estadia')
             ->select(
@@ -496,7 +508,8 @@ class facturaController extends Controller
             'tarifa' => $tarifa,
             'tarifa1' => $tarifa1,
             'iva_tarifa' => $iva,
-            'consumicion' => $consumicion
+            'consumicion' => $consumicion,
+            'traslado' => $traslado
             //'servicios' => $servicios
         ];
         //return $request;

@@ -150,7 +150,7 @@
                         <li><a href="{{ route('cobros.index') }}" class="dropdown-item">Cobros</a></li>
                         <li><a href="{{ route('arqueo.index') }}" class="dropdown-item">Arqueo</a></li>
                         <li><a href="{{ route('nota_de_credito.index') }}" class="dropdown-item">Nota De Credito</a></li>
-                        <li><a href="{{ route('recaudaciones.index') }}" class="dropdown-item">Recaudaciones a Depositar</a></li>
+                        <li><a href="{{ route('recaudaciones.index') }}" class="dropdown-item">Nota de Debito</a></li>
                     </ul>
                 </li>
                 @endif

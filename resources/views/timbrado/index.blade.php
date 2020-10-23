@@ -35,8 +35,8 @@
                         <tr>
                             <td>{{$vari->id}}</td>
                             <td>{{$vari->nro}}</td>
-                            <td>{{$vari->fecha_desde}}</td>
-                            <td>{{$vari->fecha_fin}}</td>
+                            <td>{{ \Carbon\Carbon::parse($vari->fecha_desde)->format('d/m/Y')}}</td>
+                            <td>{{ \Carbon\Carbon::parse($vari->fecha_fin)->format('d/m/Y')}}</td>
                         </tr>
                         @endforeach
                     </tbody>
