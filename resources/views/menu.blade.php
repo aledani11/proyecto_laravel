@@ -17,7 +17,7 @@
 
         <div id="navbarContent" class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
-
+            @if($nivel=="ADMIN")
                 <!-- nav dropdown -->
                 <li class="nav-item dropdown">
 
@@ -92,18 +92,22 @@
                         <li class="dropdown-submenu">
                             <a href="#" role="button" data-toggle="dropdown" class="dropdown-item dropdown-toggle">Facturacion</a>
                             <ul class="dropdown-menu">
+                                <li><a href="{{ route('sucursal.index') }}" class="dropdown-item">Sucursal</a></li>
+                                <li><a href="{{ route('timbrado.index') }}" class="dropdown-item">Timbrado</a></li>
+                                <li><a href="{{ route('factura_numero.index') }}" class="dropdown-item">Factura numero</a></li>
                                 <li><a href="{{ route('caja.index') }}" class="dropdown-item">Caja</a></li>
+                                <li><a href="{{ route('user_numero.index') }}" class="dropdown-item">User numero</a></li>
                                 <li><a href="{{ route('entidad.index') }}" class="dropdown-item">Entidad</a></li>
-                                <li><a href="{{ route('iva.index') }}" class="dropdown-item">Iva</a></li>
                                 <li><a href="{{ route('marca_tarjeta.index') }}" class="dropdown-item">Marca Tarjeta</a></li>
                                 <li><a href="{{ route('procesadora.index') }}" class="dropdown-item">Procesadora</a></li>
-                                <li><a href="{{ route('timbrado.index') }}" class="dropdown-item">Timbrado</a></li>
                                 <li><a href="{{ route('tipo_tarjeta.index') }}" class="dropdown-item">Tipo Tarjeta</a></li>
+                                <li><a href="{{ route('iva.index') }}" class="dropdown-item">Iva</a></li>
                             </ul>
                         </li>
 
                     </ul>
                 </li>
+                @endif
                 @if($nivel=="COMPRA"||$nivel=="ADMIN")
                 <li class="nav-item dropdown">
 
@@ -142,9 +146,9 @@
                     <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle">Facturacion</a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ route('apertura.index') }}" class="dropdown-item">Apertura y Cierre</a></li>
-                        <li><a href="{{ route('arqueo.index') }}" class="dropdown-item">Arqueo</a></li>
-                        <li><a href="{{ route('cobros.index') }}" class="dropdown-item">Cobros</a></li>
                         <li><a href="{{ route('factura.index') }}" class="dropdown-item">Factura</a></li>
+                        <li><a href="{{ route('cobros.index') }}" class="dropdown-item">Cobros</a></li>
+                        <li><a href="{{ route('arqueo.index') }}" class="dropdown-item">Arqueo</a></li>
                         <li><a href="{{ route('nota_de_credito.index') }}" class="dropdown-item">Nota De Credito</a></li>
                         <li><a href="{{ route('recaudaciones.index') }}" class="dropdown-item">Recaudaciones a Depositar</a></li>
                     </ul>

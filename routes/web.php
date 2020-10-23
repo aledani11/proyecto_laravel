@@ -44,9 +44,9 @@ Route::get('/reserva/anular/{reserva}', 'reservaController@destroy')->name('rese
 Route::get('/factura','facturaController@index')->name('factura.index')->middleware('auth');
 Route::post('/factura', 'facturaController@store')->name('factura.store')->middleware('auth');
 Route::get('/factura/create', 'facturaController@create')->name('factura.create')->middleware('auth');
-Route::get('/factura/editar/{factura}', 'facturaController@edit')->name('factura.edit')->middleware('auth');
+Route::get('/factura/editar/{factura}/{timbrado}', 'facturaController@edit')->name('factura.edit')->middleware('auth');
 Route::put('/factura/{factura}', 'facturaController@update')->name('factura.update')->middleware('auth');
-Route::get('/factura/anular/{factura}', 'facturaController@destroy')->name('factura.destroy')->middleware('auth');
+Route::get('/factura/anular/{factura}/{timbrado}', 'facturaController@destroy')->name('factura.destroy')->middleware('auth');
 Route::post('/factura_estadia', 'facturaController@estadia')->name('factura.estadia')->middleware('auth');
 
 Route::get('/apertura_cierre','aperturaController@index')->name('apertura.index')->middleware('auth');
@@ -92,6 +92,11 @@ Route::get('/presupuesto/create', 'presupuestoController@create')->name('presupu
 Route::get('/presupuesto/editar/{requisicion}', 'presupuestoController@edit')->name('presupuesto.edit')->middleware('auth');
 Route::put('/presupuesto/{requisicion}', 'presupuestoController@update')->name('presupuesto.update')->middleware('auth');
 Route::get('/presupuesto/anular/{requisicion}', 'presupuestoController@destroy')->name('presupuesto.destroy')->middleware('auth');
+
+Route::get('/factura_numero','factura_numeroController@index')->name('factura_numero.index')->middleware('auth');
+Route::post('/factura_numero', 'factura_numeroController@store')->name('factura_numero.store')->middleware('auth');
+Route::get('/factura_numero/create', 'factura_numeroController@create')->name('factura_numero.create')->middleware('auth');
+Route::get('/factura_numero/anular/{requisicion}', 'factura_numeroController@destroy')->name('factura_numero.destroy')->middleware('auth');
 
 Route::get('/orden','ordenController@index')->name('orden.index')->middleware('auth');
 Route::post('/orden', 'ordenController@store')->name('orden.store')->middleware('auth');
@@ -465,12 +470,22 @@ Route::get('/productos/editar/{timbrado}', 'productosController@edit')->name('pr
 Route::put('/productos/{timbrado}', 'productosController@update')->name('productos.update')->middleware('auth');
 Route::get('/productos/eliminar/{timbrado}', 'productosController@destroy')->name('productos.destroy')->middleware('auth');
 
+Route::get('/sucursal','sucursalController@index')->name('sucursal.index')->middleware('auth');
+Route::post('/sucursal', 'sucursalController@store')->name('sucursal.store')->middleware('auth');
+Route::get('/sucursal/create', 'sucursalController@create')->name('sucursal.create')->middleware('auth');
+Route::get('/sucursal/eliminar/{timbrado}', 'sucursalController@destroy')->name('sucursal.destroy')->middleware('auth');
+
 Route::get('/clientes','clientesController@index')->name('clientes.index')->middleware('auth');
 Route::post('/clientes', 'clientesController@store')->name('clientes.store')->middleware('auth');
 Route::get('/clientes/create', 'clientesController@create')->name('clientes.create')->middleware('auth');
 Route::get('/clientes/editar/{timbrado}', 'clientesController@edit')->name('clientes.edit')->middleware('auth');
 Route::put('/clientes/{timbrado}', 'clientesController@update')->name('clientes.update')->middleware('auth');
 Route::get('/clientes/eliminar/{timbrado}', 'clientesController@destroy')->name('clientes.destroy')->middleware('auth');
+
+Route::get('/user_numero','user_numeroController@index')->name('user_numero.index')->middleware('auth');
+Route::post('/user_numero', 'user_numeroController@store')->name('user_numero.store')->middleware('auth');
+Route::get('/user_numero/create', 'user_numeroController@create')->name('user_numero.create')->middleware('auth');
+Route::get('/user_numero/eliminar/{timbrado}', 'user_numeroController@destroy')->name('user_numero.destroy')->middleware('auth');
 
 //Buscadores
 Route::get('/searcher/clientes', 'searcherController@clientes')->name('searcher.clientes')->middleware('auth');
@@ -498,6 +513,8 @@ Route::get('/searcher/cama', 'searcherController@cama')->name('searcher.cama')->
 Route::get('/searcher/empleado', 'searcherController@empleado')->name('searcher.empleado')->middleware('auth');
 Route::get('/searcher/departamento', 'searcherController@departamento')->name('searcher.departamento')->middleware('auth');
 Route::get('/searcher/pais', 'searcherController@pais')->name('searcher.pais')->middleware('auth');
+Route::get('/searcher/timbrado', 'searcherController@timbrado')->name('searcher.timbrado')->middleware('auth');
+Route::get('/searcher/user', 'searcherController@user')->name('searcher.user')->middleware('auth');
 
 Auth::routes();
 

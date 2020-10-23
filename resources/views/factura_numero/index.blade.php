@@ -1,6 +1,6 @@
 @extends ('layout')
 
-@section('title','Caja')
+@section('title','Factura numero')
 
 @section('link')
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -10,31 +10,47 @@
 @section('script')
 <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
 <script src="/js/bootstrap-table-es-MX.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>
 @endsection
 
-@section('header', 'Caja')
+@section('header', 'Factura numero')
 
 @section('content')
 
 <div class="container" style="margin-top:30px">
     <div class="row">
+        @if (session('error_')!==null)
+        <div class="col-md-12 mb-3">
+            <div class="alert alert-danger">
+                <ul>
+                    <li>{{ session('error_') }}</li>
+                </ul>
+            </div>
+        </div>
+        @endif
         <div class="col-md-10 form-group">
             <div>
-                <table id="eventsTable" data-show-print="true" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
-                <thead>
+                <table id="eventsTable" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
+                    <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Id</th>
-                            <th>Descripcion</th>
-                            <th>Numero</th>
+                            <th>Nro desde</th>
+                            <th>Nro hasta</th>
+                            <th>Nro actual</th>
+                            <th>Nro timbrado</th>
+                            <th>Fecha desde</th>
+                            <th>Fecha fin</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($variables as $vari)
+                        @foreach($presupuesto as $pre)
                         <tr>
-                            <td>{{$vari->id}}</td>
-                            <td>{{$vari->descripcion}}</td>
-                            <td>{{$vari->numero}}</td>
+                            <td>{{$pre->id}}</td>
+                            <td>{{$pre->nro_desde}}</td>
+                            <td>{{$pre->nro_hasta}}</td>
+                            <td>{{$pre->nro_actual}}</td>
+                            <td>{{$pre->nro}}</td>
+                            <td>{{ \Carbon\Carbon::parse($pre->fecha_desde)->format('d/m/Y')}}</td>
+                            <td>{{ \Carbon\Carbon::parse($pre->fecha_fin)->format('d/m/Y')}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -44,45 +60,22 @@
 
         <div class="col-md-2 form-group mt-5">
             <div class="col-md-12">
-                <a class="btn btn-dark form-group" href="{{ route('caja.create') }}">Agregar</a>
+                <a class="btn btn-dark form-group" href="{{ route('factura_numero.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('caja.destroy', 'empty') }}">Eliminar</a>
+                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('factura_numero.destroy', 'empty') }}">Anular</a>
             </div>
             <div class="col-md-12">
-                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('caja.edit', 'empty') }}">Modificar</a>
+                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('presupuesto.edit', 'empty') }}">Modificar</a>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    /*var checkedRows = [];
-
-        $('#eventsTable').on('check.bs.table', function (e, row) {
-            checkedRows.push({ id: row.id, name: row.name, forks: row.forks });
-            console.log(checkedRows);
-        });
-
-        $('#eventsTable').on('uncheck.bs.table', function (e, row) {
-            $.each(checkedRows, function (index, value) {
-                if (value.id === row.id) {
-                    checkedRows.splice(index, 1);
-                }
-            });
-            console.log(checkedRows);
-        });
-
-        $("#add_cart").click(function () {
-            $("#output").empty();
-            $.each(checkedRows, function (index, value) {
-                $('#output').append($('<li></li>').text(value.id + " | " + value.name + " | " + value.forks));
-            });
-        });
-*/
-var id_sel;
+    var id_sel;
     $('#eventsTable').on('click-row.bs.table', function(e, row) {
-        id_sel=row;
+        id_sel = row;
         // console.log(row.id);
         var a = document.getElementById("modificar").getAttribute("href");
         var f = document.getElementById("anular").getAttribute("href");
@@ -111,6 +104,7 @@ var id_sel;
             return false;
         }
     }
+
     function mensaje_modificar() {
         if (id_sel == null) {
             alert("Seleccionar fila primero");

@@ -1,6 +1,6 @@
 @extends ('layout')
 
-@section('title','Factura')
+@section('title','Sucursal')
 
 @section('link')
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -10,45 +10,31 @@
 @section('script')
 <script src="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.js"></script>
 <script src="/js/bootstrap-table-es-MX.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.15.4/extensions/print/bootstrap-table-print.js"></script>
 @endsection
 
-@section('header', 'Factura')
+@section('header', 'Sucursal')
 
 @section('content')
 
 <div class="container" style="margin-top:30px">
     <div class="row">
-    @if (session('error_')!==null)
-        <div class="col-md-12 mb-3">
-            <div class="alert alert-danger">
-                <ul>
-                    <li>{{ session('error_') }}</li>
-                </ul>
-            </div>
-        </div>
-        @endif
         <div class="col-md-10 form-group">
             <div>
-                <table id="eventsTable" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
-                    <thead>
+                <table id="eventsTable" data-show-print="true" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
+                <thead>
                         <tr>
-                            <th data-sortable="true" data-field="id">Numero</th>
-                            <th>Timbrado</th>
-                            <th>Fecha</th>
-                            <th>Condicion</th>
-                            <th>Cliente</th>
-                            <th>Ruc</th>
+                            <th data-sortable="true" data-field="id">Id</th>
+                            <th>Nombre</th>
+                            <th>Numero</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($facturas as $factura)
+                        @foreach($variables as $vari)
                         <tr>
-                            <td id="numero_fac">{{$factura->numero}}</td>
-                            <td>{{$factura->timbrado}}</td>
-                            <td>{{ \Carbon\Carbon::parse($factura->fecha)->format('d/m/Y')}}</td>
-                            <td>{{$factura->condicion}}</td>
-                            <td>{{$factura->nombre}} {{ $factura->apellido }}</td>
-                            <td>{{$factura->ruc}}</td>
+                            <td>{{$vari->id}}</td>
+                            <td>{{$vari->nombre}}</td>
+                            <td>{{$vari->numero}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -58,13 +44,13 @@
 
         <div class="col-md-2 form-group mt-5">
             <div class="col-md-12">
-                <a class="btn btn-dark form-group" href="{{ route('factura.create') }}">Agregar</a>
+                <a class="btn btn-dark form-group" href="{{ route('sucursal.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-            <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('factura.destroy', ['empty', 'empty']) }}">Anular</a>
+                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('sucursal.destroy', 'empty') }}">Eliminar</a>
             </div>
             <div class="col-md-12">
-            <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('factura.edit', ['empty', 'empty']) }}">Modificar</a>
+                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('productos.edit', 'empty') }}">Modificar</a>
             </div>
         </div>
     </div>
@@ -94,29 +80,19 @@
             });
         });
 */
-    var id_sel;
-    var url = "{{ route('factura.edit', ['empty', 'empty']) }}";
-    var url1 = "{{ route('factura.destroy', ['empty', 'empty']) }}";
+var id_sel;
     $('#eventsTable').on('click-row.bs.table', function(e, row) {
-        document.getElementById("modificar").setAttribute("href", url);
-        document.getElementById("anular").setAttribute("href", url1);
-        id_sel = row;
+        id_sel=row;
         // console.log(row.id);
         var a = document.getElementById("modificar").getAttribute("href");
         var f = document.getElementById("anular").getAttribute("href");
         //console.log(f);
-        //var pos = a.lastIndexOf("/");
-        //var pos1 = f.lastIndexOf("/");
-        var pos = a.indexOf("empty");
-        var pos1 = f.indexOf("empty");
-        //var res = a.slice(0, pos + 1);
-        //var res1 = f.slice(0, pos1 + 1);
-        var res = a.slice(0, pos);
-        var res1 = f.slice(0, pos1);
-        //var link = res.concat(row[2]);
-        //var link1 = res1.concat(row[2]);
-        var link = res.concat(row.id, "/" + row[1]);
-        var link1 = res1.concat(row.id, "/" + row[1]);
+        var pos = a.lastIndexOf("/");
+        var pos1 = f.lastIndexOf("/");
+        var res = a.slice(0, pos + 1);
+        var res1 = f.slice(0, pos1 + 1);
+        var link = res.concat(row.id);
+        var link1 = res1.concat(row.id);
         document.getElementById("modificar").setAttribute("href", link);
         document.getElementById("anular").setAttribute("href", link1);
     })
@@ -135,7 +111,6 @@
             return false;
         }
     }
-
     function mensaje_modificar() {
         if (id_sel == null) {
             alert("Seleccionar fila primero");

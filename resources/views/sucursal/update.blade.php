@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
 @endsection
 
-@section('title','Caja agregar')
+@section('title','Productos editar')
 
 @section('script')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -17,45 +17,51 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Caja agregar')
+@section('header', 'Productos editar')
 
 @section('content')
 
-<form onsubmit="return validateForm()" method="POST" action="{{route('caja.store')}}">
+<form onsubmit="return validateForm()" method="POST" action="{{route('productos.update',$variables[0]->id)}}">
     @csrf
-<br>
+    @method('PUT')
+    
     <div class="container" style="margin-top:30px">
         <div class="row">
             <div class="col-md-6">
                 <div class="form-group">
                     <label for="codigo"> Codigo </label>
-                    <input type="text" id="codigo" name="codigo" readonly>
+                    <input type="text" id="codigo" name="codigo" readonly value="{{$variables[0]->id}}">
                 </div>
                 <div class="form-group">
-                    <label for="numero">Numero</label>
-                    <input type="text" id="numero" name="numero" required>
+                    <label for="precio">Precio</label>
+                    <input type="number" id="precio" name="precio" value="{{$variables[0]->precio}}" min="0" max="1000000000" required>
                 </div>
             </div>
             <div class="col-md-6">
+            <div class="form-group">
+                    <label for="producto">Producto</label>
+                    <input type="text" id="producto" name="producto" required value="{{$variables[0]->producto}}">
+                </div>
                 <div class="form-group">
                     <label for="descripcion">Descripcion</label>
-                    <input type="text" id="descripcion" name="descripcion" required>
+                    <input type="text" id="descripcion" name="descripcion" required value="{{$variables[0]->descripcion}}">
                 </div>
+                
             </div>
         </div>
     </div>
-<br>
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="d-flex flex-wrap justify-content-md-around ">
-                    <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
-                    <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
-                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('caja.index') }}'" class="btn btn-dark">SALIR</button></div>
+
+        <div class="container">
+            <div class="row">
+                <div class="col-md-10">
+                    <div class="d-flex flex-wrap justify-content-md-around ">
+                        <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
+                        <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
+                        <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('productos.index') }}'" class="btn btn-dark">SALIR</button></div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
     </div>
 
 </form>
@@ -380,27 +386,26 @@
     });
 
     function validateForm() {
-
+       
         //console.log(taf);
         // console.log(taf.length);
         //console.log(x[0]);
         //console.log(x[0].value);
     }
 
-    document.querySelector('#numero').addEventListener("keypress", function(evt) {
+    $('.hidden').hide();
+    $('.show').show();
+
+    function mensaje_grabar(){
+            return confirm('Desea grabar el registro');
+        }
+
+        document.querySelector('#precio').addEventListener("keypress", function(evt) {
         if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
             evt.preventDefault();
         }
     });
-
-    $('.hidden').hide();
-    $('.show').show();
-
-    function mensaje_grabar() {
-        return confirm('Desea grabar el registro');
-    }
-
-  
+        
 </script>
 
 @endsection

@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
 @endsection
 
-@section('title','Caja agregar')
+@section('title','Sucursal agregar')
 
 @section('script')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -17,11 +17,11 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Caja agregar')
+@section('header', 'Sucursal agregar')
 
 @section('content')
 
-<form onsubmit="return validateForm()" method="POST" action="{{route('caja.store')}}">
+<form onsubmit="return validateForm()" method="POST" action="{{route('sucursal.store')}}">
     @csrf
 <br>
     <div class="container" style="margin-top:30px">
@@ -38,8 +38,8 @@
             </div>
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="descripcion">Descripcion</label>
-                    <input type="text" id="descripcion" name="descripcion" required>
+                    <label for="nombre">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" required>
                 </div>
             </div>
         </div>
@@ -51,7 +51,7 @@
                 <div class="d-flex flex-wrap justify-content-md-around ">
                     <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
                     <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" onclick="remove_all()">CANCELAR</button></div>
-                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('caja.index') }}'" class="btn btn-dark">SALIR</button></div>
+                    <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('sucursal.index') }}'" class="btn btn-dark">SALIR</button></div>
                 </div>
             </div>
         </div>
@@ -387,18 +387,18 @@
         //console.log(x[0].value);
     }
 
-    document.querySelector('#numero').addEventListener("keypress", function(evt) {
-        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
-            evt.preventDefault();
-        }
-    });
-
     $('.hidden').hide();
     $('.show').show();
 
     function mensaje_grabar() {
         return confirm('Desea grabar el registro');
     }
+
+    document.querySelector('#numero').addEventListener("keypress", function(evt) {
+        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
+            evt.preventDefault();
+        }
+    });
 
   
 </script>

@@ -54,7 +54,8 @@ class cajaController extends Controller
         // dump(request()->all());
           DB::table('caja')->insert(
             [
-                'descripcion' => request()->descripcion
+                'descripcion' => request()->descripcion,
+                'numero' => request()->numero
             ]
         );
        

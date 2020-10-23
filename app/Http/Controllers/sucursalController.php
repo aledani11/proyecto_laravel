@@ -6,7 +6,7 @@ use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class timbradoController extends Controller
+class sucursalController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,15 +17,15 @@ class timbradoController extends Controller
     {
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
-        $timbrado = DB::table('timbrado')
+        $productos = DB::table('sucursal')
             ->select(
-                'timbrado.*'
+                'sucursal.*'
             )
             ->get();
 
         // dd($estadia);
 
-        return view('timbrado.index', ['variables' => $timbrado]);
+        return view('sucursal.index', ['variables' => $productos]);
     }
 
     /**
@@ -37,7 +37,7 @@ class timbradoController extends Controller
     {
 
         return view(
-            'timbrado.create'
+            'sucursal.create'
             /* ,[
             'ciudades' => $ciudad,
         ]*/
@@ -53,15 +53,14 @@ class timbradoController extends Controller
     public function store(Request $request)
     {
         // dump(request()->all());
-        DB::table('timbrado')->insert(
+        DB::table('sucursal')->insert(
             [
-                'nro' => request()->numero,
-                'fecha_desde' => request()->fecha_desde,
-                'fecha_fin' => request()->fecha_fin
+                'nombre' => request()->nombre,
+                'numero' => request()->numero,
             ]
         );
 
-        return redirect()->route('timbrado.index');
+        return redirect()->route('sucursal.index');
     }
 
     /**
@@ -85,13 +84,13 @@ class timbradoController extends Controller
     {
         // $ciudad = DB::table('ciudad')->get();
 
-        $timbrado = DB::table('timbrado')
+        $productos = DB::table('productos')
             ->where('id', '=', $id)
             ->get();
 
         //dd($reservas);
-        return view('timbrado.update', [
-            'variables' => $timbrado
+        return view('productos.update', [
+            'variables' => $productos
         ]);
     }
 
@@ -105,18 +104,18 @@ class timbradoController extends Controller
     public function update(Request $request)
     {
         //dump($request->all());
-        DB::table('timbrado')
+        DB::table('productos')
             ->where('id', request()->codigo)
             ->update(
                 [
-                    'nro' => request()->numero,
-                    'fecha_desde' => request()->fecha_desde,
-                    'fecha_fin' => request()->fecha_fin
+                    'producto' => request()->producto,
+                    'descripcion' => request()->descripcion,
+                    'precio' => request()->precio
                 ]
             );
 
 
-        return redirect()->route('timbrado.index');
+        return redirect()->route('productos.index');
     }
 
     /**
@@ -127,9 +126,9 @@ class timbradoController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('timbrado')->where('id', '=', $id)->delete();
+        DB::table('sucursal')->where('id', '=', $id)->delete();
 
-        return redirect()->route('timbrado.index');
+        return redirect()->route('sucursal.index');
     }
 
     public function tarifa(Request $request)

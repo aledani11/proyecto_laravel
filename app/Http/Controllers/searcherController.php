@@ -501,4 +501,44 @@ class searcherController extends Controller
 
         return view('buscadores.presupuesto', ['presupuestos' => $presupuesto]);
     }
+    public function timbrado()
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        //a=activo i=inactivo
+        $timbrado = DB::table('timbrado')
+            ->select(
+                'timbrado.*'
+            )
+            ->where('timbrado.fecha_fin', '>=', 'NOW()')
+            ->get();
+
+        // dd($estadia);
+
+        return view('buscadores.timbrado', ['timbrado' => $timbrado]);
+    }
+
+    public function user()
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        //a=activo i=inactivo
+        $user = DB::table('users')
+            ->select(
+                'users.id', 'users.name', 'users.email', 'users.nivel',
+                'pe.nombre',
+                'pe.apellido',
+                'emp.persona_nro_documento as documento'
+            )
+            ->leftJoin('empleado as emp', 'emp.id', '=', 'users.empleado_id')
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('emp.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('emp.persona_nro_documento', '=', 'pe.nro_documento');
+            })
+            ->get();
+
+        // dd($estadia);
+
+        return view('buscadores.user', ['variables' => $user]);
+    }
 }

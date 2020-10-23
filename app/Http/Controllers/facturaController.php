@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class facturaController extends Controller
 {
@@ -27,7 +28,7 @@ class facturaController extends Controller
             ->where('estado', '=', 'A')
             ->leftJoin('clientes as cl', 'factura.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('cl.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
                 $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();
@@ -57,7 +58,41 @@ class facturaController extends Controller
             'tipo_estadias' => $tipo_estadia,
             'habitaciones' => $habitacion
         ]);*/
-        return view('factura.create');
+        try {
+            $id = Auth::id();
+            $sucursal = DB::table('sucursal')
+                ->orderBy('id', 'desc')
+                ->limit(1)
+                ->get();
+            $user_numero = DB::table('user_numero')
+                ->select(
+                    'ca.numero',
+                )
+                ->where('user_id', '=', $id)
+                ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+                ->get();
+            $numero = DB::table('factura_numero')
+                ->orderBy('id', 'desc')
+                ->limit(1)
+                ->get();
+            $nro3 = ((int) $numero[0]->nro_actual + 1);
+            $nro3 = str_pad($nro3, 7, "0", STR_PAD_LEFT);
+            $nro = $sucursal[0]->numero . "-" . $user_numero[0]->numero . "-" . $nro3;
+            $timbrado = DB::table('timbrado')
+                ->select(
+                    'timbrado.nro',
+                )
+                ->where('id', '=', $numero[0]->timbrado)
+                ->get();
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
+        return view('factura.create', [
+            'numero' => $nro,
+            'timbrado' => $timbrado
+        ]);
     }
 
     /**
@@ -155,7 +190,7 @@ class facturaController extends Controller
                 ]);
         }
 
-        DB::table('estadia')->where('id',$request->estad)
+        DB::table('estadia')->where('id', $request->estad)
             ->update(['estado' => 'I']);
 
         return redirect()->route('factura.index');
@@ -387,23 +422,60 @@ class facturaController extends Controller
 
     public function estadia(Request $request)
     {
+        try {
+            $estadia = DB::table('estadia')
+                ->select('estadia.id', 'es.entrada', 'es.salida', 'ha.descripcion')
+                ->where('estadia.id', '=', $request->id)
+                ->leftJoin('estadia_habitaciones as es', 'estadia.id', '=', 'es.id_estadia')
+                ->leftJoin('habitaciones as ha', 'es.id_habitacion', '=', 'ha.id')
+                ->get();
 
-        $estadia = DB::table('estadia')
-            ->select('estadia.id', 'es.entrada', 'es.salida', 'ha.descripcion')
-            ->where('estadia.id', '=', $request->id)
-            ->leftJoin('estadia_habitaciones as es', 'estadia.id', '=', 'es.id_estadia')
-            ->leftJoin('habitaciones as ha', 'es.id_habitacion', '=', 'ha.id')
-            ->get();
+            $iva = DB::table('iva')
+                ->select('iva.id', 'iva.porcentaje')
+                ->where('descripcion', '=', '10%')
+                ->get();
 
-        $tarifa = DB::table('estadia')
-            ->select('estadia.id as estadia_id', 'ta.id', 'tn.descripcion', 'ta.precio')
-            ->where('estadia.id', '=', $request->id)
-            ->leftJoin('estadia_tarifas as et', 'estadia.id', '=', 'et.estadia_id')
-            ->leftJoin('tarifas as ta', 'et.tarifa_id', '=', 'ta.id')
-            ->leftJoin('tarifas_nombres as tn', 'tn.id', '=', 'ta.tarifas_nombres_id')
-            ->get();
+            $tarifa = DB::table('estadia')
+                ->select('estadia.id as estadia_id', 'ta.id', 'tn.descripcion', 'ta.precio')
+                ->where('estadia.id', '=', $request->id)
+                ->leftJoin('estadia_tarifas as et', 'estadia.id', '=', 'et.estadia_id')
+                ->leftJoin('tarifas as ta', 'et.tarifa_id', '=', 'ta.id')
+                ->leftJoin('tarifas_nombres as tn', 'tn.id', '=', 'ta.tarifas_nombres_id')
+                ->get();
 
-        $servicios = DB::table('estadia')
+            $tarifa1 = DB::table('estadia_tarifas')
+                ->select(
+                    DB::raw('DATEDIFF(eh.salida, eh.entrada)+1 as dias'),
+                    'eh.id_habitacion',
+                    'ta.id',
+                    'tn.descripcion',
+                    'ta.precio'
+                )
+                ->where([
+                    ['estadia_tarifas.estadia_id', '=', $request->id],
+                    ['eh.id_estadia', '=', $request->id]
+                ])
+                ->leftJoin('tarifas as ta', 'estadia_tarifas.tarifa_id', '=', 'ta.id')
+                ->leftJoin('tarifas_nombres as tn', 'tn.id', '=', 'ta.tarifas_nombres_id')
+                ->leftJoin('estadia_habitaciones as eh', 'ta.habitacion_id', '=', 'eh.id_habitacion')
+                ->get();
+
+            $consumicion = DB::table('s_consumicion')
+                ->select(
+                    'cd.cantidad',
+                    'pr.producto',
+                    'pr.precio'
+                )
+                ->where('s_consumicion.estadia_id', '=', $request->id)
+                ->leftJoin('consumicion_detalle as cd', 's_consumicion.id', '=', 'cd.s_consumicion_id')
+                ->leftJoin('productos as pr', 'cd.producto_id', '=', 'pr.id')
+                ->get();
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            // request()->session()->flash('error_', 'Error en base de datos');
+             return ['error' => $e->getMessage()];
+        }
+        /*  $servicios = DB::table('estadia')
             ->select(
                 'estadia.id as estadia_id',
                 'es.id as esta_servi_id',
@@ -414,7 +486,7 @@ class facturaController extends Controller
             ->leftJoin('estadia_servicios as es', 'estadia.id', '=', 'es.estadia_id')
             ->leftJoin('servicios as se', 'es.servicios_id', '=', 'se.id')
             ->leftJoin('servicios_nombres as sn', 'se.nombre_id', '=', 'sn.id')
-            ->get();
+            ->get();*/
         //dd($tarifa);
 
         //return view('estadia.create', ['tarifas' => $tarifa]);
@@ -422,7 +494,10 @@ class facturaController extends Controller
         return [
             'estadias' => $estadia,
             'tarifa' => $tarifa,
-            'servicios' => $servicios
+            'tarifa1' => $tarifa1,
+            'iva_tarifa' => $iva,
+            'consumicion' => $consumicion
+            //'servicios' => $servicios
         ];
         //return $request;
     }

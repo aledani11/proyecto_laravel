@@ -26,10 +26,19 @@
 
     <div class="container" style="margin-top:30px">
         <div class="row">
+        @if (session('error_')!==null)
+        <div class="col-md-12 mb-3">
+            <div class="alert alert-danger">
+                <ul>
+                    <li>{{ session('error_') }}</li>
+                </ul>
+            </div>
+        </div>
+        @endif
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="numero"> Numero </label>
-                    <input type="text" id="numero" name="codigo" readonly>
+                    <input type="text" id="numero" name="codigo" readonly required value="{{$numero}}">
                 </div>
                 <div class="form-group">
                     <label for="condicion">Condicion</label>
@@ -45,9 +54,9 @@
                 </div>
             </div>
             <div class="col-md-4">
-                <div class="form-group">
-                    <label for="fecha">Fecha</label>
-                    <input type="date" name="fecha" id="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
+            <div class="form-group">
+                    <label for="timbrado"> Timbrado </label>
+                    <input type="text" id="timbrado" name="timbrado" readonly required value="{{$timbrado[0]->nro}}">
                 </div>
                 <div class="form-group">
                     <label for="cliente">Cliente</label>
@@ -60,6 +69,10 @@
                 </div>
             </div>
             <div class="col-md-4">
+            <div class="form-group">
+                    <label for="fecha">Fecha</label>
+                    <input type="date" name="fecha" id="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
+                </div>
                 <div class="form-group">
                     <label for="total"> Total </label>
                     <input type="text" id="total" name="total" readonly required tabindex="1">
@@ -78,11 +91,11 @@
             <div class="col-md-4">
             </div>
         </div>
-        <div class="form-group my-2 col-md-10">
+        <div class="form-group my-2 col-md-12">
             <h5>Estadia</h5>
         </div>
         <div class="row">
-            <div class="col-md-10 form-group">
+            <div class="col-md-12 form-group">
                 <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
                     <table id="estadia_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
                         <thead>
@@ -98,76 +111,7 @@
                     </table>
                 </div>
             </div>
-
-            <div class="col-md-2 form-group">
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" onclick="add('estadia')" tabindex="8">Agregar</button>
-                </div>
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" onclick="remove('estadia')">Quitar</button>
-                </div>
-                <div class="col-md-12">
-                    <button type="button" class="btn btn-dark form-group" onclick="edit('estadia')">Editar</button>
-                </div>
-            </div>
         </div>
-        <div class="form-group my-2 col-md-12">
-            <h5>Tarifa</h5>
-        </div>
-        <div class="row mt-3">
-            <div class="col-md-12 form-group">
-                <div class="table-responsive-md table-hover from-group" style="overflow-y:auto; height:200px">
-                    <table id="tarifa_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
-                        <thead>
-                            <tr>
-                                <th data-sortable="true">Id</th>
-                                <th>Id_estadia</th>
-                                <th>Tarifa</th>
-                                <th>Precio</th>
-                                <th>Iva</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-
-        </div>
-
-
-        <div class="row form-group">
-            <div class="col-8 form-group">
-            </div>
-            <div class="col-3 ">
-                <label for="total_iva" class="form-group1">
-                    <span> Total Iva</span>
-                    <input type="text" id="total_iva" readonly>
-                </label>
-            </div>
-        </div>
-        <div class="row form-group">
-            <div class="col-8 form-group">
-            </div>
-            <div class="col-3 ">
-                <label for="subtotal" class="form-group1">
-                    <span> Subtotal</span>
-                    <input type="text" id="subtotal" readonly>
-                </label>
-            </div>
-        </div>
-        <div class="row form-group">
-            <div class="col-8 form-group">
-            </div>
-            <div class="col-3 ">
-                <label for="total1" class="form-group1">
-                    <span> Total</span>
-                    <input type="text" id="total1" readonly>
-                </label>
-            </div>
-        </div>
-
 
         <div class="row">
             <div class="col-md-4">
@@ -176,7 +120,7 @@
             </div>
         </div>
         <div class="form-group my-2 col-md-12">
-            <h5>Servicios</h5>
+            <h5>Factura detalle</h5>
         </div>
         <div class="row">
             <div class="col-md-12 form-group">
@@ -184,11 +128,11 @@
                     <table id="servicios_table" data-toggle="table" data-classes="table table-bordered table-hover table-md">
                         <thead>
                             <tr>
-                                <th>Id</th>
-                                <th>id_estadia</th>
-                                <th>Servicio</th>
+                                <th>Descripcion</th>
                                 <th>Precio</th>
+                                <th>Cantidad</th>
                                 <th>Iva</th>
+                                <th>Tarifa</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -196,17 +140,7 @@
                     </table>
                 </div>
             </div>
-
-            <div class="col-md-2 form-group">
-                <div class="col-md-12">
-                </div>
-                <div class="col-md-12">
-                </div>
-                <div class="col-md-12">
-                </div>
-            </div>
         </div>
-
 
         <div class="row form-group">
             <div class="col-8 form-group">
@@ -233,7 +167,7 @@
             </div>
             <div class="col-3 ">
                 <label for="total2" class="form-group1">
-                    <span> Total</span>
+                    <span> Total factura</span>
                     <input type="text" id="total2" readonly>
                 </label>
             </div>
@@ -289,6 +223,7 @@
                     id: val
                 },
                 success: function(data) {
+                    console.log(data);
                     addTable(data, table)
                 }
             });
@@ -296,28 +231,20 @@
 
 
         function addTable(data, table) {
+
             if (table === "#estadia_table") {
-                var name_estadia = document.getElementsByName("estad[]");
-                for (let index = 0; index < name_estadia.length; index++) {
-                    const element = name_estadia[index];
-                    if (element.value == data.estadias[0].id) {
-                        alert("Codigo ya ingresado");
-                        return false;
-                    }
-                }
                 for (let index = 0; index < data.estadias.length; index++) {
                     $("#estadia_table").bootstrapTable('insertRow', {
                         index: 0,
                         row: [data.estadias[index].id,
                             data.estadias[index].descripcion,
                             data.estadias[index].entrada,
-                            data.estadias[index].salida +
-                            '<input type="hidden" name ="estad[]" value=' + data.estadias[index].id + '>'
+                            data.estadias[index].salida
                         ]
                     })
                 }
 
-                for (let index = 0; index < data.tarifa.length; index++) {
+                /*for (let index = 0; index < data.tarifa.length; index++) {
                     $("#tarifa_table").bootstrapTable('insertRow', {
                         index: 0,
                         row: [data.tarifa[index].id,
@@ -335,22 +262,45 @@
                 total1 = iva_total + subtotal;
                 document.getElementById("total_iva").value = iva_total.format(0, 3, '.', ',');
                 document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
-                document.getElementById("total1").value = total1.format(0, 3, '.', ',');
+                document.getElementById("total1").value = total1.format(0, 3, '.', ',');*/
 
-                for (let index = 0; index < data.servicios.length; index++) {
+                for (let index = 0; index < data.tarifa1.length; index++) {
+                    var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
+                    console.log(descri_tari1);
+                    var descri_tari="Tarifa-".concat(descri_tari1);
                     $("#servicios_table").bootstrapTable('insertRow', {
                         index: 0,
-                        row: [data.servicios[index].esta_servi_id,
-                            data.servicios[index].estadia_id,
-                            data.servicios[index].servicio,
-                            data.servicios[index].precio_servi.format(0, 3, '.', ','),
-                            (data.servicios[index].precio_servi / 11).format(0, 3, '.', ',') +
-                            '<input type="hidden" name ="estadia_servicios[]" value=' + data.servicios[index].esta_servi_id + '>' +
-                            '<input type="hidden" name ="estadia_servi_iva[]" value=2>'
+                        row: ['Tarifa '+data.tarifa1[index].descripcion,
+                            data.tarifa1[index].precio.format(0, 3, '.', ','),
+                            data.tarifa1[index].dias,
+                            (data.tarifa1[index].precio / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ','),
+                            data.tarifa1[index].descripcion +
+                            '<input type="hidden" name ="descripcion_detalle[]" value=' + descri_tari + '>' +
+                            '<input type="hidden" name ="precio_detalle[]" value=' + data.tarifa1[index].precio + '>' +
+                            '<input type="hidden" name ="cantidad_detalle[]" value=' + data.tarifa1[index].dias + '>' +
+                            '<input type="hidden" name ="iva_detalle[]" value=' + data.iva_tarifa[0].id + '>' +
+                            '<input type="hidden" name ="tarifa_detalle[]" value=' + data.tarifa1[index].id + '>' 
                         ]
                     })
-                    iva_total1 += (data.servicios[index].precio_servi / 11);
-                    subtotal1 += data.servicios[index].precio_servi;
+                   // iva_total1 += (data.servicios[index].precio_servi / 11);
+                   // subtotal1 += data.servicios[index].precio_servi;
+
+                }
+
+                for (let index = 0; index < data.consumicion.length; index++) {
+                  //  var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
+                  //  console.log(descri_tari1);
+                 //   var descri_tari="Tarifa-".concat(descri_tari1);
+                    $("#servicios_table").bootstrapTable('insertRow', {
+                        index: 0,
+                        row: ['Consumicion '+data.consumicion[index].producto,
+                            data.consumicion[index].precio.format(0, 3, '.', ','),
+                            data.consumicion[index].cantidad,
+                            (data.consumicion[index].precio / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ',')
+                        ]
+                    })
+                   // iva_total1 += (data.servicios[index].precio_servi / 11);
+                   // subtotal1 += data.servicios[index].precio_servi;
 
                 }
 
@@ -497,6 +447,7 @@
         }
         if (estadias != "nothing" && estadias != null) {
             document.getElementById("estadia").value = estadias;
+            add('estadia');
         }
 
         localStorage.removeItem("clientes");

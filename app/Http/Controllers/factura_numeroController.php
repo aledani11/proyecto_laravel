@@ -6,7 +6,7 @@ use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class nota_credito_cController extends Controller
+class factura_numeroController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,22 +18,19 @@ class nota_credito_cController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //estado i=inactivo a=activo
-        $n_credito_compra = DB::table('n_credito_compra')
+        $presupuesto = DB::table('factura_numero')
             ->select(
-                'n_credito_compra.*',
-                'fc.numero as fc_numero',
-                'pr.ruc',
-                'pr.nombre'
+                'factura_numero.*',
+                'tm.nro',
+                'tm.fecha_desde',
+                'tm.fecha_fin'
             )
-            ->where('n_credito_compra.estado', '=', 'A')
-            ->leftJoin('factura_compra as fc', 'n_credito_compra.factura_compra_id', '=', 'fc.id')
-            ->leftJoin('orden_de_compra as or', 'fc.orden_de_compra_numero', '=', 'or.numero')
-            ->leftJoin('proveedor as pr', 'or.proveedor_ruc', '=', 'pr.ruc')
+            ->leftJoin('timbrado as tm', 'factura_numero.timbrado', '=', 'tm.id')
             ->get();
 
         //  dd($nota_credito);
 
-        return view('nota_credito_c.index', ['n_credito_compra' => $n_credito_compra]);
+        return view('factura_numero.index', ['presupuesto' => $presupuesto]);
     }
 
     /**
@@ -45,7 +42,7 @@ class nota_credito_cController extends Controller
     {
         $iva = DB::table('iva')->get();
 
-        return view('nota_credito_c.create', [
+        return view('factura_numero.create', [
             'ivas' => $iva,
         ]);
     }
@@ -59,86 +56,26 @@ class nota_credito_cController extends Controller
     public function store(Request $request)
     {
         try {
-
-            $c_a_pagar = DB::table('cuentas_a_pagar')
-                ->select('cuentas_a_pagar.*')
-                ->where([
-                    ['factura_compra_id', '=', request()->factura],
-                    ['estado', '=', "A"],
-                ])->get();
-            $monto_c = 0;
-            $can = 0;
-            foreach ($c_a_pagar as $key => $value) {
-                $monto_c += (int)$c_a_pagar[$key]->monto;
-                $can += 1;
-            }
-            //dump($monto_c);
-            $monto = ((int) str_replace('.', '', request()->monto));
-            //dump($monto);
-            if ($monto_c >= $monto) {
-                //dump("modificar");
-                DB::table('cuentas_a_pagar')
-                    ->where([
-                        ['factura_compra_id', '=', request()->factura],
-                        ['estado', '=', "A"],
-                    ])
-                    ->update(
-                        [
-                            'monto' => (($monto_c - $monto) / $can)
-                        ]
-                    );
-            } else {
-                // dump("error");
-                request()->session()->flash('error_', 'Monto mayor a total cuentas a pagar');
-                return redirect()->route('nota_credito_c.index');
-            }
-
-            //dd(request()->all());
+            // dd(request()->all());
             //c=cobrado a=anulado
-            DB::table('n_credito_compra')->insert(
+            $nro3 = ((int) request()->nro_desde - 1);
+            $nro3 = str_pad($nro3, 7, "0", STR_PAD_LEFT);
+            DB::table('factura_numero')->insert(
                 [
-                    'numero' => request()->numero, 'factura_compra_id' => request()->factura,
-                    'fecha_emision' => request()->fechae, 'estado' => "A",
-                    'nombre' => request()->nombre, 'ruc' => request()->ruc,
-                    'concepto' => request()->concepto, 'fecha_registro' => request()->fechar,
-                    'importe' => ((int) str_replace('.', '', request()->monto))
+                    'nro_desde' => request()->nro_desde, 'nro_hasta' => request()->nro_hasta,
+                    'timbrado' => request()->timbrado, 'nro_actual' => $nro3
                 ]
             );
-
-            $input = $request->only([
-                'articulo_detalle', 'precio_detalle',
-                'cantidad_detalle', 'iva_detalle'
-            ]);
-            //dump($input);
             //dump($input["habitacion"][1]);
-            if (isset($input["articulo_detalle"])) {
-                foreach ($input["articulo_detalle"] as $key => $value) {
 
-                    $iva = DB::table('iva')
-                        ->select('iva.id')
-                        ->where('porcentaje', '=', $input["iva_detalle"][$key])
-                        ->get();
-
-                    $data1[] = [
-                        'n_credito_compra_numero' => request()->numero,
-                        'articulo_codigo' => $input["articulo_detalle"][$key],
-                        'precio' => $input["precio_detalle"][$key],
-                        'cantidad' => $input["cantidad_detalle"][$key],
-                        'iva_id' => $iva[0]->id
-                    ];
-                }
-
-
-                DB::table('n_credito_c_detalle')->insert($data1);
-            }
         } catch (\Exception $e) {
-           // request()->session()->flash('error_', $e->getMessage());
+            //request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');
             // return redirect()->route('personas.index');
         }
 
 
-        return redirect()->route('nota_credito_c.index');
+        return redirect()->route('factura_numero.index');
     }
 
     /**
@@ -344,48 +281,18 @@ class nota_credito_cController extends Controller
         try {
             //dump($id);
             //i=inactivo a=activo 
-
-            $n_credito_c = DB::table('n_credito_compra')
-                ->select('n_credito_compra.*')
-                ->where('numero', '=', $id)
-                ->get();
-
-            $can = DB::table('cuentas_a_pagar')
+            DB::table('factura_numero')
                 ->where([
-                    ['factura_compra_id', '=', $n_credito_c[0]->factura_compra_id],
-                    ['estado', '=', "A"],
-                ])
-                ->count();
-
-            DB::table('cuentas_a_pagar')
-                ->where([
-                    ['factura_compra_id', '=', $n_credito_c[0]->factura_compra_id],
-                    ['estado', '=', "A"],
-                ])
-                ->update(
-                    [
-                        'monto' => DB::raw('monto+' . (((int)$n_credito_c[0]->importe) / $can))
-                    ]
-                );
-
-            DB::table('n_credito_c_detalle')
-                ->where([
-                    ['n_credito_compra_numero', '=', $id]
-                ])
-                ->delete();
-
-            DB::table('n_credito_compra')
-                ->where([
-                    ['numero', '=', $id]
+                    ['id', '=', $id]
                 ])
                 ->delete();
         } catch (\Exception $e) {
-            request()->session()->flash('error_', $e->getMessage());
-            //request()->session()->flash('error_', 'Error en base de datos');
+            //request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
             //  return redirect()->route('personas.index');
         }
 
-        return redirect()->route('nota_credito_c.index');
+        return redirect()->route('factura_numero.index');
     }
 
     public function tarifa(Request $request)
@@ -418,27 +325,6 @@ class nota_credito_cController extends Controller
         //return view('estadia.create', ['tarifas' => $tarifa]);
 
         return ['personas' => $persona];
-        //return $request;
-    }
-    public function factura(Request $request)
-    {
-
-        $factura_c_detalle = DB::table('factura_c_detalle')
-            ->select(
-                'ar.codigo',
-                'ar.nombre',
-                'factura_c_detalle.cantidad',
-                'factura_c_detalle.precio',
-                'iv.porcentaje'
-            )
-            ->where('factura_compra_id', '=', $request->id)
-            ->leftJoin('articulo as ar', 'factura_c_detalle.articulo_codigo', '=', 'ar.codigo')
-            ->leftJoin('iva as iv', 'factura_c_detalle.iva_id', '=', 'iv.id')
-            ->get();
-
-        return [
-            'articulos' => $factura_c_detalle,
-        ];
         //return $request;
     }
 }

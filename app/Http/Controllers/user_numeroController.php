@@ -6,7 +6,7 @@ use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class timbradoController extends Controller
+class user_numeroController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -17,15 +17,30 @@ class timbradoController extends Controller
     {
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
-        $timbrado = DB::table('timbrado')
+        $user_numero = DB::table('user_numero')
             ->select(
-                'timbrado.*'
+                'user_numero.*',
+                'usr.name',
+                'usr.nivel',
+                'usr.email',
+                'ca.numero as numero_caja',
+                'pe.nombre',
+                'pe.apellido',
+                'emp.persona_nro_documento as documento'
             )
+            ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+            ->leftJoin('users as usr', 'user_numero.user_id', '=', 'usr.id')
+            ->leftJoin('empleado as emp', 'usr.empleado_id', '=', 'emp.id')
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('emp.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('emp.persona_nro_documento', '=', 'pe.nro_documento');
+            })
             ->get();
+
 
         // dd($estadia);
 
-        return view('timbrado.index', ['variables' => $timbrado]);
+        return view('user_numero.index', ['variables' => $user_numero]);
     }
 
     /**
@@ -35,12 +50,19 @@ class timbradoController extends Controller
      */
     public function create()
     {
-
+        /* $cargo = DB::table('empleado')
+            ->select(
+                'empleado.*',
+                'car.descripcion as cargo'
+            )
+            ->leftJoin('cargo as car', 'empleado.cargo_id', '=', 'car.id')
+            ->get();*/
+        $cargo = DB::table('caja')->get();
         return view(
-            'timbrado.create'
-            /* ,[
-            'ciudades' => $ciudad,
-        ]*/
+            'user_numero.create',
+            [
+                'caja' => $cargo,
+            ]
         );
     }
 
@@ -52,16 +74,21 @@ class timbradoController extends Controller
      */
     public function store(Request $request)
     {
-        // dump(request()->all());
-        DB::table('timbrado')->insert(
-            [
-                'nro' => request()->numero,
-                'fecha_desde' => request()->fecha_desde,
-                'fecha_fin' => request()->fecha_fin
-            ]
-        );
+        try {
+            // dump(request()->all());
+            DB::table('user_numero')->insert(
+                [
+                    'user_id' => request()->user,
+                    'caja_id' => request()->caja
+                ]
+            );
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
 
-        return redirect()->route('timbrado.index');
+        return redirect()->route('user_numero.index');
     }
 
     /**
@@ -84,14 +111,16 @@ class timbradoController extends Controller
     public function edit($id)
     {
         // $ciudad = DB::table('ciudad')->get();
+        $cargo = DB::table('cargo')->get();
 
-        $timbrado = DB::table('timbrado')
+        $empleado = DB::table('empleado')
             ->where('id', '=', $id)
             ->get();
 
         //dd($reservas);
-        return view('timbrado.update', [
-            'variables' => $timbrado
+        return view('empleado.update', [
+            'variables' => $empleado,
+            'cargos' => $cargo
         ]);
     }
 
@@ -105,18 +134,19 @@ class timbradoController extends Controller
     public function update(Request $request)
     {
         //dump($request->all());
-        DB::table('timbrado')
+        DB::table('empleado')
             ->where('id', request()->codigo)
             ->update(
                 [
-                    'nro' => request()->numero,
-                    'fecha_desde' => request()->fecha_desde,
-                    'fecha_fin' => request()->fecha_fin
+                    'cargo_id' => request()->cargo,
+                    'codigo_empleado' => request()->codigo_empleado,
+                    'persona_ciudad_id' => request()->persona_ciudad,
+                    'persona_nro_documento' => request()->persona_documento
                 ]
             );
 
 
-        return redirect()->route('timbrado.index');
+        return redirect()->route('empleado.index');
     }
 
     /**
@@ -127,9 +157,15 @@ class timbradoController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('timbrado')->where('id', '=', $id)->delete();
+        try {
+            DB::table('user_numero')->where('user_id', '=', $id)->delete();
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
 
-        return redirect()->route('timbrado.index');
+        return redirect()->route('user_numero.index');
     }
 
     public function tarifa(Request $request)
