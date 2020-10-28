@@ -35,6 +35,11 @@
                     <label for="numero"> Numero </label>
                     <input type="number" id="numero" name="numero" required min="0" max="100000000000">
                 </div>
+                <div class="form-group">
+                    <label for="sucursal">Sucursal</label>
+                    <input type="text" id="sucursal" name="sucursal" readonly autocomplete="off">
+                    <input type="button" value="..." class="btn-dark" onclick="openWin('sucursal')" tabindex="7">
+                </div>
             </div>
             <div class="col-md-6">
                 <div class="form-group">
@@ -337,8 +342,8 @@
     }
 
     function openWin(w) {
-        if (w == "cliente") {
-            myWindow = window.open("{{ route('searcher.clientes') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+        if (w == "sucursal") {
+            myWindow = window.open("{{ route('searcher.sucursal') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
         if (w == "reserva") {
             myWindow = window.open("{{ route('searcher.reservas') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
@@ -355,13 +360,13 @@
 
     function play() {
         // console.log("hola");
-        var clientes = localStorage.getItem("clientes");
+        var sucursal = localStorage.getItem("sucursal");
         var reservas = localStorage.getItem("reservas");
         var tarifas = localStorage.getItem("tarifas");
         var personas = localStorage.getItem("personas");
 
-        if (clientes != "nothing" && clientes != null) {
-            document.getElementById("cliente").value = clientes;
+        if (sucursal != "nothing" && sucursal != null) {
+            document.getElementById("sucursal").value = sucursal;
         }
         if (reservas != "nothing" && reservas != null) {
             document.getElementById("reserva").value = reservas;
@@ -373,7 +378,7 @@
             document.getElementById("persona").value = personas;
         }
 
-        localStorage.removeItem("clientes");
+        localStorage.removeItem("sucursal");
         localStorage.removeItem("reservas");
         localStorage.removeItem("tarifas");
         localStorage.removeItem("personas");

@@ -1,6 +1,6 @@
 @extends ('layout')
 
-@section('title','Buscador timbrado')
+@section('title','Buscador factura numero')
 
 @section('link')
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -12,7 +12,7 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Buscador timbrado')
+@section('header', 'Buscador factura numero')
 
 @section('content')
 
@@ -24,22 +24,24 @@
                 <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Id</th>
-                            <th>Numero</th>
+                            <th>Nro desde</th>
+                            <th>Nro hasta</th>
+                            <th>Nro actual</th>
+                            <th>Nro timbrado</th>
                             <th>Fecha desde</th>
                             <th>Fecha fin</th>
-                            <th>Sucursal</th>
-                            <th>Numero</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($variables as $vari)
+                        @foreach($variables as $pre)
                         <tr>
-                            <td>{{$vari->id}}</td>
-                            <td>{{$vari->nro}}</td>
-                            <td>{{ \Carbon\Carbon::parse($vari->fecha_desde)->format('d/m/Y')}}</td>
-                            <td>{{ \Carbon\Carbon::parse($vari->fecha_fin)->format('d/m/Y')}}</td>
-                            <td>{{$vari->nombre}}</td>
-                            <td>{{$vari->numero}}</td>
+                            <td>{{$pre->id}}</td>
+                            <td>{{$pre->nro_desde}}</td>
+                            <td>{{$pre->nro_hasta}}</td>
+                            <td>{{$pre->nro_actual}}</td>
+                            <td>{{$pre->nro}}</td>
+                            <td>{{ \Carbon\Carbon::parse($pre->fecha_desde)->format('d/m/Y')}}</td>
+                            <td>{{ \Carbon\Carbon::parse($pre->fecha_fin)->format('d/m/Y')}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -89,7 +91,6 @@
         var link = res.concat(row.id);
         document.getElementById("modificar").setAttribute("href", link);*/
         a = row.id;
-        b = row[5];
     })
 
     $('#eventsTable').on('click', 'tbody tr', function(event) {
@@ -99,8 +100,7 @@
     function closewin(e) {
         //myWindow.close();
         //sessionStorage.setItem("clientes", a);
-        localStorage.setItem("timbrado", a);
-        //localStorage.setItem("ruc_orden", b);
+        localStorage.setItem("factura_numero", a);
         this.close();
         //console.log(e);
     }

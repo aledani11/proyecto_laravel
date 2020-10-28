@@ -515,6 +515,8 @@ Route::get('/searcher/departamento', 'searcherController@departamento')->name('s
 Route::get('/searcher/pais', 'searcherController@pais')->name('searcher.pais')->middleware('auth');
 Route::get('/searcher/timbrado', 'searcherController@timbrado')->name('searcher.timbrado')->middleware('auth');
 Route::get('/searcher/user', 'searcherController@user')->name('searcher.user')->middleware('auth');
+Route::get('/searcher/factura_numero', 'searcherController@factura_numero')->name('searcher.factura_numero')->middleware('auth');
+Route::get('/searcher/sucursal', 'searcherController@sucursal')->name('searcher.sucursal')->middleware('auth');
 
 Auth::routes();
 

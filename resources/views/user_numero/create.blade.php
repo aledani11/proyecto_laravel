@@ -9,7 +9,7 @@
 <link rel="stylesheet" href="https://unpkg.com/bootstrap-table@1.15.5/dist/bootstrap-table.min.css">
 @endsection
 
-@section('title','User numero agregar')
+@section('title','User número agregar')
 
 @section('script')
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -17,7 +17,7 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'User numero agregar')
+@section('header', 'User número agregar')
 
 @section('content')
 
@@ -31,10 +31,15 @@
                     <label for="numero"> Codigo </label>
                     <input type="text" id="numero" name="numero" autocomplete="off" class="readonly" style="caret-color: transparent !important;">
                 </div>
+                <div class="form-group">
+                    <label for="factura_numero">Factura número</label>
+                    <input type="text" id="factura_numero" name="factura_numero" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
+                    <input type="button" value="..." class=" btn-dark" onclick="openWin('factura_numero')">
+                </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="numero">Numero</label>
+                    <label for="numero">Número</label>
                     <select id="numero" name="caja" required>
                         <option value="">--Selecciona una opción--</option>
                         @foreach($caja as $caj)
@@ -307,8 +312,8 @@
     }
 
     function openWin(w) {
-        if (w == "articulo") {
-            myWindow = window.open("{{ route('searcher.articulo') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
+        if (w == "factura_numero") {
+            myWindow = window.open("{{ route('searcher.factura_numero') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
         }
         if (w == "user") {
             myWindow = window.open("{{ route('searcher.user') }}", "_blank", "width=1000, height=500, menubar=no, top=50, left=250");
@@ -322,12 +327,12 @@
 
     function play() {
         // console.log("hola");
-        var articulo = localStorage.getItem("articulo");
+        var factura_numero = localStorage.getItem("factura_numero");
         var user = localStorage.getItem("user");
         var requisicion = localStorage.getItem("requisicion");
 
-        if (articulo != "nothing" && articulo != null) {
-            document.getElementById("articulo").value = articulo;
+        if (factura_numero != "nothing" && factura_numero != null) {
+            document.getElementById("factura_numero").value = factura_numero;
         }
         if (requisicion != "nothing" && requisicion != null) {
             document.getElementById("requisicion").value = requisicion;
@@ -335,7 +340,7 @@
         if (user != "nothing" && user != null) {
             document.getElementById("user").value = user;
         }
-        localStorage.removeItem("articulo");
+        localStorage.removeItem("factura_numero");
         localStorage.removeItem("requisicion");
         localStorage.removeItem("user");
     }

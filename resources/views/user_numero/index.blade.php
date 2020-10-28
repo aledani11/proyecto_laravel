@@ -37,6 +37,7 @@
                             <th>Email</th>
                             <th>Nivel</th>
                             <th>Caja nro</th>
+                            <th>Timbrado</th>
                             <th>Nombre</th>
                             <th>Apellido</th>
                             <th>Documento</th>
@@ -50,6 +51,7 @@
                             <td>{{$vari->email}}</td>
                             <td>{{$vari->nivel}}</td>
                             <td>{{$vari->numero_caja}}</td>
+                            <td>{{$vari->timbrado}}</td>
                             <td>{{$vari->nombre}}</td>
                             <td>{{$vari->apellido}}</td>
                             <td>{{$vari->documento}}</td>

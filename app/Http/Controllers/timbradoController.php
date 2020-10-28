@@ -19,8 +19,12 @@ class timbradoController extends Controller
         //return view('estadia.index', ['estadias' => $estadia]);
         $timbrado = DB::table('timbrado')
             ->select(
-                'timbrado.*'
+                'timbrado.*',
+                'su.nombre',
+                'su.numero'
             )
+            ->where('timbrado.estado', '=', 'A')
+            ->leftJoin('sucursal as su','timbrado.sucursal_id','=','su.id')
             ->get();
 
         // dd($estadia);
@@ -57,7 +61,9 @@ class timbradoController extends Controller
             [
                 'nro' => request()->numero,
                 'fecha_desde' => request()->fecha_desde,
-                'fecha_fin' => request()->fecha_fin
+                'fecha_fin' => request()->fecha_fin,
+                'sucursal_id' => request()->sucursal,
+                'estado' => "A"
             ]
         );
 
@@ -127,7 +133,13 @@ class timbradoController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('timbrado')->where('id', '=', $id)->delete();
+        DB::table('timbrado')
+                ->where('id', $id)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
 
         return redirect()->route('timbrado.index');
     }

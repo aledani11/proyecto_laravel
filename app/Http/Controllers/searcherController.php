@@ -508,14 +508,17 @@ class searcherController extends Controller
         //a=activo i=inactivo
         $timbrado = DB::table('timbrado')
             ->select(
-                'timbrado.*'
+                'timbrado.*',
+                'su.nombre',
+                'su.numero'
             )
-            ->where('fecha_fin', '>=', DB::raw('NOW()'))
+            ->where('timbrado.estado', '=', 'A')
+            ->leftJoin('sucursal as su','timbrado.sucursal_id','=','su.id')
             ->get();
 
         // dd($estadia);
 
-        return view('buscadores.timbrado', ['timbrado' => $timbrado]);
+        return view('buscadores.timbrado', ['variables' => $timbrado]);
     }
 
     public function user()
@@ -540,5 +543,42 @@ class searcherController extends Controller
         // dd($estadia);
 
         return view('buscadores.user', ['variables' => $user]);
+    }
+
+    public function factura_numero()
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        //a=activo i=inactivo
+        $presupuesto = DB::table('factura_numero')
+            ->select(
+                'factura_numero.*',
+                'tm.nro',
+                'tm.fecha_desde',
+                'tm.fecha_fin'
+            )
+            ->where('factura_numero.estado', '=', 'A')
+            ->leftJoin('timbrado as tm', 'factura_numero.timbrado', '=', 'tm.id')
+            ->get();
+
+        // dd($estadia);
+
+        return view('buscadores.factura_numero', ['variables' => $presupuesto]);
+    }
+
+    public function sucursal()
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        //a=activo i=inactivo
+        $productos = DB::table('sucursal')
+            ->select(
+                'sucursal.*'
+            )
+            ->get();
+
+        // dd($estadia);
+
+        return view('buscadores.sucursal', ['variables' => $productos]);
     }
 }

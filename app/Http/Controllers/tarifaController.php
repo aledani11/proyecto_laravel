@@ -65,7 +65,7 @@ class tarifaController extends Controller
             [
                 'tarifas_nombres_id' => request()->nombre, 'temporada_id' => request()->temp,
                 'habitacion_id' => request()->habitacion, 'cantidad_personas' => request()->canp,
-                'descuento_personas' => request()->descp, 'porcentaje_pago' => request()->porc,
+                'descuento_personas' => request()->descp,
                 'hora_limite' => request()->hlimite, 'precio' => request()->precio
             ]
         );

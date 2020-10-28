@@ -28,6 +28,8 @@
                             <th>Numero</th>
                             <th>Fecha desde</th>
                             <th>Fecha fin</th>
+                            <th>Sucursal</th>
+                            <th>Numero</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -37,6 +39,8 @@
                             <td>{{$vari->nro}}</td>
                             <td>{{ \Carbon\Carbon::parse($vari->fecha_desde)->format('d/m/Y')}}</td>
                             <td>{{ \Carbon\Carbon::parse($vari->fecha_fin)->format('d/m/Y')}}</td>
+                            <td>{{$vari->nombre}}</td>
+                            <td>{{$vari->numero}}</td>
                         </tr>
                         @endforeach
                     </tbody>
@@ -49,7 +53,7 @@
                 <a class="btn btn-dark form-group" href="{{ route('timbrado.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('timbrado.destroy', 'empty') }}">Eliminar</a>
+                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('timbrado.destroy', 'empty') }}">Anular</a>
             </div>
             <div class="col-md-12">
                 <a id="modificar" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('timbrado.edit', 'empty') }}">Modificar</a>

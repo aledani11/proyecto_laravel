@@ -1,6 +1,6 @@
 @extends ('layout')
 
-@section('title','Buscador timbrado')
+@section('title','Buscador sucursal')
 
 @section('link')
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -12,7 +12,7 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Buscador timbrado')
+@section('header', 'Buscador sucursal')
 
 @section('content')
 
@@ -21,13 +21,10 @@
         <div class="col-md-10 form-group">
             <div>
                 <table id="eventsTable" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
-                <thead>
+                    <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Id</th>
-                            <th>Numero</th>
-                            <th>Fecha desde</th>
-                            <th>Fecha fin</th>
-                            <th>Sucursal</th>
+                            <th>Nombre</th>
                             <th>Numero</th>
                         </tr>
                     </thead>
@@ -35,9 +32,6 @@
                         @foreach($variables as $vari)
                         <tr>
                             <td>{{$vari->id}}</td>
-                            <td>{{$vari->nro}}</td>
-                            <td>{{ \Carbon\Carbon::parse($vari->fecha_desde)->format('d/m/Y')}}</td>
-                            <td>{{ \Carbon\Carbon::parse($vari->fecha_fin)->format('d/m/Y')}}</td>
                             <td>{{$vari->nombre}}</td>
                             <td>{{$vari->numero}}</td>
                         </tr>
@@ -89,7 +83,6 @@
         var link = res.concat(row.id);
         document.getElementById("modificar").setAttribute("href", link);*/
         a = row.id;
-        b = row[5];
     })
 
     $('#eventsTable').on('click', 'tbody tr', function(event) {
@@ -99,8 +92,7 @@
     function closewin(e) {
         //myWindow.close();
         //sessionStorage.setItem("clientes", a);
-        localStorage.setItem("timbrado", a);
-        //localStorage.setItem("ruc_orden", b);
+        localStorage.setItem("sucursal", a);
         this.close();
         //console.log(e);
     }

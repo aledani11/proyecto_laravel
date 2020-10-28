@@ -25,6 +25,7 @@ class factura_numeroController extends Controller
                 'tm.fecha_desde',
                 'tm.fecha_fin'
             )
+            ->where('factura_numero.estado', '=', 'A')
             ->leftJoin('timbrado as tm', 'factura_numero.timbrado', '=', 'tm.id')
             ->get();
 
@@ -282,10 +283,12 @@ class factura_numeroController extends Controller
             //dump($id);
             //i=inactivo a=activo 
             DB::table('factura_numero')
-                ->where([
-                    ['id', '=', $id]
-                ])
-                ->delete();
+                ->where('id', $id)
+                ->update(
+                    [
+                        'estado' => "I"
+                    ]
+                );
         } catch (\Exception $e) {
             //request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');

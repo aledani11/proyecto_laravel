@@ -24,6 +24,7 @@ class user_numeroController extends Controller
                 'usr.nivel',
                 'usr.email',
                 'ca.numero as numero_caja',
+                'tm.nro as timbrado',
                 'pe.nombre',
                 'pe.apellido',
                 'emp.persona_nro_documento as documento'
@@ -35,6 +36,8 @@ class user_numeroController extends Controller
                 $join->on('emp.persona_ciudad_id', '=', 'pe.ciudad_id');
                 $join->on('emp.persona_nro_documento', '=', 'pe.nro_documento');
             })
+            ->leftJoin('factura_numero as fn', 'user_numero.factura_numero_id', '=', 'fn.id')
+            ->leftJoin('timbrado as tm', 'fn.timbrado', '=', 'tm.id')
             ->get();
 
 
@@ -79,6 +82,7 @@ class user_numeroController extends Controller
             DB::table('user_numero')->insert(
                 [
                     'user_id' => request()->user,
+                    'factura_numero_id' => request()->factura_numero,
                     'caja_id' => request()->caja
                 ]
             );

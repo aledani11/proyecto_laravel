@@ -26,15 +26,15 @@
 
     <div class="container" style="margin-top:30px">
         <div class="row">
-        @if (session('error_')!==null)
-        <div class="col-md-12 mb-3">
-            <div class="alert alert-danger">
-                <ul>
-                    <li>{{ session('error_') }}</li>
-                </ul>
+            @if (session('error_')!==null)
+            <div class="col-md-12 mb-3">
+                <div class="alert alert-danger">
+                    <ul>
+                        <li>{{ session('error_') }}</li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        @endif
+            @endif
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="numero"> Numero </label>
@@ -54,7 +54,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-            <div class="form-group">
+                <div class="form-group">
                     <label for="timbrado"> Timbrado </label>
                     <input type="text" id="timbrado" name="timbrado" readonly required value="{{$timbrado[0]->nro}}">
                 </div>
@@ -69,7 +69,7 @@
                 </div>
             </div>
             <div class="col-md-4">
-            <div class="form-group">
+                <div class="form-group">
                     <label for="fecha">Fecha</label>
                     <input type="date" name="fecha" id="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
                 </div>
@@ -84,7 +84,7 @@
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="estadia">Estadia</label>
-                    <input type="text" id="estadia" readonly autocomplete="off">
+                    <input type="text" id="estadia" name="estadia" readonly required autocomplete="off">
                     <input type="button" value="..." class="btn-dark" onclick="openWin('estadia')" tabindex="7">
                 </div>
             </div>
@@ -102,8 +102,13 @@
                             <tr>
                                 <th data-sortable="true">Id</th>
                                 <th>Habitacion</th>
+                                <th>Huespedes</th>
                                 <th>Entrada</th>
                                 <th>Salida</th>
+                                <th>Dias</th>
+                                <th>Id</th>
+                                <th>Tarifa</th>
+                                <th>Precio</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -129,10 +134,12 @@
                         <thead>
                             <tr>
                                 <th>Descripcion</th>
+                                <th>Descuento</th>
                                 <th>Precio</th>
                                 <th>Cantidad</th>
+                                <th>Importe</th>
                                 <th>Iva</th>
-                                <th>Tarifa</th>
+                                <th>%</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -167,7 +174,7 @@
             </div>
             <div class="col-3 ">
                 <label for="total2" class="form-group1">
-                    <span> Total </span>
+                    <span> Total Factura </span>
                     <input type="text" id="total2" readonly>
                 </label>
             </div>
@@ -223,7 +230,8 @@
                     id: val
                 },
                 success: function(data) {
-                    console.log(data);
+                    //console.log(data);
+                    document.getElementById("cliente").value = data.estadias[0].clientes_id;
                     addTable(data, table)
                 }
             });
@@ -233,13 +241,18 @@
         function addTable(data, table) {
 
             if (table === "#estadia_table") {
-                for (let index = 0; index < data.estadias.length; index++) {
+                for (let index = 0; index < data.estadia1.length; index++) {
                     $("#estadia_table").bootstrapTable('insertRow', {
                         index: 0,
-                        row: [data.estadias[index].id,
-                            data.estadias[index].descripcion,
-                            data.estadias[index].entrada,
-                            data.estadias[index].salida
+                        row: [data.estadia1[index].id_estadia,
+                            data.estadia1[index].habitacion,
+                            data.estadia1[index].huespedes_can,
+                            showDate(data.estadia1[index].entrada),
+                            showDate(data.estadia1[index].salida),
+                            data.estadia1[index].dias,
+                            data.estadia1[index].id_tarifa,
+                            data.estadia1[index].tarifa,
+                            data.estadia1[index].precio.format(0, 3, '.', ',')
                         ]
                     })
                 }
@@ -264,76 +277,109 @@
                 document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
                 document.getElementById("total1").value = total1.format(0, 3, '.', ',');*/
 
-                for (let index = 0; index < data.tarifa1.length; index++) {
-                    var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
-                    console.log(descri_tari1);
-                    var descri_tari="Tarifa-".concat(descri_tari1);
-                    $("#servicios_table").bootstrapTable('insertRow', {
-                        index: 0,
-                        row: ['Tarifa '+data.tarifa1[index].descripcion,
-                            data.tarifa1[index].precio.format(0, 3, '.', ','),
-                            data.tarifa1[index].dias,
-                            (data.tarifa1[index].precio / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ','),
-                            data.tarifa1[index].descripcion +
-                            '<input type="hidden" name ="descripcion_detalle[]" value=' + descri_tari + '>' +
-                            '<input type="hidden" name ="precio_detalle[]" value=' + data.tarifa1[index].precio + '>' +
-                            '<input type="hidden" name ="cantidad_detalle[]" value=' + data.tarifa1[index].dias + '>' +
-                            '<input type="hidden" name ="iva_detalle[]" value=' + data.iva_tarifa[0].id + '>' +
-                            '<input type="hidden" name ="tarifa_detalle[]" value=' + data.tarifa1[index].id + '>' 
-                        ]
-                    })
-                   // iva_total1 += (data.servicios[index].precio_servi / 11);
-                   // subtotal1 += data.servicios[index].precio_servi;
-
-                }
-
                 for (let index = 0; index < data.consumicion.length; index++) {
-                  //  var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
-                  //  console.log(descri_tari1);
-                 //   var descri_tari="Tarifa-".concat(descri_tari1);
+                    //  var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
+                    //  console.log(descri_tari1);
+                    //   var descri_tari="Tarifa-".concat(descri_tari1);
+                    //console.log(desc_tari);
+                    var descri1 = data.consumicion[index].producto.replace(/ /g, "_");
+                    var descri = "Consumicion_".concat(descri1).concat('_Habitacion_').concat(data.consumicion[index].habitacion);
+                    var desc = (data.consumicion[index].precio * data.consumicion[index].promocion) / 100;
+                    var importe = (data.consumicion[index].precio - desc) * data.consumicion[index].cantidad;
+                    //console.log(desc);
+                    //console.log(importe);
                     $("#servicios_table").bootstrapTable('insertRow', {
                         index: 0,
-                        row: ['Consumicion '+data.consumicion[index].producto,
-                            data.consumicion[index].precio.format(0, 3, '.', ','),
+                        row: ['Consumicion ' + data.consumicion[index].producto + ' Habitación ' + data.consumicion[index].habitacion,
+                            data.consumicion[index].promocion + "%",
+                            (data.consumicion[index].precio - desc).format(0, 3, '.', ','),
                             data.consumicion[index].cantidad,
-                            (data.consumicion[index].precio / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ',')
+                            importe.format(0, 3, '.', ','),
+                            (importe / data.consumicion[index].porcentaje_iva).format(0, 3, '.', ','),
+                            data.consumicion[index].descripcion_iva +
+                            '<input type="hidden" name ="descripcion_detalle[]" value=' + descri + '>' +
+                            '<input type="hidden" name ="precio_detalle[]" value=' + (data.consumicion[index].precio - desc) + '>' +
+                            '<input type="hidden" name ="cantidad_detalle[]" value=' + data.consumicion[index].cantidad + '>' +
+                            '<input type="hidden" name ="iva_detalle[]" value=' + data.consumicion[index].id_iva + '>' +
+                            '<input type="hidden" name ="tarifa_detalle[]" value=' + data.consumicion[index].tarifa_id + '>'
                         ]
                     })
-                   // iva_total1 += (data.servicios[index].precio_servi / 11);
-                   // subtotal1 += data.servicios[index].precio_servi;
+                    iva_total1 += (importe / data.consumicion[index].porcentaje_iva);
+                    subtotal1 += importe;
 
                 }
 
 
                 for (let index = 0; index < data.traslado.length; index++) {
-                  //  var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
-                  //  console.log(descri_tari1);
-                 //   var descri_tari="Tarifa-".concat(descri_tari1);
+                    //  var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g,"_");
+                    //  console.log(descri_tari1);
+                    //   var descri_tari="Tarifa-".concat(descri_tari1);
+                    var descri1 = data.traslado[index].descripcion.replace(/ /g, "_");
+                    var descri = "Traslado_".concat(descri1);
+                    var desc = (data.traslado[index].precio * data.traslado[index].promocion) / 100;
+                    var importe = (data.traslado[index].precio - desc) * 1;
                     $("#servicios_table").bootstrapTable('insertRow', {
                         index: 0,
-                        row: ['Traslado '+data.traslado[index].descripcion,
-                            data.traslado[index].precio.format(0, 3, '.', ','),
+                        row: ['Traslado ' + data.traslado[index].descripcion,
+                            data.traslado[index].promocion + "%",
+                            (data.traslado[index].precio - desc).format(0, 3, '.', ','),
                             1,
-                            (data.traslado[index].precio / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ',')
+                            importe.format(0, 3, '.', ','),
+                            (importe / data.traslado[index].porcentaje_iva).format(0, 3, '.', ','),
+                            data.traslado[index].descripcion_iva +
+                            '<input type="hidden" name ="descripcion_detalle[]" value=' + descri + '>' +
+                            '<input type="hidden" name ="precio_detalle[]" value=' + (data.traslado[index].precio - desc) + '>' +
+                            '<input type="hidden" name ="cantidad_detalle[]" value=' + 1 + '>' +
+                            '<input type="hidden" name ="iva_detalle[]" value=' + data.traslado[index].id_iva + '>' +
+                            '<input type="hidden" name ="tarifa_detalle[]" value=' + data.traslado[index].tarifa_id + '>'
                         ]
                     })
-                   // iva_total1 += (data.servicios[index].precio_servi / 11);
-                   // subtotal1 += data.servicios[index].precio_servi;
+                    iva_total1 += (importe / data.traslado[index].porcentaje_iva);
+                    subtotal1 += importe;
 
                 }
 
-                total2 = iva_total1 + subtotal1;
+                for (let index = 0; index < data.tarifa1.length; index++) {
+                    var descri_tari1 = data.tarifa1[index].descripcion.replace(/ /g, "_");
+                    //console.log(descri_tari1);
+                    var descri_tari = "Tarifa_".concat(descri_tari1);
+                    var desc_tari = (data.tarifa1[index].cantidad_personas - data.tarifa1[index].huespedes_can) * parseInt(data.tarifa1[index].descuento_personas);
+                    //console.log(desc_tari);
+                    var desc_tari1 = (data.tarifa1[index].precio * desc_tari) / 100;
+                    var importe_tarifa = (data.tarifa1[index].precio - desc_tari1) * data.tarifa1[index].dias;
+                    $("#servicios_table").bootstrapTable('insertRow', {
+                        index: 0,
+                        row: ['Tarifa ' + data.tarifa1[index].descripcion,
+                            desc_tari + '%',
+                            (data.tarifa1[index].precio - desc_tari1).format(0, 3, '.', ','),
+                            data.tarifa1[index].dias,
+                            importe_tarifa.format(0, 3, '.', ','),
+                            (importe_tarifa / data.iva_tarifa[0].porcentaje).format(0, 3, '.', ','),
+                            data.iva_tarifa[0].descripcion +
+                            '<input type="hidden" name ="descripcion_detalle[]" value=' + descri_tari + '>' +
+                            '<input type="hidden" name ="precio_detalle[]" value=' + (data.tarifa1[index].precio - desc_tari1) + '>' +
+                            '<input type="hidden" name ="cantidad_detalle[]" value=' + data.tarifa1[index].dias + '>' +
+                            '<input type="hidden" name ="iva_detalle[]" value=' + data.iva_tarifa[0].id + '>' +
+                            '<input type="hidden" name ="tarifa_detalle[]" value=' + data.tarifa1[index].id_tarifa + '>'
+                        ]
+                    })
+                    iva_total1 += (importe_tarifa / data.iva_tarifa[0].porcentaje);
+                    subtotal1 += importe_tarifa;
+
+                }
+
+                total1 = iva_total1 + subtotal1;
                 document.getElementById("total_iva1").value = iva_total1.format(0, 3, '.', ',');
                 document.getElementById("subtotal1").value = subtotal1.format(0, 3, '.', ',');
-                document.getElementById("total2").value = total2.format(0, 3, '.', ',');
+                document.getElementById("total2").value = total1.format(0, 3, '.', ',');
 
-                document.getElementById("total").value = (total1 + total2).format(0, 3, '.', ',');
+                document.getElementById("total").value = total1.format(0, 3, '.', ',');
 
 
 
-                document.getElementById("estadia").value = "";
+                //document.getElementById("estadia").value = "";
             }
-            
+
         }
 
     }
@@ -362,14 +408,14 @@
             //var xx = $('#tarifa_table').bootstrapTable('getData');
             //console.log(xx);
             //console.log(xx[0][0]);
-           /* $('#tarifa_table').bootstrapTable('remove', {
-                field: 1,
-                values: [id_delete[0]]
-            });
-            $('#servicios_table').bootstrapTable('remove', {
-                field: 1,
-                values: [id_delete[0]]
-            });*/
+            /* $('#tarifa_table').bootstrapTable('remove', {
+                 field: 1,
+                 values: [id_delete[0]]
+             });
+             $('#servicios_table').bootstrapTable('remove', {
+                 field: 1,
+                 values: [id_delete[0]]
+             });*/
             $("#tarifa_table").bootstrapTable('removeAll');
             $("#servicios_table").bootstrapTable('removeAll');
             $("#estadia_table").bootstrapTable('removeAll');
@@ -392,10 +438,10 @@
             field: 0,
             values: [id_delete[0]]
         });*/
-     
+
 
         id_delete = null
-        
+
     }
 
 
@@ -478,9 +524,9 @@
     });
 
     function validateForm() {
-        var taf = document.getElementsByName("estad[]");
+        var taf = document.getElementsByName("descripcion_detalle[]");
         if (taf.length == 0) {
-            alert("Cargar al menos una estadia");
+            alert("Cargar detalle factura");
             return false;
         }
     }
@@ -498,24 +544,23 @@
         return (c ? num.replace('.', c) : num).replace(new RegExp(re, 'g'), '$&' + (s || ','));
     };
 
-    function condition(){
+    function condition() {
         var sele = document.getElementById("condicion").value;
-        if(sele!="" || sele=="Contado"){
-            document.getElementById("plazo").value=0;
-            document.getElementById("canc").value=0;
+        if (sele != "" || sele == "Contado") {
+            document.getElementById("plazo").value = 0;
+            document.getElementById("canc").value = 0;
             document.getElementById("plazo").setAttribute("readonly", true);
             document.getElementById("canc").setAttribute("readonly", true);
         }
-         if(sele=="Credito"){
+        if (sele == "Credito") {
             document.getElementById("plazo").removeAttribute("readonly");
             document.getElementById("canc").removeAttribute("readonly");
-            document.getElementById("plazo").value=30;
-            document.getElementById("canc").value=1;
+            document.getElementById("plazo").value = 30;
+            document.getElementById("canc").value = 1;
             document.getElementById("plazo").setAttribute("min", 1);
             document.getElementById("canc").setAttribute("min", 1);
         }
     }
-
 </script>
 
 @endsection

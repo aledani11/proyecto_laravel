@@ -37,8 +37,8 @@
                     <input type="button" value="..." class=" btn-dark" onclick="openWin('habitacion')">
                 </div>
                 <div class="form-group">
-                    <label for="porc"> Porcentaje pago </label>
-                    <input type="number" id="porc" name="porc" value="0" min="0" max="100" required>
+                    <label for="hlimite"> Hora limite </label>
+                    <input type="time" id="hlimite" name="hlimite" required>
                 </div>
             </div>
             <div class="col-md-4">
@@ -56,8 +56,8 @@
                     <input type="number" id="canp" name="canp" value="0" min="0" max="100" required>
                 </div>
                 <div class="form-group">
-                    <label for="hlimite"> Hora limite </label>
-                    <input type="time" id="hlimite" name="hlimite" required>
+                    <label for="precio"> Precio </label>
+                    <input type="number" id="precio" name="precio" value="0" min="0" max="10000000000" required>
                 </div>
             </div>
             <div class="col-md-4">
@@ -73,10 +73,6 @@
                 <div class="form-group">
                     <label for="descp"> Descuento personas </label>
                     <input type="number" id="descp" name="descp" value="0" min="0" max="100" required>
-                </div>
-                <div class="form-group">
-                    <label for="precio"> Precio </label>
-                    <input type="number" id="precio" name="precio" value="0" min="0" max="10000000000" required>
                 </div>
             </div>
         </div>
