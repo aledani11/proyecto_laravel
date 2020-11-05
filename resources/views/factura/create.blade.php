@@ -230,7 +230,7 @@
                     id: val
                 },
                 success: function(data) {
-                    //console.log(data);
+                    console.log(data);
                     document.getElementById("cliente").value = data.estadias[0].clientes_id;
                     addTable(data, table)
                 }
@@ -301,6 +301,8 @@
                             '<input type="hidden" name ="precio_detalle[]" value=' + (data.consumicion[index].precio - desc) + '>' +
                             '<input type="hidden" name ="cantidad_detalle[]" value=' + data.consumicion[index].cantidad + '>' +
                             '<input type="hidden" name ="iva_detalle[]" value=' + data.consumicion[index].id_iva + '>' +
+                            '<input type="hidden" name ="iva_descri[]" value=' + data.consumicion[index].descri_iva + '>' +
+                            '<input type="hidden" name ="iva_porcentaje[]" value=' + data.consumicion[index].porcentaje_iva + '>' +
                             '<input type="hidden" name ="tarifa_detalle[]" value=' + data.consumicion[index].tarifa_id + '>'
                         ]
                     })
@@ -331,6 +333,8 @@
                             '<input type="hidden" name ="precio_detalle[]" value=' + (data.traslado[index].precio - desc) + '>' +
                             '<input type="hidden" name ="cantidad_detalle[]" value=' + 1 + '>' +
                             '<input type="hidden" name ="iva_detalle[]" value=' + data.traslado[index].id_iva + '>' +
+                            '<input type="hidden" name ="iva_descri[]" value=' + data.traslado[index].descri_iva + '>' +
+                            '<input type="hidden" name ="iva_porcentaje[]" value=' + data.traslado[index].porcentaje_iva + '>' +
                             '<input type="hidden" name ="tarifa_detalle[]" value=' + data.traslado[index].tarifa_id + '>'
                         ]
                     })
@@ -360,6 +364,8 @@
                             '<input type="hidden" name ="precio_detalle[]" value=' + (data.tarifa1[index].precio - desc_tari1) + '>' +
                             '<input type="hidden" name ="cantidad_detalle[]" value=' + data.tarifa1[index].dias + '>' +
                             '<input type="hidden" name ="iva_detalle[]" value=' + data.iva_tarifa[0].id + '>' +
+                            '<input type="hidden" name ="iva_descri[]" value=' + data.iva_tarifa[0].descripcion + '>' +
+                            '<input type="hidden" name ="iva_porcentaje[]" value=' + data.iva_tarifa[0].porcentaje + '>' +
                             '<input type="hidden" name ="tarifa_detalle[]" value=' + data.tarifa1[index].id_tarifa + '>'
                         ]
                     })

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class arqueoController extends Controller
 {
@@ -17,12 +18,24 @@ class arqueoController extends Controller
     {
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
+        $id = Auth::id();
+        $caja = DB::table('user_numero')
+            ->select(
+                'ca.descripcion',
+                'ca.id'
+            )
+            ->where('user_id', '=', $id)
+            ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+            ->get();
         $arqueo = DB::table('arqueo')
             ->select(
                 'arqueo.*',
                 'ca.descripcion as caja'
             )
-            ->where('arqueo.estado', '=', 'A')
+            ->where([
+                ['ap.caja_id', '=', $caja[0]->id],
+                ['arqueo.estado', '=', "A"],
+            ])
             ->leftJoin('apertura_cierre as ap', 'arqueo.apertura_cierre_id', '=', 'ap.id')
             ->leftJoin('caja as ca', 'ap.caja_id', '=', 'ca.id')
             ->get();
@@ -52,6 +65,31 @@ class arqueoController extends Controller
             'tipo_estadias' => $tipo_estadia,
             'habitaciones' => $habitacion
         ]);*/
+
+        $id = Auth::id();
+        $caja = DB::table('user_numero')
+            ->select(
+                'ca.descripcion',
+                'ca.id'
+            )
+            ->where('user_id', '=', $id)
+            ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+            ->get();
+
+        $apertura = DB::table('apertura_cierre')
+            ->select(
+                'apertura_cierre.id'
+            )
+            ->where([
+                ['caja_id', '=', $caja[0]->id],
+                ['estado', '=', "A"],
+            ])
+            ->leftJoin('caja as ca', 'apertura_cierre.caja_id', '=', 'ca.id')
+            ->get();
+
+        return view('arqueo.create', [
+            'apertura' => $apertura
+        ]);
         return view('arqueo.create');
     }
 
@@ -63,16 +101,21 @@ class arqueoController extends Controller
      */
     public function store(Request $request)
     {
-        //dump(request()->all());
         //activo inactivo
         $id = DB::table('arqueo')->insert(
             [
-                'monto_cheque' => request()->monto_cheque, 'monto_efectivo' => request()->monto_efectivo,
-                'fecha' => request()->fecha, 'usuarios_id' => 1,
-                'apertura_cierre_id' => request()->apertura, 'estado' => "A"
+                'monto_cheque' => request()->monto_cheque,
+                'fecha' => request()->fecha,
+                'apertura_cierre_id' => request()->apertura, 'estado' => "A",
+                '100mil' => request()->cienmill, '50mil' => request()->cincuentamil,
+                '20mil' => request()->veintemil, '10mil' => request()->diezmil,
+                '1mil' => request()->mil, '500' => request()->quinientos,
+                '100' => request()->cien, '50' => request()->cincuenta,
+                '5mil' => request()->cincomil, '2mil' => request()->dosmil,
+                'monto_efectivo' => str_replace('.', '', request()->m_efectivo)
             ]
         );
-       
+
         return redirect()->route('arqueo.index');
     }
 
@@ -242,22 +285,33 @@ class arqueoController extends Controller
     public function estimado(Request $request)
     {
 
-        $cobro = DB::table('cobros')
-            ->select('cc.monto as monto_cheque', 'ce.monto as monto_efectivo')
-            ->where('cobros.apertura_cierre_id', '=', $request->id)
-            ->leftJoin('cobro_efectivo as ce', 'cobros.id', '=', 'ce.cobrosid')
+        $cobroe = DB::table('cobros')
+            ->select(DB::raw('(SUM(cf.`monto`) + ac.`saldo_inicial`)-SUM(cf.`vuelto`) AS saldo'))
+            ->where([
+                ['cobros.apertura_cierre_id', '=', $request->id],
+                ['cobros.estado', '=', 'C'],
+            ])
+            ->leftJoin('cobro_efectivo as cf', 'cobros.id', '=', 'cf.cobrosid')
+            ->leftJoin('apertura_cierre as ac', 'cobros.apertura_cierre_id', '=', 'ac.id')
+            ->get();
+
+        $cobroc = DB::table('cobros')
+            ->select(DB::raw('SUM(cc.monto) as cheque'))
+            ->where([
+                ['cobros.apertura_cierre_id', '=', $request->id],
+                ['cobros.estado', '=', 'C'],
+            ])
             ->leftJoin('cobro_cheque as cc', 'cobros.id', '=', 'cc.cobrosid')
             ->get();
 
-       
-            
+
         //dd($tarifa);
 
         //return view('estadia.create', ['tarifas' => $tarifa]);
 
-       return [
-            'cobros' => $cobro,
-            
+        return [
+            'cobroe' => $cobroe,
+            'cobroc' => $cobroc
         ];
         //return $request;
     }

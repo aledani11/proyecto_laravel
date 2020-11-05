@@ -39,17 +39,15 @@
                     <label for="fechac">Fecha cierre</label>
                     <input type="date" id="fechac" name="fechac" readonly>
                 </div>
-
+                <div class="form-group">
+                    <label for="m_cheque">Monto cheque</label>
+                    <input type="text" id="m_cheque" readonly>
+                </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="caja">Caja</label>
-                    <select id="caja" required name="caja">
-                        <option value="">--Selecciona una opción--</option>
-                        @foreach($cajas as $caja)
-                        <option value={{ $caja->id }}>{{ $caja->descripcion }}</option>
-                        @endforeach
-                    </select>
+                    <label for="caja"> Caja id </label>
+                    <input type="text" id="caja" name="caja" readonly value="{{$cajas[0]->id}}">
                 </div>
                 <div class="form-group">
                     <label for="horaa">Hora apertura</label>
@@ -59,16 +57,27 @@
                     <label for="horae">Hora cierre</label>
                     <input type="time" id="horae" name="horac" readonly>
                 </div>
-
+                <div class="form-group">
+                    <label for="m_efectivo">Monto efectivo</label>
+                    <input type="text" id="m_efectivo" readonly>
+                </div>
             </div>
             <div class="col-md-4">
+                <div class="form-group">
+                    <label for="caja"> Caja </label>
+                    <input type="text" id="caja" readonly value="{{$cajas[0]->descripcion}}">
+                </div>
                 <div class="form-group">
                     <label for="si"> Saldo inicial </label>
                     <input type="number" id="salini" name="salini" value="" min="0" max="100000000" required>
                 </div>
                 <div class="form-group">
                     <label for="sf"> Saldo final </label>
-                    <input type="number" id="salfin" name="salfin" value="" min="0" max="100000000" readonly>
+                    <input type="text" id="salfin" name="salfin" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="m_tarjeta">Monto tarjeta</label>
+                    <input type="text" id="m_tarjeta" readonly>
                 </div>
             </div>
         </div>

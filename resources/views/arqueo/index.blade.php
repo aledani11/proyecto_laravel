@@ -25,8 +25,6 @@
                     <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Id</th>
-                            <th>Monto Cheque</th>
-                            <th>Monto efectivo</th>
                             <th>Fecha</th>
                             <th>Caja</th>
                         </tr>
@@ -35,8 +33,6 @@
                         @foreach($arqueos as $arqueo)
                         <tr>
                             <td>{{$arqueo->id}}</td>
-                            <td>{{number_format($arqueo->monto_cheque,0,'','.')}}</td>
-                            <td>{{number_format($arqueo->monto_efectivo,0,'','.')}}</td>
                             <td>{{ \Carbon\Carbon::parse($arqueo->fecha)->format('d/m/Y')}}</td>
                             <td>{{$arqueo->caja}}</td>
                         </tr>
@@ -49,6 +45,9 @@
         <div class="col-md-2 form-group mt-5">
             <div class="col-md-12">
                 <a class="btn btn-dark form-group" href="{{ route('arqueo.create') }}">Agregar</a>
+            </div>
+            <div class="col-md-12">
+                <a class="btn btn-dark form-group" href="{{ route('apertura.index') }}">Cierre</a>
             </div>
             <div class="col-md-12">
                 <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('arqueo.destroy', 'empty') }}">Anular</a>

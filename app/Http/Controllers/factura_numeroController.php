@@ -64,7 +64,7 @@ class factura_numeroController extends Controller
             DB::table('factura_numero')->insert(
                 [
                     'nro_desde' => request()->nro_desde, 'nro_hasta' => request()->nro_hasta,
-                    'timbrado' => request()->timbrado, 'nro_actual' => $nro3
+                    'timbrado' => request()->timbrado, 'nro_actual' => $nro3, 'estado' => 'A'
                 ]
             );
             //dump($input["habitacion"][1]);

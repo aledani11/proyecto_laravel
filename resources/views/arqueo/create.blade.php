@@ -32,12 +32,25 @@
                     <input type="text" id="codigo" name="codigo" readonly>
                 </div>
                 <div class="form-group">
-                    <label for="me"> Monto efectivo </label>
-                    <input type="number" id="me" name="monto_efectivo" value="0" min="0" max="1000000000" onkeyup="efectivo_cal()" required>
-                </div>
-                <div class="form-group">
                     <label for="me"> Estimado efectivo </label>
                     <input type="text" id="estimado_efectivo" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label for="mc"> Monto cheque </label>
+                    <input type="number" id="mc" name="monto_cheque" value="0" min="0" max="1000000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="20mil"> Cant. 20 mil </label>
+                    <input type="number" id="20mil" name="veintemil" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="2mil"> Cant. 2 mil </label>
+                    <input type="number" id="2mil" name="dosmil" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="100"> Cant. 100 </label>
+                    <input type="number" id="100" name="cien" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
                 </div>
             </div>
             <div class="col-md-4">
@@ -46,24 +59,51 @@
                     <input type="date" id="fecha" name="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
                 </div>
                 <div class="form-group">
-                    <label for="mc"> Monto cheque </label>
-                    <input type="number" id="mc" name="monto_cheque" value="0" min="0" max="1000000000" onkeyup="efectivo_cal()" required>
-                </div>
-                <div class="form-group">
                     <label for="mc"> Estimado cheque </label>
                     <input type="text" id="estimado_cheque" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="100mil"> Cant. 100 mil </label>
+                    <input type="number" id="100mil" name="cienmill" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="10mil"> Cant. 10 mil </label>
+                    <input type="number" id="10mil" name="diezmil" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="1mil"> Cant. 1 mil </label>
+                    <input type="number" id="1mil" name="mil" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="50"> Cant. 50 </label>
+                    <input type="number" id="50" name="cincuenta" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
                 </div>
             </div>
             <div class="col-md-4">
 
                 <div class="form-group">
                     <label for="apertura">Apertura</label>
-                    <input type="text" id="apertura" name="apertura" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
-                    <input type="button" value="..." class=" btn-dark" onclick="openWin('apertura')">
+                    <input type="text" id="apertura" name="apertura" value="{{isset($apertura[0]->id)?$apertura[0]->id:''}}" class="readonly" required autocomplete="off" style="caret-color: transparent !important;">
                 </div>
                 <div class="form-group">
                     <label for="mc"> Diferencia </label>
                     <input type="text" id="diferencia" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="50mil"> Cant. 50 mil </label>
+                    <input type="number" id="50mil" name="cincuentamil" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="5mil"> Cant. 5 mil </label>
+                    <input type="number" id="5mil" name="cincomil" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="500"> Cant. 500 </label>
+                    <input type="number" id="500" name="quinientos" value="0" min="0" max="1000000" onkeyup="efectivo_cal()" onclick="efectivo_cal()" required>
+                </div>
+                <div class="form-group">
+                    <label for="m_efectivo"> Total efectivo </label>
+                    <input type="text" id="m_efectivo" name="m_efectivo" value="0" readonly required>
                 </div>
             </div>
         </div>
@@ -74,7 +114,7 @@
                 <div class="col-md-12">
                     <div class="d-flex flex-wrap justify-content-md-around ">
                         <div class="p-2 mx-auto"><button type="submit" class="btn btn-dark" onclick="return mensaje_grabar()" tabindex="18">GRABAR</button></div>
-                        <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark" >CANCELAR</button></div>
+                        <div class="p-2 mx-auto"><button type="reset" class="btn btn-dark">CANCELAR</button></div>
                         <div class="p-2 mx-auto"><button type="button" onclick="location.href = '{{ route('arqueo.index') }}'" class="btn btn-dark">SALIR</button></div>
                     </div>
                 </div>
@@ -95,25 +135,34 @@
     function efectivo_cal() {
         if (!isNaN(parseInt(document.getElementById("estimado_efectivo").value)) && !isNaN(parseInt(document.getElementById("estimado_cheque").value))) {
             //total_entregado -= mon_efectivo;
-            mon_efectivo = parseInt(document.getElementById("me").value);
-            mon_cheque = parseInt(document.getElementById("mc").value);
+            //  mon_efectivo = parseInt(document.getElementById("me").value);
+            //  mon_cheque = parseInt(document.getElementById("mc").value);
             entregado();
         } else {
             document.getElementById("diferencia").value = 0;
+            document.getElementById("m_efectivo").value = 0;
             entregado();
         }
     }
 
     function entregado() {
-        if (!isNaN(parseInt(document.getElementById("me").value)) && !isNaN(parseInt(document.getElementById("mc").value))) {
+        if (!isNaN(parseInt(document.getElementById("100mil").value)) && !isNaN(parseInt(document.getElementById("mc").value))) {
             // total_entregado -= mon_efectivo;
-            var monto_sum = (parseInt((document.getElementById("me").value.replace(".", ""))) + parseInt((document.getElementById("mc").value.replace(".", ""))));
+            var monto_efe = (parseInt(document.getElementById("100mil").value) * 100000) +
+                (parseInt(document.getElementById("50mil").value) * 50000) + (parseInt(document.getElementById("20mil").value) * 20000) +
+                (parseInt(document.getElementById("10mil").value) * 10000) + (parseInt(document.getElementById("5mil").value) * 5000) +
+                (parseInt(document.getElementById("2mil").value) * 2000) + (parseInt(document.getElementById("1mil").value) * 1000) +
+                (parseInt(document.getElementById("500").value) * 500) + (parseInt(document.getElementById("100").value) * 100) +
+                (parseInt(document.getElementById("50").value) * 50);
+            var monto_sum= monto_efe + parseInt(document.getElementById("mc").value);
             var monto_est = est_efectivo + est_cheque;
             mon_diferencia = monto_sum - monto_est;
             // total_entregado += mon_efectivo;
             document.getElementById("diferencia").value = mon_diferencia.format(0, 3, '.', ',');
+            document.getElementById("m_efectivo").value = monto_efe.format(0, 3, '.', ',');
         } else {
             document.getElementById("diferencia").value = 0;
+            document.getElementById("m_efectivo").value = 0;
         }
     }
 
@@ -155,20 +204,20 @@
                       data.tarifas[0].habitacion_id
                   ]
               })*/
-            if (data.cobros.length !== 0) {
+            if (data.cobroe.length !== 0) {
                 // document.getElementById("tarifa").value = "";
                 //if (typeof data.cobros[0].monto_efectivo !== 'undefined') {
-                if (data.cobros[0].monto_efectivo !== null) {
+                if (data.cobroe[0].saldo !== null) {
                     //if (data.cobros[0].hasOwnProperty('monto_efectivo')) {
-                    est_efectivo = parseInt(data.cobros[0].monto_efectivo);
+                    est_efectivo = parseInt(data.cobroe[0].saldo);
                     document.getElementById("estimado_efectivo").value = est_efectivo.format(0, 3, '.', ',');
                 } else {
                     document.getElementById("estimado_efectivo").value = 0;
                 }
                 // if (typeof data.cobros[0].monto_cheque !== 'undefined') {
-                if (data.cobros[0].monto_cheque !== null) {
+                if (data.cobroc[0].cheque !== null) {
                     // if (data.cobros[0].hasOwnProperty('monto_cheque')) {
-                    est_cheque = parseInt(data.cobros[0].monto_cheque);
+                    est_cheque = parseInt(data.cobroc[0].cheque);
                     document.getElementById("estimado_cheque").value = est_cheque.format(0, 3, '.', ',');
                 } else {
                     document.getElementById("estimado_cheque").value = 0;
@@ -177,8 +226,9 @@
                 document.getElementById("estimado_efectivo").value = 0;
                 document.getElementById("estimado_cheque").value = 0;
                 document.getElementById("diferencia").value = 0;
-                 est_efectivo = 0;
-                 est_cheque = 0;
+                document.getElementById("m_efectivo").value = 0;
+                est_efectivo = 0;
+                est_cheque = 0;
             }
             entregado();
         }
@@ -219,6 +269,11 @@
         localStorage.removeItem("apertura_cierre");
     }
 
+    $(document).ready(function() {
+        add();
+    });
+
+
     $(".readonly").on('keydown paste', function(e) {
         e.preventDefault();
     });
@@ -237,11 +292,7 @@
             evt.preventDefault();
         }
     });
-    document.querySelector('#me').addEventListener("keypress", function(evt) {
-        if (evt.which != 8 && evt.which != 0 && evt.which < 48 || evt.which > 57) {
-            evt.preventDefault();
-        }
-    });
+
 
     Number.prototype.format = function(n, x, s, c) {
         var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\D' : '$') + ')',

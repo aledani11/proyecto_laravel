@@ -77,14 +77,15 @@ class cobrosController extends Controller
         $id = DB::table('cobros')->insertGetId(
             [
                 'fecha' => request()->fecha, 'cuentas_a_cobrar_id' => request()->cuenta,
-                'apertura_cierre_id' => request()->apertura, 'usuario_id' => 1,
+                'apertura_cierre_id' => request()->apertura,
                 'estado' => "C"
             ]
         );
 
         DB::table('cobro_efectivo')->insert(
             [
-                'monto' => str_replace('.', '', request()->efectivo), 'cobrosid' => $id
+                'monto' => str_replace('.', '', request()->efectivo), 'cobrosid' => $id,
+                'vuelto' => request()->vuelto
             ]
         );
 

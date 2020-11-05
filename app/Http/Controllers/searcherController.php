@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+
 
 class searcherController extends Controller
 {
@@ -153,12 +155,24 @@ class searcherController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //a=activo i=inactivo
+        $id = Auth::id();
+        $caja = DB::table('user_numero')
+            ->select(
+                'ca.descripcion',
+                'ca.id'
+            )
+            ->where('user_id', '=', $id)
+            ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+            ->get();
         $apertura = DB::table('apertura_cierre')
             ->select(
                 'apertura_cierre.*',
                 'ca.descripcion as caja'
             )
-            ->where('apertura_cierre.estado', '=', 'A')
+            ->where([
+                ['caja_id', '=', $caja[0]->id],
+                ['estado', '=', "A"],
+            ])
             ->leftJoin('caja as ca', 'apertura_cierre.caja_id', '=', 'ca.id')
             ->get();
 
@@ -513,7 +527,7 @@ class searcherController extends Controller
                 'su.numero'
             )
             ->where('timbrado.estado', '=', 'A')
-            ->leftJoin('sucursal as su','timbrado.sucursal_id','=','su.id')
+            ->leftJoin('sucursal as su', 'timbrado.sucursal_id', '=', 'su.id')
             ->get();
 
         // dd($estadia);
@@ -528,7 +542,10 @@ class searcherController extends Controller
         //a=activo i=inactivo
         $user = DB::table('users')
             ->select(
-                'users.id', 'users.name', 'users.email', 'users.nivel',
+                'users.id',
+                'users.name',
+                'users.email',
+                'users.nivel',
                 'pe.nombre',
                 'pe.apellido',
                 'emp.persona_nro_documento as documento'

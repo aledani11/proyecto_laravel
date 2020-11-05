@@ -55,6 +55,7 @@ Route::get('/apertura_cierre/create', 'aperturaController@create')->name('apertu
 Route::get('/apertura_cierre/editar/{apertura}', 'aperturaController@edit')->name('apertura.edit')->middleware('auth');
 Route::put('/apertura_cierre/{apertura}', 'aperturaController@update')->name('apertura.update')->middleware('auth');
 Route::get('/apertura_cierre/anular/{apertura}', 'aperturaController@destroy')->name('apertura.destroy')->middleware('auth');
+Route::post('/apertura_estimado', 'aperturaController@estimado')->name('apertura.estimado')->middleware('auth');
 
 Route::get('/cobros','cobrosController@index')->name('cobros.index')->middleware('auth');
 Route::post('/cobros', 'cobrosController@store')->name('cobros.store')->middleware('auth');

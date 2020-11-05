@@ -18,6 +18,15 @@
 
 <div class="container" style="margin-top:30px">
     <div class="row">
+    @if (session('error_')!==null)
+        <div class="col-md-12 mb-3">
+            <div class="alert alert-danger">
+                <ul>
+                    <li>{{ session('error_') }}</li>
+                </ul>
+            </div>
+        </div>
+        @endif
         <div class="col-md-10 form-group">
             <div>
                 <table id="eventsTable" data-toggle="table" data-height="300" data-pagination="true" data-search="true" data-show-refresh="true" data-show-toggle="true" data-show-columns="true" data-classes="table table-bordered table-hover table-md" data-toolbar="#toolbar">
@@ -47,13 +56,16 @@
 
         <div class="col-md-2 form-group mt-5">
             <div class="col-md-12">
-                <a class="btn btn-dark form-group" href="{{ route('apertura.create') }}">Agregar</a>
+                <a class="btn btn-dark form-group" href="{{ route('apertura.create') }}" onclick="return mensaje_agregar()">Apertura</a>
+            </div>
+            <div class="col-md-12">
+                <a class="btn btn-dark form-group" href="{{ route('arqueo.create') }}" >Arqueo</a>
             </div>
             <div class="col-md-12">
                 <a id="anular" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('apertura.destroy', 'empty') }}">Anular</a>
             </div>
             <div class="col-md-12">
-                <a id="modificar" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('apertura.edit', 'empty') }}">Modificar</a>
+                <a id="modificar" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('apertura.edit', 'empty') }}">Cierre</a>
             </div>
         </div>
     </div>
@@ -95,6 +107,14 @@ var id_sel;
         if (id_sel == null) {
             alert("Seleccionar fila primero");
             return false;
+        }
+    }
+
+    function mensaje_agregar() {
+        
+        if($('#eventsTable').bootstrapTable('getData').length != 0){
+            alert("Ya existe una apertura");
+            return false
         }
     }
 </script>

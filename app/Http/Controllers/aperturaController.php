@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\estadia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class aperturaController extends Controller
 {
@@ -17,12 +18,24 @@ class aperturaController extends Controller
     {
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
+        $id = Auth::id();
+        $caja = DB::table('user_numero')
+            ->select(
+                'ca.descripcion',
+                'ca.id'
+            )
+            ->where('user_id', '=', $id)
+            ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+            ->get();
         $apertura = DB::table('apertura_cierre')
             ->select(
                 'apertura_cierre.*',
                 'ca.descripcion as caja'
             )
-            ->where('estado', '=', 'A')
+            ->where([
+                ['caja_id', '=', $caja[0]->id],
+                ['estado', '=', "A"],
+            ])
             ->leftJoin('caja as ca', 'apertura_cierre.caja_id', '=', 'ca.id')
             ->get();
 
@@ -38,7 +51,15 @@ class aperturaController extends Controller
      */
     public function create()
     {
-        $caja = DB::table('caja')->get();
+        $id = Auth::id();
+        $caja = DB::table('user_numero')
+            ->select(
+                'ca.descripcion',
+                'ca.id'
+            )
+            ->where('user_id', '=', $id)
+            ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+            ->get();
 
         return view('apertura_cierre.create', [
             'cajas' => $caja
@@ -53,14 +74,20 @@ class aperturaController extends Controller
      */
     public function store(Request $request)
     {
-        // dump(request()->all());
-         DB::table('apertura_cierre')->insert(
-            [
-                'caja_id' => request()->caja, 'fecha_apertura' => request()->fechaa,
-                'hora_apertura' => request()->horaa, 'saldo_inicial' => request()->salini,
-                'usuario_id' => 1, 'estado' => "A"
-            ]
-        );
+        try {
+            // dump(request()->all());
+            DB::table('apertura_cierre')->insert(
+                [
+                    'caja_id' => request()->caja, 'fecha_apertura' => request()->fechaa,
+                    'hora_apertura' => request()->horaa, 'saldo_inicial' => request()->salini,
+                    'estado' => "A"
+                ]
+            );
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
 
         return redirect()->route('apertura.index');
     }
@@ -85,15 +112,23 @@ class aperturaController extends Controller
     public function edit($id)
     {
         //dump($id);
-        $caja = DB::table('caja')->get();
+        $id1 = Auth::id();
+        $caja = DB::table('user_numero')
+            ->select(
+                'ca.descripcion',
+                'ca.id'
+            )
+            ->where('user_id', '=', $id1)
+            ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
+            ->get();
 
         $apertura = DB::table('apertura_cierre')
             ->where('id', '=', $id)
             ->get();
 
         return view('apertura_cierre.update', [
-            'cajas' => $caja,            
-            'aperturas' => $apertura,            
+            'cajas' => $caja,
+            'aperturas' => $apertura,
         ]);
     }
 
@@ -106,17 +141,23 @@ class aperturaController extends Controller
      */
     public function update(Request $request)
     {
+        try {
             DB::table('apertura_cierre')->where('id', request()->codigo)
-            ->update(
-                [
-                    'caja_id' => request()->caja, 'fecha_apertura' => request()->fechaa,
-                    'hora_apertura' => request()->horaa, 'saldo_inicial' => request()->salini,
-                    'usuario_id' => 1, 'estado' => "I", 'fecha_cierre' => request()->fechac,
-                    'hora_cierre' => request()->horac, 'saldo_final' => request()->salfin,
-                ]
-            );
+                ->update(
+                    [
+                        'caja_id' => request()->caja, 'fecha_apertura' => request()->fechaa,
+                        'hora_apertura' => request()->horaa, 'saldo_inicial' => request()->salini,
+                        'estado' => "I", 'fecha_cierre' => request()->fechac,
+                        'hora_cierre' => request()->horac, 'saldo_final' => str_replace('.', '', request()->salfin)
+                    ]
+                );
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
 
-       
+
 
         return redirect()->route('apertura.index');
     }
@@ -129,7 +170,47 @@ class aperturaController extends Controller
      */
     public function destroy($id)
     {
-       
     }
 
+    public function estimado(Request $request)
+    {
+        $cobroe = DB::table('cobros')
+            ->select(DB::raw('SUM(cf.`monto`)-SUM(cf.`vuelto`) AS saldo'))
+            ->where([
+                ['cobros.apertura_cierre_id', '=', $request->id],
+                ['cobros.estado', '=', 'C'],
+            ])
+            ->leftJoin('cobro_efectivo as cf', 'cobros.id', '=', 'cf.cobrosid')
+            ->get();
+
+        $cobroc = DB::table('cobros')
+            ->select(DB::raw('SUM(cc.monto) as cheque'))
+            ->where([
+                ['cobros.apertura_cierre_id', '=', $request->id],
+                ['cobros.estado', '=', 'C'],
+            ])
+            ->leftJoin('cobro_cheque as cc', 'cobros.id', '=', 'cc.cobrosid')
+            ->get();
+
+            $cobrot = DB::table('cobros')
+            ->select(DB::raw('SUM(ct.monto) as tarjeta'))
+            ->where([
+                ['cobros.apertura_cierre_id', '=', $request->id],
+                ['cobros.estado', '=', 'C'],
+            ])
+            ->leftJoin('cobro_tarjeta as ct', 'cobros.id', '=', 'ct.cobrosid')
+            ->get();    
+
+
+        //dd($tarifa);
+
+        //return view('estadia.create', ['tarifas' => $tarifa]);
+
+        return [
+            'cobroe' => $cobroe,
+            'cobroc' => $cobroc,
+            'cobrot' => $cobrot
+        ];
+        //return $request;
+    }
 }

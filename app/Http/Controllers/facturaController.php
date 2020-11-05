@@ -105,6 +105,7 @@ class facturaController extends Controller
      */
     public function store(Request $request)
     {
+       
         //dump(request()->all());dd("asdf");
         //dump(str_replace('.', '', request()->total));
         try {
@@ -152,8 +153,11 @@ class facturaController extends Controller
 
             $input = $request->only([
                 'descripcion_detalle', 'precio_detalle', 'cantidad_detalle',
-                'iva_detalle', 'tarifa_detalle'
+                'iva_detalle', 'tarifa_detalle','iva_descri','iva_porcentaje'
             ]);
+            
+            $iva5 = 0;
+            $iva10 = 0;
 
             foreach ($input["descripcion_detalle"] as $key => $value) {
                 $data2[] = [
@@ -165,7 +169,21 @@ class facturaController extends Controller
                     'iva_id' => $input["iva_detalle"][$key],
                     'tarifa_id' => $input["tarifa_detalle"][$key]
                 ];
-            }
+                if($input['iva_descri'][$key]=="5%"){
+                    $iva5+= ($input["precio_detalle"][$key] * $input["cantidad_detalle"][$key]) + ((($input["precio_detalle"][$key] * $input["cantidad_detalle"][$key]) )/$input["iva_porcentaje"][$key]);
+                }else if($input['iva_descri'][$key]=="10%"){
+                    $iva10+= ($input["precio_detalle"][$key] * $input["cantidad_detalle"][$key]) + (($input["precio_detalle"][$key] * $input["cantidad_detalle"][$key]) /$input["iva_porcentaje"][$key]);
+                }
+            } 
+
+            $id = DB::table('libro_ventas')->insert(
+                [
+                    'factura_numero' => $nro,
+                    'fecha' => request()->fecha,
+                    'factura_timbrado' => $timbrado[0]->nro, 'iva_5' => $iva5,
+                    'iva_10' => $iva10
+                ]
+            );
 
             DB::table('factura_detalle')->insert($data2);
 
@@ -197,13 +215,16 @@ class facturaController extends Controller
 
             DB::table('estadia')->where('id', $request->estadia)
                 ->update(['estado' => 'P']);
+
+            return redirect()->intended('http://localhost:8084/reportes/Imprimir_fac.jsp?desde='.$nro.'&hasta='.$timbrado[0]->nro.'&nombre_reporte=factura_1');
+
         } catch (\Exception $e) {
             // request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');
             // return redirect()->route('personas.index');
         }
 
-        return redirect()->route('factura.index');
+       // return redirect()->route('factura.index');
     }
 
     /**
@@ -519,6 +540,7 @@ class facturaController extends Controller
                     'iv.descripcion as descripcion_iva',
                     'iv.porcentaje as porcentaje_iva',
                     'iv.id as id_iva',
+                    'iv.descripcion as descri_iva',
                     'ta.id as tarifa_id'
                 )
                 ->where([
@@ -542,6 +564,7 @@ class facturaController extends Controller
                     'iv.descripcion as descripcion_iva',
                     'iv.porcentaje as porcentaje_iva',
                     'iv.id as id_iva',
+                    'iv.descripcion as descri_iva',
                     'ta.id as tarifa_id'
                 )
                 ->where([
