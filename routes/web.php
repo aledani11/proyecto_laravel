@@ -77,7 +77,16 @@ Route::post('/nota_de_credito', 'nota_de_creditoController@store')->name('nota_d
 Route::get('/nota_de_credito/create', 'nota_de_creditoController@create')->name('nota_de_credito.create')->middleware('auth');
 Route::get('/nota_de_credito/editar/{credito}', 'arqueoController@edit')->name('nota_de_credito.edit')->middleware('auth');
 Route::put('/nota_de_credito/{credito}', 'nota_de_creditoController@update')->name('nota_de_credito.update')->middleware('auth');
-Route::get('/nota_de_credito/anular/{credito}', 'nota_de_creditoController@destroy')->name('nota_de_credito.destroy')->middleware('auth');
+Route::get('/nota_de_credito/anular/{credito}/{timbrado}', 'nota_de_creditoController@destroy')->name('nota_de_credito.destroy')->middleware('auth');
+Route::post('/n_credito_factura', 'nota_de_creditoController@factura')->name('n_credito.factura')->middleware('auth');
+
+Route::get('/nota_de_debito','nota_de_debitoController@index')->name('nota_de_debito.index')->middleware('auth');
+Route::post('/nota_de_debito', 'nota_de_debitoController@store')->name('nota_de_debito.store')->middleware('auth');
+Route::get('/nota_de_debito/create', 'nota_de_debitoController@create')->name('nota_de_debito.create')->middleware('auth');
+Route::get('/nota_de_debito/editar/{credito}', 'nota_de_debitoController@edit')->name('nota_de_debito.edit')->middleware('auth');
+Route::put('/nota_de_debito/{credito}', 'nota_de_debitoController@update')->name('nota_de_debito.update')->middleware('auth');
+Route::get('/nota_de_debito/anular/{credito}/{timbrado}', 'nota_de_debitoController@destroy')->name('nota_de_debito.destroy')->middleware('auth');
+Route::post('/n_debito_factura', 'nota_de_debitoController@factura')->name('n_debito.factura')->middleware('auth');
 
 Route::get('/requisicion','requisicionController@index')->name('requisicion.index')->middleware('auth');
 Route::post('/requisicion', 'requisicionController@store')->name('requisicion.store')->middleware('auth');

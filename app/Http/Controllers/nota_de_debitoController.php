@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
-class nota_de_creditoController extends Controller
+class nota_de_debitoController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -19,15 +19,15 @@ class nota_de_creditoController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //estado i=inactivo a=activo
-        $nota_credito = DB::table('nota_credito')
+        $nota_credito = DB::table('nota_debito')
             ->select(
-                'nota_credito.*',
+                'nota_debito.*',
                 'pe.nombre',
                 'pe.apellido',
                 'cl.ruc'
             )
-            ->where('nota_credito.estado', '=', 'A')
-            ->leftJoin('factura as fa', 'nota_credito.factura_numero', '=', 'fa.numero')
+            ->where('nota_debito.estado', '=', 'A')
+            ->leftJoin('factura as fa', 'nota_debito.factura_numero', '=', 'fa.numero')
             ->leftJoin('clientes as cl', 'fa.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
                 $join->on('cl.persona_pais', '=', 'pe.pais_id');
@@ -37,7 +37,7 @@ class nota_de_creditoController extends Controller
 
         //  dd($nota_credito);
 
-        return view('nota_de_credito.index', ['notas_creditos' => $nota_credito]);
+        return view('nota_de_debito.index', ['notas_creditos' => $nota_credito]);
     }
 
     /**
@@ -58,7 +58,7 @@ class nota_de_creditoController extends Controller
                 )
                 ->where([
                     ['user_id', '=', $id],
-                    ['tipo', '=', 'Nota_credito'],
+                    ['tipo', '=', 'Nota_debito'],
                 ])
                 ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
                 ->leftJoin('factura_numero as fn', 'user_numero.factura_numero_id', '=', 'fn.id')
@@ -84,9 +84,9 @@ class nota_de_creditoController extends Controller
             // request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');
             //return view('nota_de_credito.index');
-            return redirect()->route('nota_de_credito.index');
+            return redirect()->route('nota_de_debito.index');
         }
-        return view('nota_de_credito.create', [
+        return view('nota_de_debito.create', [
             'numero' => $nro,
             'timbrado' => $timbrado,
             'ivas' => $iva
@@ -124,7 +124,7 @@ class nota_de_creditoController extends Controller
             //dump($monto_c);
             $monto = ((int) str_replace('.', '', request()->importe));
             //dump($monto);
-            if ($monto_c >= $monto) {
+            if (1) {
                 //dump("modificar");
                 DB::table('cuentas_a_cobrar')
                     ->where([
@@ -135,17 +135,17 @@ class nota_de_creditoController extends Controller
                     ->leftJoin('condicion as co', 'cuentas_a_cobrar.condicion_id', '=', 'co.id')
                     ->update(
                         [
-                            'monto' => (($monto_c - $monto) / $can)
+                            'monto' => (($monto_c + $monto) / $can)
                         ]
                     );
             } else {
                 // dump("error");
                 request()->session()->flash('error_', 'Monto mayor al total de cuentas a cobrar');
-                return redirect()->route('nota_de_credito.index');
+                return redirect()->route('nota_de_debito.index');
             }
 
 
-            DB::table('nota_credito')->insert(
+            DB::table('nota_debito')->insert(
                 [
                     'numero' => request()->numero, 'factura_numero' => request()->factura,
                     'fecha' => request()->fecha, 'estado' => "A",
@@ -169,8 +169,8 @@ class nota_de_creditoController extends Controller
                         ->get();
 
                     $data1[] = [
-                        'nota_credito_numero' => request()->numero,
-                        'nota_credito_timbrado' => request()->timbrado,
+                        'nota_debito_numero' => request()->numero,
+                        'nota_debito_timbrado' => request()->timbrado,
                         'descripcion' => str_replace('_', ' ', $input["descripcion_detalle"][$key]),
                         'precio' => $input["precio_detalle"][$key],
                         'cantidad' => $input["cantidad_detalle"][$key],
@@ -178,7 +178,7 @@ class nota_de_creditoController extends Controller
                     ];
                 }
 
-                DB::table('nota_credito_detalle')->insert($data1);
+                DB::table('nota_debito_detalle')->insert($data1);
             }
         } catch (\Exception $e) {
             // request()->session()->flash('error_', $e->getMessage());
@@ -187,7 +187,7 @@ class nota_de_creditoController extends Controller
         }
 
 
-        return redirect()->route('nota_de_credito.index');
+        return redirect()->route('nota_de_debito.index');
     }
 
     /**
@@ -395,8 +395,8 @@ class nota_de_creditoController extends Controller
             //dump($id);
             //i=inactivo a=activo 
 
-            $n_credito_c = DB::table('nota_credito')
-                ->select('nota_credito.*')
+            $n_credito_c = DB::table('nota_debito')
+                ->select('nota_debito.*')
                 ->where([
                     ['numero', '=', $nro],
                     ['timbrado', '=', $timbrado],
@@ -422,18 +422,18 @@ class nota_de_creditoController extends Controller
                 ->leftJoin('condicion as co', 'cuentas_a_cobrar.condicion_id', '=', 'co.id')
                 ->update(
                     [
-                        'monto' => DB::raw('monto+' . (((int)$n_credito_c[0]->importe) / $can))
+                        'monto' => DB::raw('monto-' . (((int)$n_credito_c[0]->importe) / $can))
                     ]
                 );
 
-                DB::table('nota_credito_detalle')
+                DB::table('nota_debito_detalle')
                 ->where([
-                    ['nota_credito_numero', '=', $nro],
-                    ['nota_credito_timbrado', '=', $timbrado],
+                    ['nota_debito_numero', '=', $nro],
+                    ['nota_debito_timbrado', '=', $timbrado],
                 ])
                 ->delete();
 
-            DB::table('nota_credito')
+            DB::table('nota_debito')
                 ->where([
                     ['numero', '=', $nro],
                     ['timbrado', '=', $timbrado],
@@ -445,7 +445,7 @@ class nota_de_creditoController extends Controller
             // return redirect()->route('personas.index');
         }
 
-        return redirect()->route('nota_de_credito.index');
+        return redirect()->route('nota_de_debito.index');
     }
 
     public function tarifa(Request $request)

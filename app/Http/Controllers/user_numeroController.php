@@ -83,7 +83,7 @@ class user_numeroController extends Controller
                 [
                     'user_id' => request()->user,
                     'factura_numero_id' => request()->factura_numero,
-                    'caja_id' => request()->caja
+                    'caja_id' => request()->caja, 'tipo' => request()->tipo
                 ]
             );
         } catch (\Exception $e) {

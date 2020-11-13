@@ -24,6 +24,7 @@
                     <thead>
                         <tr>
                             <th data-sortable="true" data-field="id">Numero</th>
+                            <th>Timbrado</th>
                             <th>Fecha</th>
                             <th>Total</th>
                             <th>Condicion</th>
@@ -35,6 +36,7 @@
                         @foreach($facturas as $factura)
                         <tr>
                             <td>{{$factura->numero}}</td>
+                            <td>{{$factura->timbrado}}</td>
                             <td>{{ \Carbon\Carbon::parse($factura->fecha)->format('d/m/Y')}}</td>
                             <td>{{number_format($factura->total,0,'','.')}}</td>
                             <td>{{$factura->condicion}}</td>
@@ -89,6 +91,7 @@
         var link = res.concat(row.id);
         document.getElementById("modificar").setAttribute("href", link);*/
         a = row.id;
+        b = row[1]
     })
 
     $('#eventsTable').on('click', 'tbody tr', function(event) {
@@ -99,6 +102,7 @@
         //myWindow.close();
         //sessionStorage.setItem("clientes", a);
         localStorage.setItem("factura", a);
+        localStorage.setItem("facturaf", b);
         this.close();
         //console.log(e);
     }

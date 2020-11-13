@@ -26,10 +26,23 @@
 
     <div class="container" style="margin-top:30px">
         <div class="row">
+            @if (session('error_')!==null)
+            <div class="col-md-12 mb-3">
+                <div class="alert alert-danger">
+                    <ul>
+                        <li>{{ session('error_') }}</li>
+                    </ul>
+                </div>
+            </div>
+            @endif
             <div class="col-md-4">
                 <div class="form-group">
                     <label for="numero"> Numero </label>
-                    <input type="text" id="numero" name="numero" required>
+                    <input type="text" id="numero" name="numero" required readonly value="{{$numero}}">
+                </div>
+                <div class="form-group">
+                    <label for="fechae">Fecha</label>
+                    <input type="date" id="fecha" name="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
                 </div>
                 <div class="form-group">
                     <label for="factura">Factura</label>
@@ -40,15 +53,20 @@
             </div>
             <div class="col-md-4">
                 <div class="form-group">
-                    <label for="fechae">Fecha</label>
-                    <input type="date" id="fecha" name="fecha" required value="{{\Carbon\Carbon::now(new DateTimeZone('America/Asuncion'))->format('Y-m-d')}}">
+                    <label for="timbrado"> Timbrado </label>
+                    <input type="text" id="timbrado" name="timbrado" required readonly value="{{$timbrado[0]->nro}}">
                 </div>
                 <div class="form-group">
                     <label for="importe"> Importe </label>
-                    <input type="number" id="importe" name="importe" value="0" min="0" max="1000000000" required>
+                    <input type="text" id="importe" name="importe" value="0" min="0" readonly required>
+                </div>
+                <div class="form-group">
+                    <label for="timbradof"> Timbrado fac.</label>
+                    <input type="text" id="timbradof" name="timbradof" required readonly>
                 </div>
             </div>
             <div class="col-md-4">
+
                 <div class="form-group">
                     <label for="concepto">Concepto</label>
                     <textarea autofocus id="concepto" cols="30" rows="4" name="concepto" maxlength="100" required tabindex="1"></textarea>
@@ -175,7 +193,7 @@
 
 
     function add(table) {
-
+        var x = [];
         if (table === "nota") {
             //console.log(val);
             var ca = document.getElementById("cantidad");
@@ -194,7 +212,7 @@
                 //console.log(x);
                 return false;
             }
-            if (parseInt(x[1]) <= 0 ) {
+            if (parseInt(x[1]) <= 0) {
                 alert("Cantidad debe ser mayor a cero");
                 //console.log(x);
                 return false;
@@ -206,7 +224,60 @@
             addTable(x, table);
         }
 
+        if (table === "nota_factura") {
+            remove_all()
+            var path = "{{route('n_credito.factura')}}";
+            var table = "#nota_table"
+            var val = [];
+            val[0] = document.getElementById("factura").value;
+            val[1] = document.getElementById("timbradof").value;
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+            $.ajax({
+                type: 'POST',
+                url: path,
+                data: {
+                    id: val
+                },
+                success: function(data) {
+                    //alert(data.presupuesto_);
+                    // console.log(data);
+                    //alert(data.tarifas[0].descripcion);
+                    //$('#tarifa_table').bootstrapTable('insertRow', {index: 0, row: [1,"hola"]})
+                    //console.log([1,"hola"]);
+                    //addTable(data, table)
+                    add_data(data);
+                    //var x = [];
+                    //x[0] = de.value;
 
+                }
+            });
+            path = "empty";
+        }
+
+        function add_data(data) {
+
+            //console.log(data);
+            //var data1 = {array: ["hola","hola"]};
+            //console.log(data1);
+            //data.articulos.shift();
+            //console.log(data);
+            //x[0] = de.value;
+            lenght_data = data.factura.length;
+            for (let index = 0; index < lenght_data; index++) {
+                x[0] = data.factura[0].descripcion;
+                x[1] = data.factura[0].cantidad;
+                x[2] = data.factura[0].precio;
+                x[3] = data.factura[0].porcentaje;
+                addTable(x, table);
+                //console.log(data);
+                data.factura.shift();
+                //console.log(data);
+            }
+        }
 
         if (path !== "empty") {
             $.ajaxSetup({
@@ -230,18 +301,18 @@
                 }
             });
         }
-
+        
         function addTable(data, table) {
             if (table === "#nota_table") {
                 id_monto += 1;
                 var importe = 0;
                 importe = (parseInt(data[2]) * parseInt(data[1]));
                 var iva = 0;
-                iva = parseInt(importe/parseInt(data[3]));
+                iva = parseInt(importe / parseInt(data[3]));
                 $(table).bootstrapTable('insertRow', {
                     index: 0,
                     row: [id_monto, data[0], data[1], parseInt(data[2]).format(0, 3, '.', ','), importe.format(0, 3, '.', ','), iva.format(0, 3, '.', ',') +
-                        '<input type="hidden" name ="descripcion_detalle[]" value=' + data[0] + '>' +
+                        '<input type="hidden" name ="descripcion_detalle[]" value=' + data[0].replace(/ /g, "_") + '>' +
                         '<input type="hidden" name ="precio_detalle[]" value=' + data[2] + '>' +
                         '<input type="hidden" name ="cantidad_detalle[]" value=' + data[1] + '>' +
                         '<input type="hidden" name ="iva_detalle[]" value=' + data[3] + '>'
@@ -254,7 +325,7 @@
                 document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
                 document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
                 document.getElementById("total").value = total.format(0, 3, '.', ',');
-                document.getElementById("importe").value = (total.format(0, 3, '.', ',')).replace(".","");
+                document.getElementById("importe").value = (total.format(0, 3, '.', ',')).replace(".", "");
 
                 document.getElementById("cantidad").value = "";
                 document.getElementById("descripcion").value = "";
@@ -282,7 +353,9 @@
 
     function remove_all() {
         $("#nota_table").bootstrapTable('removeAll');
-
+        total_iva = 0;
+        subtotal = 0;
+        total = total_iva + subtotal;
     }
 
     function remove(table_remove) {
@@ -308,6 +381,7 @@
             document.getElementById("total_iva").value = total_iva.format(0, 3, '.', ',');
             document.getElementById("subtotal").value = subtotal.format(0, 3, '.', ',');
             document.getElementById("total").value = total.format(0, 3, '.', ',');
+            document.getElementById("importe").value = total.format(0, 3, '.', ',');
         }
         if (table_remove === "cheque") {
             var table_rem = "#cheque_table";
@@ -396,11 +470,14 @@
     function play() {
         // console.log("hola");
         var factura = localStorage.getItem("factura");
+        var facturaf = localStorage.getItem("facturaf");
         var cuentas_monto = localStorage.getItem("cuentas_monto");
         var apertura = localStorage.getItem("apertura_cierre");
 
         if (factura != "nothing" && factura != null) {
             document.getElementById("factura").value = factura;
+            document.getElementById("timbradof").value = facturaf;
+            add("nota_factura");
         }
         if (apertura != "nothing" && apertura != null) {
             document.getElementById("apertura").value = apertura;
@@ -410,6 +487,7 @@
             entregado();
         }
         localStorage.removeItem("factura");
+        localStorage.removeItem("facturaf");
         localStorage.removeItem("apertura_cierre");
         localStorage.removeItem("cuentas_monto");
     }
@@ -419,7 +497,11 @@
     });
 
     function validateForm() {
-
+        var taf = document.getElementsByName("descripcion_detalle[]");
+        if (taf.length == 0) {
+            alert("Cargar al menos un detalle");
+            return false;
+        }
         //console.log(taf);
         // console.log(taf.length);
         //console.log(x[0]);

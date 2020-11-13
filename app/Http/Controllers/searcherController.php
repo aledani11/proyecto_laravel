@@ -196,7 +196,7 @@ class searcherController extends Controller
             ->where('factura.estado', '=', 'A')
             ->leftJoin('clientes as cl', 'factura.clientes_id', '=', 'cl.id')
             ->leftJoin('persona as pe', function ($join) {
-                $join->on('cl.persona_ciudad_id', '=', 'pe.ciudad_id');
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
                 $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
             })
             ->get();

@@ -150,7 +150,7 @@
                         <li><a href="{{ route('cobros.index') }}" class="dropdown-item">Cobros</a></li>
                         <li><a href="{{ route('arqueo.index') }}" class="dropdown-item">Arqueo</a></li>
                         <li><a href="{{ route('nota_de_credito.index') }}" class="dropdown-item">Nota De Credito</a></li>
-                        <li><a href="{{ route('recaudaciones.index') }}" class="dropdown-item">Nota de Debito</a></li>
+                        <li><a href="{{ route('nota_de_debito.index') }}" class="dropdown-item">Nota de Debito</a></li>
                     </ul>
                 </li>
                 @endif
@@ -165,6 +165,12 @@
                         <li><a href="http://localhost:8084/reportes/Listado_Arqueo.jsp" target="_blank" class="dropdown-item">Arqueo</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Estadia_2.jsp" target="_blank" class="dropdown-item">Estadia</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Inventarios.jsp" target="_blank" class="dropdown-item">Inventarios</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_tarifas.jsp" target="_blank" class="dropdown-item">Tarifas</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Habitacion.jsp" target="_blank" class="dropdown-item">Habitaciones</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Consumicion.jsp" target="_blank" class="dropdown-item">Consumicion</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Cuentas_Cobrar.jsp" target="_blank" class="dropdown-item">Cuentas a Cobrar</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_recaudaciones.jsp" target="_blank" class="dropdown-item">Recaudaciones a depositar</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Nota_Credito.jsp" target="_blank" class="dropdown-item">Nota Credito</a></li>
                     </ul>
                 </li>
                 <li class="nav-item"><a href="/ayuda.htm" target="_blank" class="nav-link">Ayuda</a></li>

@@ -47,6 +47,15 @@
                         @endforeach
                     </select>
                 </div>
+                <div class="form-group">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo" name="tipo" required>
+                        <option value="">--Selecciona una opción--</option>
+                        <option value="Factura">Factura</option>
+                        <option value="Nota_credito">Nota credito</option>
+                        <option value="Nota_debito">Nota debito</option>
+                    </select>
+                </div>
             </div>
             <div class="col-md-4">
                 <div class="form-group">

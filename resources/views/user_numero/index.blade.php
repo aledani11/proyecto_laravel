@@ -33,6 +33,7 @@
                     <thead>
                     <tr>
                             <th data-sortable="true" data-field="id">Id</th>
+                            <th>Tipo</th>
                             <th>User</th>
                             <th>Email</th>
                             <th>Nivel</th>
@@ -47,6 +48,7 @@
                         @foreach($variables as $vari)
                         <tr>
                             <td>{{$vari->user_id}}</td>
+                            <td>{{$vari->tipo}}</td>
                             <td>{{$vari->name}}</td>
                             <td>{{$vari->email}}</td>
                             <td>{{$vari->nivel}}</td>

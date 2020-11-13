@@ -142,6 +142,32 @@ class aperturaController extends Controller
     public function update(Request $request)
     {
         try {
+            $cobroe = DB::table('cobros')
+                ->select(DB::raw('SUM(cf.`monto`)-SUM(cf.`vuelto`) AS saldo'))
+                ->where([
+                    ['cobros.apertura_cierre_id', '=', $request->codigo],
+                    ['cobros.estado', '=', 'C'],
+                ])
+                ->leftJoin('cobro_efectivo as cf', 'cobros.id', '=', 'cf.cobrosid')
+                ->get();
+
+            $cobroc = DB::table('cobros')
+                ->select(DB::raw('SUM(cc.monto) as cheque'))
+                ->where([
+                    ['cobros.apertura_cierre_id', '=', $request->codigo],
+                    ['cobros.estado', '=', 'C'],
+                ])
+                ->leftJoin('cobro_cheque as cc', 'cobros.id', '=', 'cc.cobrosid')
+                ->get();
+
+            DB::table('recaudaciones_a_depositar')
+                ->insert(
+                    [
+                        'apertura_cierre_id' => request()->codigo, 'monto_efectivo' => $cobroe[0]->saldo,
+                        'monto_cheque' => $cobroc[0]->cheque
+                    ]
+                );
+
             DB::table('apertura_cierre')->where('id', request()->codigo)
                 ->update(
                     [
@@ -192,14 +218,14 @@ class aperturaController extends Controller
             ->leftJoin('cobro_cheque as cc', 'cobros.id', '=', 'cc.cobrosid')
             ->get();
 
-            $cobrot = DB::table('cobros')
+        $cobrot = DB::table('cobros')
             ->select(DB::raw('SUM(ct.monto) as tarjeta'))
             ->where([
                 ['cobros.apertura_cierre_id', '=', $request->id],
                 ['cobros.estado', '=', 'C'],
             ])
             ->leftJoin('cobro_tarjeta as ct', 'cobros.id', '=', 'ct.cobrosid')
-            ->get();    
+            ->get();
 
 
         //dd($tarifa);

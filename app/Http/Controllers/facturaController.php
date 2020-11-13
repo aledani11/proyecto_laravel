@@ -67,6 +67,10 @@ class facturaController extends Controller
                     'fn.timbrado'
                 )
                 ->where('user_id', '=', $id)
+                ->where([
+                    ['user_id', '=', $id],
+                    ['tipo', '=', 'Factura'],
+                ])
                 ->leftJoin('caja as ca', 'user_numero.caja_id', '=', 'ca.id')
                 ->leftJoin('factura_numero as fn', 'user_numero.factura_numero_id', '=', 'fn.id')
                 ->get();
@@ -89,7 +93,7 @@ class facturaController extends Controller
         } catch (\Exception $e) {
             // request()->session()->flash('error_', $e->getMessage());
             request()->session()->flash('error_', 'Error en base de datos');
-            // return redirect()->route('personas.index');
+             return redirect()->route('factura.index');
         }
         return view('factura.create', [
             'numero' => $nro,

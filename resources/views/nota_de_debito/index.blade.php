@@ -1,6 +1,6 @@
 @extends ('layout')
 
-@section('title','Nota de credito')
+@section('title','Nota de debito')
 
 @section('link')
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
@@ -12,7 +12,7 @@
 <script src="/js/bootstrap-table-es-MX.js"></script>
 @endsection
 
-@section('header', 'Nota de credito')
+@section('header', 'Nota de debito')
 
 @section('content')
 
@@ -62,14 +62,14 @@
 
         <div class="col-md-2 form-group mt-5">
             <div class="col-md-12">
-                <a class="btn btn-dark form-group" href="{{ route('nota_de_credito.create') }}">Agregar</a>
+                <a class="btn btn-dark form-group" href="{{ route('nota_de_debito.create') }}">Agregar</a>
             </div>
             <div class="col-md-12">
-                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('nota_de_credito.destroy', ['empty', 'empty']) }}">Anular</a>
+                <a id="anular" class="btn btn-dark form-group" onclick="return mensaje_anular()" href="{{ route('nota_de_debito.destroy', ['empty', 'empty']) }}">Anular</a>
 
             </div>
             <div class="col-md-12">
-                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('nota_de_credito.edit', 'empty') }}">Modificar</a>
+                <a id="modificar" style="display: none;" class="btn btn-dark form-group" onclick="return mensaje_modificar()" href="{{ route('nota_de_debito.edit', 'empty') }}">Modificar</a>
             </div>
         </div>
     </div>
@@ -77,8 +77,8 @@
 
 <script>
  var id_sel;
-    var url = "{{ route('nota_de_credito.edit', ['empty', 'empty']) }}";
-    var url1 = "{{ route('nota_de_credito.destroy', ['empty', 'empty']) }}";
+    var url = "{{ route('nota_de_debito.edit', ['empty', 'empty']) }}";
+    var url1 = "{{ route('nota_de_debito.destroy', ['empty', 'empty']) }}";
     $('#eventsTable').on('click-row.bs.table', function(e, row) {
         document.getElementById("modificar").setAttribute("href", url);
         document.getElementById("anular").setAttribute("href", url1);
