@@ -333,9 +333,9 @@
         if (table_remove === "consumicion") {
             var table_rem = "#consumicion_table";
 
-            total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
+         //   total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
 
-            document.getElementById("total").value = total;
+         //   document.getElementById("total").value = total;
         }
         if (table_remove === "huesped") {
             var table_rem = "#huesped_table";
@@ -379,9 +379,9 @@
         if (table_edit === "consumicion") {
             var table_rem = "#consumicion_table";
 
-            total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
+          //  total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
 
-            document.getElementById("total").value = total;
+         //   document.getElementById("total").value = total;
         }
         if (table_edit === "huesped") {
             var table_edt = "#huesped_table";

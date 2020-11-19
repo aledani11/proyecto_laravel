@@ -379,6 +379,20 @@ class searcherController extends Controller
 
         return view('buscadores.spa', ['spas' => $spa]);
     }
+    public function lavanderia()
+    {
+        //$estadia = estadia::all();
+        //return view('estadia.index', ['estadias' => $estadia]);
+        $lavanderia = DB::table('lavanderia')
+            ->select(
+                'lavanderia.*'
+            )
+            ->get();
+
+        //dd($clientes);
+
+        return view('buscadores.lavanderia', ['lavanderia' => $lavanderia]);
+    }
     public function habitacion()
     {
         //$estadia = estadia::all();

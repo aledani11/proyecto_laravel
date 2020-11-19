@@ -289,13 +289,15 @@
                     promocion = data.promocion[0].porcentaje;
                 }
 
+                var descri1 = val[4].replace(/ /g, "_");
+
                 $(table).bootstrapTable('insertRow', {
                     index: 0,
                     row: [data.traslado[0].id, data.traslado[0].descripcion, data.traslado[0].precio.format(0, 3, '.', ','),
                         data.habitaciones[0].descripcion, data.huespedes[0].nombre + " " + data.huespedes[0].apellido, promocion + "%" +
                         '<input type="hidden" name ="traslado_detalle[]" value=' + data.traslado[0].id + '>' +
                         '<input type="hidden" name ="destino_detalle[]" value=' + val[3] + '>' +
-                        '<input type="hidden" name ="direccion_detalle[]" value=' + val[4] + '>' +
+                        '<input type="hidden" name ="direccion_detalle[]" value=' + descri1 + '>' +
                         '<input type="hidden" name ="hora_detalle[]" value=' + val[5] + '>' +
                         '<input type="hidden" name ="huespedes_detalle[]" value=' + data.huespedes[0].id + '>' +
                         '<input type="hidden" name ="promocion_detalle[]" value=' + promocion + '>' +
@@ -353,9 +355,9 @@
         if (table_remove === "consumicion") {
             var table_rem = "#consumicion_table";
 
-            total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
+           // total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
 
-            document.getElementById("total").value = total;
+          //  document.getElementById("total").value = total;
         }
         if (table_remove === "huesped") {
             var table_rem = "#huesped_table";
@@ -399,9 +401,9 @@
         if (table_edit === "consumicion") {
             var table_rem = "#consumicion_table";
 
-            total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
+          //  total -= (parseInt(id_delete[2]) * parseInt(id_delete[3].replace(".", "")));
 
-            document.getElementById("total").value = total;
+          //  document.getElementById("total").value = total;
         }
         if (table_edit === "huesped") {
             var table_edt = "#huesped_table";

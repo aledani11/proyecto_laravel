@@ -174,6 +174,15 @@ Route::get('/servicios_spa/anular/{servicios}', 'servicios_spaController@destroy
 Route::post('/servicios_huesped', 'servicios_spaController@huesped')->name('servicios_spa.huesped')->middleware('auth');
 Route::post('/servicios_sauna', 'servicios_spaController@sauna')->name('servicios_spa.sauna')->middleware('auth');
 
+Route::get('/servicios_spa_sauna','servicios_spa_saunaController@index')->name('servicios_spa_sauna.index')->middleware('auth');
+Route::post('/servicios_spa_sauna', 'servicios_spa_saunaController@store')->name('servicios_spa_sauna.store')->middleware('auth');
+Route::get('/servicios_spa_sauna/create', 'servicios_spa_saunaController@create')->name('servicios_spa_sauna.create')->middleware('auth');
+Route::get('/servicios_spa_sauna/editar/{servicios}', 'servicios_spa_saunaController@edit')->name('servicios_spa_sauna.edit')->middleware('auth');
+Route::put('/servicios_spa_sauna/{servicios}', 'servicios_spa_saunaController@update')->name('servicios_spa_sauna.update')->middleware('auth');
+Route::get('/servicios_spa_sauna/anular/{servicios}', 'servicios_spa_saunaController@destroy')->name('servicios_spa_sauna.destroy')->middleware('auth');
+Route::post('/servicios_spa_sauna_spa_sauna', 'servicios_spa_saunaController@spa_sauna')->name('servicios_spa_sauna.spa_sauna')->middleware('auth');
+Route::get('/spa_sauna_realizado/{id}', 'servicios_spa_saunaController@realizado')->name('servicios_spa_sauna.realizado')->middleware('auth');
+
 Route::get('/servicios_consumicion','servicios_consumicionController@index')->name('servicios_consumicion.index')->middleware('auth');
 Route::post('/servicios_consumicion', 'servicios_consumicionController@store')->name('servicios_consumicion.store')->middleware('auth');
 Route::get('/servicios_consumicion/create', 'servicios_consumicionController@create')->name('servicios_consumicion.create')->middleware('auth');
@@ -182,6 +191,15 @@ Route::put('/servicios_consumicion/{servicios}', 'servicios_consumicionControlle
 Route::get('/servicios_consumicion/anular/{servicios}', 'servicios_consumicionController@destroy')->name('servicios_consumicion.destroy')->middleware('auth');
 Route::post('/servicios_producto', 'servicios_consumicionController@producto')->name('servicios_consumicion.producto')->middleware('auth');
 Route::get('/consumicion_realizado/{id}', 'servicios_consumicionController@realizado')->name('consumicion.realizado')->middleware('auth');
+
+Route::get('/servicios_lavanderia','servicios_lavanderiaController@index')->name('servicios_lavanderia.index')->middleware('auth');
+Route::post('/servicios_lavanderia', 'servicios_lavanderiaController@store')->name('servicios_lavanderia.store')->middleware('auth');
+Route::get('/servicios_lavanderia/create', 'servicios_lavanderiaController@create')->name('servicios_lavanderia.create')->middleware('auth');
+Route::get('/servicios_lavanderia/editar/{servicios}', 'servicios_lavanderiaController@edit')->name('servicios_lavanderia.edit')->middleware('auth');
+Route::put('/servicios_lavanderia/{servicios}', 'servicios_lavanderiaController@update')->name('servicios_lavanderia.update')->middleware('auth');
+Route::get('/servicios_lavanderia/anular/{servicios}', 'servicios_lavanderiaController@destroy')->name('servicios_lavanderia.destroy')->middleware('auth');
+Route::post('/servicio_lavanderia', 'servicios_lavanderiaController@lavanderia')->name('servicios_lavanderia.lavanderia')->middleware('auth');
+Route::get('/lavanderia_realizado/{id}', 'servicios_lavanderiaController@realizado')->name('lavanderia.realizado')->middleware('auth');
 
 Route::get('/servicios_traslado','servicios_trasladoController@index')->name('servicios_traslado.index')->middleware('auth');
 Route::post('/servicios_traslado', 'servicios_trasladoController@store')->name('servicios_traslado.store')->middleware('auth');
@@ -198,7 +216,8 @@ Route::get('/servicios_turismo/create', 'servicios_turismoController@create')->n
 Route::get('/servicios_turismo/editar/{servicios}', 'servicios_turismoController@edit')->name('servicios_turismo.edit')->middleware('auth');
 Route::put('/servicios_turismo/{servicios}', 'servicios_turismoController@update')->name('servicios_turismo.update')->middleware('auth');
 Route::get('/servicios_turismo/anular/{servicios}', 'servicios_turismoController@destroy')->name('servicios_turismo.destroy')->middleware('auth');
-Route::post('/servicio_turismo', 'servicios_turismoController@turi')->name('servicios_turismo.turi')->middleware('auth');
+Route::post('/servicio_turismo', 'servicios_turismoController@turismo')->name('servicios_turismo.turismo')->middleware('auth');
+Route::get('/turismo_realizado/{id}', 'servicios_turismoController@realizado')->name('turismo.realizado')->middleware('auth');
 
 Route::get('/tarifa','tarifaController@index')->name('tarifa.index')->middleware('auth');
 Route::post('/tarifa', 'tarifaController@store')->name('tarifa.store')->middleware('auth');
@@ -515,6 +534,7 @@ Route::get('/searcher/orden', 'searcherController@orden')->name('searcher.orden'
 Route::get('/searcher/huesped', 'searcherController@huesped')->name('searcher.huesped')->middleware('auth');
 Route::get('/searcher/huesped/{id}/{id1}', 'searcherController@huesped1')->name('searcher.huesped1')->middleware('auth');
 Route::get('/searcher/spa', 'searcherController@spa')->name('searcher.spa')->middleware('auth');
+Route::get('/searcher/lavanderia', 'searcherController@lavanderia')->name('searcher.lavanderia')->middleware('auth');
 Route::get('/searcher/habitacion', 'searcherController@habitacion')->name('searcher.habitacion')->middleware('auth');
 Route::get('/searcher/habitacion/{id}', 'searcherController@habitacion1')->name('searcher.habitacion1')->middleware('auth');
 Route::get('/searcher/producto', 'searcherController@producto')->name('searcher.producto')->middleware('auth');

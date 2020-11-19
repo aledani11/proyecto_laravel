@@ -18,15 +18,20 @@ class servicios_turismoController extends Controller
         //$estadia = estadia::all();
         //return view('estadia.index', ['estadias' => $estadia]);
         //estado i=inactivo a=activo
-        $servicios = DB::table('servicios')
+        $servicios = DB::table('s_turismo')
             ->select(
-                'servicios.*',
-                'nom.nombre as nombres'
+                's_turismo.*',
+                'pe.nombre',
+                'pe.apellido',
+                'cl.ruc'
             )
-           // ->where('servicios.estado', '=', 'A')
-            ->leftJoin('servicios_nombres as nom', 'servicios.nombre_id', '=', 'nom.id')
-            ->rightJoin('servicios_turismo as tu', 'servicios.id', '=', 'tu.servicios_id')
-            ->groupBy('servicios.id')
+            ->where('s_turismo.estado', '=', 'A')
+            ->leftJoin('estadia as es', 's_turismo.estadia_id', '=', 'es.id')
+            ->leftJoin('clientes as cl', 'es.clientes_id', '=', 'cl.id')
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('cl.persona_pais', '=', 'pe.pais_id');
+                $join->on('cl.persona_nro_documento', '=', 'pe.nro_documento');
+            })
             ->get();
 
         //  dd($nota_credito);
@@ -41,10 +46,10 @@ class servicios_turismoController extends Controller
      */
     public function create()
     {
-        $nombres = DB::table('servicios_nombres')->get();
+        $iva = DB::table('turismo')->get();
 
         return view('servicios_turismo.create', [
-            'nombres' => $nombres,
+            'traslado' => $iva,
         ]);
     }
 
@@ -56,54 +61,45 @@ class servicios_turismoController extends Controller
      */
     public function store(Request $request)
     {
-        // dump(request()->all());
-        //c=cobrado a=anulado
-        $id = DB::table('servicios')->insertGetId(
-            [
-                'nombre_id' => request()->nombre, 'descripcion' => request()->descripcion,
-                'fecha' => request()->fecha, 'usuario_id' => 1,
-                'realizado' => request()->realizado, 'total' => request()->total
-            ]
-        );
+//dd(request()->all());
+        try {
+            // dump(request()->all());
+            //c=cobrado a=anulado
+            $id = DB::table('s_turismo')->insertGetId(
+                [
+                    'estadia_id' => request()->estadia, 'descripcion' => request()->descripcion,
+                    'fecha' => request()->fecha, 'estado' => "A",
+                    'realizado' => request()->realizado,
+                ]
+            );
 
-        $input = $request->only([
-            'huesped_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["huesped_detalle"])) {
-            foreach ($input["huesped_detalle"] as $key => $value) {
+            $input = $request->only([
+                'turismo_detalle', 'fecha_detalle', 'cantidad_detalle', 'hora_detalle', 'habitacion_detalle', 'promocion_detalle', 'huespedes_detalle'
+            ]);
+            //dump($input);
+            //dump($input["habitacion"][1]);
+            if (isset($input["turismo_detalle"])) {
+                foreach ($input["turismo_detalle"] as $key => $value) {
 
-                $data[] = [
-                    'id_servicios' => $id,
-                    'huesped_id' => $input["huesped_detalle"][$key]
-                ];
+                    $data1[] = [
+                        's_turismo_id' => $id,
+                        'turismo_id' => $input["turismo_detalle"][$key],
+                        'hora' => $input["hora_detalle"][$key],
+                        'fecha' => $input["fecha_detalle"][$key],
+                        'cantidad' => $input["cantidad_detalle"][$key],
+                        'habitacion_id' => $input["habitacion_detalle"][$key],
+                        'huesped_id' => $input["huespedes_detalle"][$key],
+                        'promocion' => $input["promocion_detalle"][$key]
+                    ];
+                }
+
+
+                DB::table('turismo_detalle')->insert($data1);
             }
-
-
-            DB::table('servicios_detalle')->insert($data);
-        }
-
-        $input = $request->only([
-            'turismo_detalle', 'cantidad_detalle',
-            'fecha_detalle', 'hora_detalle'
-        ]);
-        //dump($input);
-        //dump($input["habitacion"][1]);
-        if (isset($input["turismo_detalle"])) {
-            foreach ($input["turismo_detalle"] as $key => $value) {
-
-                $data1[] = [
-                    'servicios_id' => $id,
-                    'turismo_id' => $input["turismo_detalle"][$key],
-                    'cantidad' => $input["cantidad_detalle"][$key],
-                    'fecha' => $input["fecha_detalle"][$key],
-                    'hora' => $input["hora_detalle"][$key]
-                ];
-            }
-
-
-            DB::table('servicios_turismo')->insert($data1);
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
         }
 
 
@@ -312,13 +308,37 @@ class servicios_turismoController extends Controller
     {
         //dump($id);
         //i=inactivo a=activo 
-        
+        try {
 
-            DB::table('servicios_detalle')->where('id_servicios', '=', $id)->delete();
-            DB::table('servicios_turismo')->where('servicios_id', '=', $id)->delete();
-            DB::table('servicios')->where('id', '=', $id)->delete();
+            DB::table('turismo_detalle')->where('s_turismo_id', '=', $id)->delete();
+            DB::table('s_turismo')->where('id', '=', $id)->delete();
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
 
-        
+        return redirect()->route('servicios_turismo.index');
+    }
+
+    public function realizado($id)
+    {
+        try {
+            //dump($id);
+            //i=inactivo a=activo 
+
+            DB::table('s_turismo')
+                ->where('id', '=', $id)->update(
+                    [
+                        'realizado' => "Si"
+                    ]
+                );
+        } catch (\Exception $e) {
+            // request()->session()->flash('error_', $e->getMessage());
+            request()->session()->flash('error_', 'Error en base de datos');
+            // return redirect()->route('personas.index');
+        }
+
         return redirect()->route('servicios_turismo.index');
     }
 
@@ -339,8 +359,8 @@ class servicios_turismoController extends Controller
     }
 
     public function huesped(Request $request)
-    {        
-            $huespedes = DB::table('huespedes')
+    {
+        $huespedes = DB::table('huespedes')
             ->select(
                 'huespedes.id',
                 'pe.nombre',
@@ -357,16 +377,60 @@ class servicios_turismoController extends Controller
         //return $request;
     }
 
-    public function turi(Request $request)
-    {        
-            $turismo = DB::table('turismo')
+    public function turismo(Request $request)
+    {
+        $productos = DB::table('turismo')
             ->select(
                 'turismo.*'
             )
-            ->where('id', '=', $request->id)
+            ->where('id', '=', $request->id[0])
             ->get();
 
-        return ['turismos' => $turismo];
+        $habitaciones = DB::table('habitaciones')
+            ->select(
+                'habitaciones.id',
+                'habitaciones.descripcion'
+            )
+            ->where('id', '=', $request->id[1])
+            ->get();
+
+        $huespedes = DB::table('huespedes')
+            ->select(
+                'huespedes.id',
+                'huespedes.estadia_id',
+                'pe.nombre',
+                'pe.apellido'
+            )
+            ->where('huespedes.id', '=', $request->id[2])
+            ->leftJoin('persona as pe', function ($join) {
+                $join->on('huespedes.persona_pais', '=', 'pe.pais_id');
+                $join->on('huespedes.persona_nro_documento', '=', 'pe.nro_documento');
+            })->get();
+
+        $tarifa_id = DB::table('estadia_tarifas')
+            ->select(
+                'ta.id'
+            )
+            ->where([
+                ['estadia_tarifas.estadia_id', '=', $huespedes[0]->estadia_id],
+                ['ta.habitacion_id', '=', $request->id[1]]
+            ])
+            ->leftJoin('tarifas as ta', 'estadia_tarifas.tarifa_id', '=', 'ta.id')
+            ->get();
+
+        $promocion = DB::table('promocion')
+            ->select(
+                'promocion.porcentaje'
+            )
+            ->where([
+                ['tarifas_id', '=', $tarifa_id[0]->id],
+                ['servicio', '=', "Turismo"]
+            ])->get();
+
+        return [
+            'turismo' => $productos, 'habitaciones' => $habitaciones,
+            'huespedes' => $huespedes, 'promocion' => $promocion
+        ];
         //return $request;
     }
 }

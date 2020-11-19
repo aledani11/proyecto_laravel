@@ -74,7 +74,7 @@ class servicios_trasladoController extends Controller
             );
 
             $input = $request->only([
-                'traslado_detalle', 'direccion_detalle','destino_detalle','hora_detalle', 'habitacion_detalle', 'promocion_detalle', 'huespedes_detalle'
+                'traslado_detalle', 'direccion_detalle', 'destino_detalle', 'hora_detalle', 'habitacion_detalle', 'promocion_detalle', 'huespedes_detalle'
             ]);
             //dump($input);
             //dump($input["habitacion"][1]);
@@ -85,7 +85,7 @@ class servicios_trasladoController extends Controller
                         's_traslado_id' => $id,
                         'traslado_id' => $input["traslado_detalle"][$key],
                         'hora' => $input["hora_detalle"][$key],
-                        'direccion' => $input["direccion_detalle"][$key],
+                        'direccion' => str_replace('_', ' ', $input["direccion_detalle"][$key]),
                         'destino' => $input["destino_detalle"][$key],
                         'habitacion_id' => $input["habitacion_detalle"][$key],
                         'huesped_id' => $input["huespedes_detalle"][$key],
@@ -397,6 +397,7 @@ class servicios_trasladoController extends Controller
         $huespedes = DB::table('huespedes')
             ->select(
                 'huespedes.id',
+                'huespedes.estadia_id',
                 'pe.nombre',
                 'pe.apellido'
             )
@@ -406,11 +407,15 @@ class servicios_trasladoController extends Controller
                 $join->on('huespedes.persona_nro_documento', '=', 'pe.nro_documento');
             })->get();
 
-        $tarifa_id = DB::table('tarifas')
+        $tarifa_id = DB::table('estadia_tarifas')
             ->select(
-                'tarifas.id'
+                'ta.id'
             )
-            ->where('habitacion_id', '=', $request->id[1])
+            ->where([
+                ['estadia_tarifas.estadia_id', '=', $huespedes[0]->estadia_id],
+                ['ta.habitacion_id', '=', $request->id[1]]
+            ])
+            ->leftJoin('tarifas as ta', 'estadia_tarifas.tarifa_id', '=', 'ta.id')
             ->get();
 
         $promocion = DB::table('promocion')

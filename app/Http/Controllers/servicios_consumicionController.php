@@ -398,6 +398,7 @@ class servicios_consumicionController extends Controller
         $huespedes = DB::table('huespedes')
             ->select(
                 'huespedes.id',
+                'huespedes.estadia_id',
                 'pe.nombre',
                 'pe.apellido'
             )
@@ -407,11 +408,15 @@ class servicios_consumicionController extends Controller
                 $join->on('huespedes.persona_nro_documento', '=', 'pe.nro_documento');
             })->get();
 
-        $tarifa_id = DB::table('tarifas')
+        $tarifa_id = DB::table('estadia_tarifas')
             ->select(
-                'tarifas.id'
+                'ta.id'
             )
-            ->where('habitacion_id', '=', $request->id[1])
+            ->where([
+                ['estadia_tarifas.estadia_id', '=', $huespedes[0]->estadia_id],
+                ['ta.habitacion_id', '=', $request->id[1]]
+            ])
+            ->leftJoin('tarifas as ta', 'estadia_tarifas.tarifa_id', '=', 'ta.id')
             ->get();
 
         $promocion = DB::table('promocion')

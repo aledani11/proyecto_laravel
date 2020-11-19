@@ -135,8 +135,9 @@
                         <li><a href="{{ route('estadia.index') }}" class="dropdown-item">Estadia</a></li>
                         <li><a href="{{ route('servicios_consumicion.index') }}" class="dropdown-item">Servicios Consumicion</a></li>
                         <li><a href="{{ route('servicios_traslado.index') }}" class="dropdown-item">Servicios Traslado</a></li>
-                        <li><a href="{{ route('servicios_spa.index') }}" class="dropdown-item">Servicios Spa Sauna</a></li>
+                        <li><a href="{{ route('servicios_spa_sauna.index') }}" class="dropdown-item">Servicios Spa Sauna</a></li>
                         <li><a href="{{ route('servicios_turismo.index') }}" class="dropdown-item">Servicios Turismo</a></li>
+                        <li><a href="{{ route('servicios_lavanderia.index') }}" class="dropdown-item">Servicios Lavanderia</a></li>
                     </ul>
                 </li>
                 @endif
@@ -149,7 +150,7 @@
                         <li><a href="{{ route('apertura.index') }}" class="dropdown-item">Apertura y Cierre</a></li>
                         <li><a href="{{ route('cobros.index') }}" class="dropdown-item">Cobros</a></li>
                         <li><a href="{{ route('arqueo.index') }}" class="dropdown-item">Arqueo</a></li>
-                        <li><a href="{{ route('nota_de_credito.index') }}" class="dropdown-item">Nota De Credito</a></li>
+                        <li><a href="{{ route('nota_de_credito.index') }}" class="dropdown-item">Nota de Credito</a></li>
                         <li><a href="{{ route('nota_de_debito.index') }}" class="dropdown-item">Nota de Debito</a></li>
                     </ul>
                 </li>
@@ -158,19 +159,28 @@
 
                     <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle">Informes</a>
                     <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" style="font-weight:bold;text-align:center">--Facturacion--</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Facturas.jsp" target="_blank" class="dropdown-item">Factura</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_libro_venta.jsp" target="_blank" class="dropdown-item">Libro ventas</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Apertura_Cierre.jsp" target="_blank" class="dropdown-item">Apertura y Cierre</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Cobros.jsp" target="_blank" class="dropdown-item">Cobros</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Arqueo.jsp" target="_blank" class="dropdown-item">Arqueo</a></li>
-                        <li><a href="http://localhost:8084/reportes/Listado_Estadia_2.jsp" target="_blank" class="dropdown-item">Estadia</a></li>
-                        <li><a href="http://localhost:8084/reportes/Listado_Inventarios.jsp" target="_blank" class="dropdown-item">Inventarios</a></li>
-                        <li><a href="http://localhost:8084/reportes/Listado_tarifas.jsp" target="_blank" class="dropdown-item">Tarifas</a></li>
-                        <li><a href="http://localhost:8084/reportes/Listado_Habitacion.jsp" target="_blank" class="dropdown-item">Habitaciones</a></li>
-                        <li><a href="http://localhost:8084/reportes/Listado_Consumicion.jsp" target="_blank" class="dropdown-item">Consumicion</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Cuentas_Cobrar.jsp" target="_blank" class="dropdown-item">Cuentas a Cobrar</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_recaudaciones.jsp" target="_blank" class="dropdown-item">Recaudaciones a depositar</a></li>
                         <li><a href="http://localhost:8084/reportes/Listado_Nota_Credito.jsp" target="_blank" class="dropdown-item">Nota Credito</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Nota_Debito.jsp" target="_blank" class="dropdown-item">Nota Debito</a></li>
+                        <li><a class="dropdown-item" style="font-weight:bold;text-align:center">--Servicios--</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Estadia_2.jsp" target="_blank" class="dropdown-item">Estadia</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Reserva.jsp" target="_blank" class="dropdown-item">Reserva</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Consumicion.jsp" target="_blank" class="dropdown-item">Consumicion</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Traslado.jsp" target="_blank" class="dropdown-item">Traslado</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Spa.jsp" target="_blank" class="dropdown-item">Spa/Sauna</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Turismo.jsp" target="_blank" class="dropdown-item">Turismo</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Lavanderia.jsp" target="_blank" class="dropdown-item">Lavanderia</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_tarifas.jsp" target="_blank" class="dropdown-item">Tarifas</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Habitacion.jsp" target="_blank" class="dropdown-item">Habitaciones</a></li>
+                        <li><a class="dropdown-item" style="font-weight:bold;text-align:center">--Compra--</a></li>
+                        <li><a href="http://localhost:8084/reportes/Listado_Inventarios.jsp" target="_blank" class="dropdown-item">Inventarios</a></li>
                     </ul>
                 </li>
                 <li class="nav-item"><a href="/ayuda.htm" target="_blank" class="nav-link">Ayuda</a></li>
